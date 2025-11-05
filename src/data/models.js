@@ -1,111 +1,103 @@
 // Полный список всех доступных моделей
 const MODELS = [
-    // Claude Models
-    { name: 'claude-sonnet-4.5', category: 'Claude' },
-    { name: 'claude-sonnet-4', category: 'Claude' },
-    { name: 'claude-3.7-sonnet', category: 'Claude' },
-    { name: 'claude-haiku-4.5', category: 'Claude' },
-    { name: 'claude-3.5-sonnet', category: 'Claude' },
-    { name: 'claude-3-opus', category: 'Claude' },
-    { name: 'claude-3-sonnet', category: 'Claude' },
-    { name: 'claude-3-haiku', category: 'Claude' },
+    // OpenAI
+    { name: 'gpt-5-chat', category: 'OpenAI', type: 'text' },
+    { name: 'gpt-5-nano', category: 'OpenAI', type: 'text' },
+    { name: 'gpt-5-mini', category: 'OpenAI', type: 'text' },
+    { name: 'gpt-4.1-mini', category: 'OpenAI', type: 'text' },
+    { name: 'gpt-4.1-nano', category: 'OpenAI', type: 'text' },
+    { name: 'gpt-4o-mini', category: 'OpenAI', type: 'multimodal' },
+    { name: 'gpt-3.5-turbo', category: 'OpenAI', type: 'text' },
+    { name: 'o1-pro', category: 'OpenAI', type: 'text' },
+    { name: 'o4-mini', category: 'OpenAI', type: 'text' },
+    { name: 'o3-mini', category: 'OpenAI', type: 'text' },
+    { name: 'gpt-oss-120b', category: 'OpenAI', type: 'text' },
+    { name: 'gpt-image-1', category: 'OpenAI', type: 'image' },
+    { name: 'dall-e-3', category: 'OpenAI', type: 'image' },
     
-    // Gemini Models
-    { name: 'gemini-2.5-pro', category: 'Gemini' },
-    { name: 'gemini-2.5-flash', category: 'Gemini' },
-    { name: 'gemini-2.0-flash-exp', category: 'Gemini' },
-    { name: 'gemini-exp-1206', category: 'Gemini' },
-    { name: 'gemini-1.5-pro', category: 'Gemini' },
-    { name: 'gemini-1.5-flash', category: 'Gemini' },
+    // Google
+    { name: 'gemini-2.5-pro', category: 'Google', type: 'multimodal' },
+    { name: 'gemini-2.5-flash', category: 'Google', type: 'multimodal' },
+    { name: 'gemini-2.5-flash-lite', category: 'Google', type: 'multimodal' },
+    { name: 'gemma-3n-e4b', category: 'Google', type: 'text' },
+    { name: 'nano-banana', category: 'Google', type: 'image' },
     
-    // GPT Models
-    { name: 'gpt-5-nano', category: 'GPT' },
-    { name: 'gpt-5-chat', category: 'GPT' },
-    { name: 'gpt-4.1-mini', category: 'GPT' },
-    { name: 'gpt-4o', category: 'GPT' },
-    { name: 'gpt-4o-mini', category: 'GPT' },
-    { name: 'gpt-4-turbo', category: 'GPT' },
-    { name: 'gpt-4', category: 'GPT' },
-    { name: 'gpt-3.5-turbo', category: 'GPT' },
+    // DeepSeek
+    { name: 'deepseek-v3.1', category: 'DeepSeek', type: 'text' },
+    { name: 'deepseek-v3.2', category: 'DeepSeek', type: 'text' },
+    { name: 'deepseek-v3', category: 'DeepSeek', type: 'text' },
+    { name: 'deepseek-chat', category: 'DeepSeek', type: 'text' },
+    { name: 'deepseek-reasoner', category: 'DeepSeek', type: 'text' },
+    { name: 'deepseek-r1', category: 'DeepSeek', type: 'text' },
+    { name: 'deepseek-r1-0528', category: 'DeepSeek', type: 'text' },
     
-    // DeepSeek Models
-    { name: 'deepseek-r1', category: 'DeepSeek' },
-    { name: 'deepseek-v3.2', category: 'DeepSeek' },
-    { name: 'deepseek-chat', category: 'DeepSeek' },
-    { name: 'deepseek-coder', category: 'DeepSeek' },
+    // Anthropic (Claude)
+    { name: 'claude-sonnet-4.5', category: 'Anthropic', type: 'text' },
+    { name: 'claude-sonnet-4', category: 'Anthropic', type: 'text' },
+    { name: 'claude-3-7-sonnet', category: 'Anthropic', type: 'text' },
+    { name: 'claude-haiku-4.5', category: 'Anthropic', type: 'text' },
     
-    // Grok Models
-    { name: 'grok-4', category: 'Grok' },
-    { name: 'grok-3', category: 'Grok' },
-    { name: 'grok-2', category: 'Grok' },
-    { name: 'grok-beta', category: 'Grok' },
+    // Qwen (Alibaba)
+    { name: 'qwen3-omni', category: 'Qwen', type: 'multimodal' },
+    { name: 'qwen3-coder', category: 'Qwen', type: 'text' },
+    { name: 'qwen3-coder-big', category: 'Qwen', type: 'text' },
+    { name: 'qwen2.5-coder-32b', category: 'Qwen', type: 'text' },
+    { name: 'qwen3-next', category: 'Qwen', type: 'text' },
+    { name: 'qwq-32b-fast', category: 'Qwen', type: 'text' },
     
-    // Llama Models
-    { name: 'llama-4-maverick', category: 'Llama' },
-    { name: 'llama-3.3-70b', category: 'Llama' },
-    { name: 'llama-3.1-405b', category: 'Llama' },
-    { name: 'llama-3.1-70b', category: 'Llama' },
-    { name: 'llama-3.1-8b', category: 'Llama' },
-    { name: 'llama-3-70b', category: 'Llama' },
-    { name: 'llama-3-8b', category: 'Llama' },
+    // Meta (Llama)
+    { name: 'llama-4-maverick', category: 'Meta', type: 'text' },
+    { name: 'llama-4-scout', category: 'Meta', type: 'text' },
+    { name: 'llama-3.3', category: 'Meta', type: 'text' },
     
-    // Mistral Models
-    { name: 'mistral-large', category: 'Mistral' },
-    { name: 'mistral-medium', category: 'Mistral' },
-    { name: 'mistral-small', category: 'Mistral' },
-    { name: 'mixtral-8x7b', category: 'Mistral' },
-    { name: 'mixtral-8x22b', category: 'Mistral' },
+    // xAI (Grok)
+    { name: 'grok-4', category: 'xAI', type: 'multimodal' },
+    { name: 'grok-4-think', category: 'xAI', type: 'multimodal' },
+    { name: 'grok-code-1', category: 'xAI', type: 'text' },
+    { name: 'grok-3-mini', category: 'xAI', type: 'text' },
     
-    // Qwen Models
-    { name: 'qwen-2.5-72b', category: 'Qwen' },
-    { name: 'qwen-2.5-coder-32b', category: 'Qwen' },
-    { name: 'qwen-2-72b', category: 'Qwen' },
-    { name: 'qwq-32b', category: 'Qwen' },
+    // Mistral AI
+    { name: 'mistral-medium-3', category: 'Mistral', type: 'text' },
+    { name: 'mistral-small-3.1-24b', category: 'Mistral', type: 'text' },
     
-    // Phi Models
-    { name: 'phi-4', category: 'Phi' },
-    { name: 'phi-3.5-mini', category: 'Phi' },
-    { name: 'phi-3-medium', category: 'Phi' },
+    // GLM (Zhipu AI)
+    { name: 'glm-4.6', category: 'GLM', type: 'multimodal' },
+    { name: 'glm-4.5', category: 'GLM', type: 'text' },
+    { name: 'glm-4.5-air', category: 'GLM', type: 'text' },
     
-    // Command Models
-    { name: 'command-r-plus', category: 'Command' },
-    { name: 'command-r', category: 'Command' },
+    // AWS
+    { name: 'nova-pro', category: 'AWS', type: 'text' },
+    { name: 'nova-lite', category: 'AWS', type: 'text' },
+    { name: 'nova-micro', category: 'AWS', type: 'text' },
     
-    // Nemotron Models
-    { name: 'nemotron-70b', category: 'Nemotron' },
+    // Moonshot AI
+    { name: 'kimi-k2', category: 'Moonshot', type: 'text' },
+    { name: 'kimi-k2-0905', category: 'Moonshot', type: 'text' },
     
-    // Sonar Models
-    { name: 'sonar-pro', category: 'Sonar' },
-    { name: 'sonar', category: 'Sonar' },
+    // Nous Research
+    { name: 'hermes-4-405b', category: 'Nous', type: 'text' },
+    { name: 'hermes-3-405b', category: 'Nous', type: 'text' },
     
-    // Hermes Models
-    { name: 'hermes-3-70b', category: 'Hermes' },
-    { name: 'hermes-3-405b', category: 'Hermes' },
+    // Stability AI
+    { name: 'sd-3.5-large', category: 'Stability', type: 'image' },
+    { name: 'sd-3.5', category: 'Stability', type: 'image' },
+    { name: 'sdxl', category: 'Stability', type: 'image' },
+    { name: 'cogvideox-flash', category: 'Stability', type: 'video' },
     
-    // WizardLM Models
-    { name: 'wizardlm-2-8x22b', category: 'WizardLM' },
+    // Flux
+    { name: 'flux-schnell', category: 'Flux', type: 'image' },
+    { name: 'seed-oss', category: 'Flux', type: 'text' },
     
-    // Yi Models
-    { name: 'yi-34b', category: 'Yi' },
-    { name: 'yi-lightning', category: 'Yi' },
-    
-    // Dolphin Models
-    { name: 'dolphin-mixtral-8x22b', category: 'Dolphin' },
-    
-    // Dbrx Models
-    { name: 'dbrx-instruct', category: 'Dbrx' },
-    
-    // Mythomax Models
-    { name: 'mythomax-l2-13b', category: 'Mythomax' },
-    
-    // Nous Models
-    { name: 'nous-hermes-2-mixtral-8x7b', category: 'Nous' },
-    
-    // Toppy Models
-    { name: 'toppy-m-7b', category: 'Toppy' },
-    
-    // OpenChat Models
-    { name: 'openchat-3.6-8b', category: 'OpenChat' }
+    // Другие
+    { name: 'command-a', category: 'Cohere', type: 'text' },
+    { name: 'ernie-4.5', category: 'Baidu', type: 'text' },
+    { name: 'nemotron-ultra-235b', category: 'NVIDIA', type: 'text' },
+    { name: 'sonar', category: 'Perplexity', type: 'text' },
+    { name: 'cliptagger-12b', category: 'Other', type: 'multimodal' },
+    { name: 'goliath-120b', category: 'Other', type: 'text' },
+    { name: 'lucid-origin', category: 'Other', type: 'text' },
+    { name: 'ring-1t', category: 'Other', type: 'text' },
+    { name: 'ling-1t', category: 'Other', type: 'text' }
 ];
 
 module.exports = MODELS;
