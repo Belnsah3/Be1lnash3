@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Чат - LumeAI</title>
     <link rel="stylesheet" href="/css/new-theme.css">
     <style>
@@ -194,6 +194,15 @@
 
         /* Адаптивность */
         @media (max-width: 768px) {
+            body {
+                overflow: hidden;
+            }
+            
+            .chat-container {
+                width: 100vw;
+                height: 100vh;
+            }
+            
             .sidebar {
                 position: fixed;
                 left: -300px;
@@ -211,27 +220,59 @@
                 display: block !important;
             }
             
+            .chat-header {
+                padding: 15px;
+            }
+            
             .chat-header h2 {
                 font-size: 18px;
+                margin: 0;
             }
             
             .model-selector {
                 font-size: 12px;
-                padding: 6px 12px;
+                padding: 6px 10px;
+                max-width: 150px;
             }
             
             .action-btn {
                 width: 40px;
                 height: 40px;
                 font-size: 16px;
+                min-width: 40px;
+            }
+            
+            .messages-container {
+                padding: 10px;
             }
             
             .message-content {
-                max-width: 85%;
+                max-width: 80%;
+                font-size: 14px;
+            }
+            
+            .input-container {
+                padding: 10px;
+            }
+            
+            .input-wrapper {
+                gap: 8px;
             }
             
             .input-field {
                 font-size: 16px; /* Предотвращает зум на iOS */
+                padding: 10px 12px;
+                min-height: 44px;
+            }
+            
+            .input-actions {
+                gap: 6px;
+                flex-shrink: 0;
+            }
+            
+            #file-preview {
+                padding: 8px;
+                margin-bottom: 8px;
             }
         }
         
