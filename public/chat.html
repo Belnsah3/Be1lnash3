@@ -228,7 +228,8 @@
         <div class="chat-main">
             <div class="chat-header">
                 <h2>Чат с AI</h2>
-                <select class="model-selector" id="model-selector">
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <select class="model-selector" id="model-selector">
                     <option value="deepseek-v3.1">DeepSeek V3.1</option>
                     <option value="command-a">Command A</option>
                     <option value="seed-oss">Seed OSS</option>
@@ -299,6 +300,10 @@
                     <option value="gemma-3n-e4b">Gemma 3N E4B</option>
                     <option value="nemotron-ultra-235b">Nemotron Ultra 235B</option>
                 </select>
+                <button class="action-btn" onclick="openSettings()" title="Настройки">
+                    ⚙️
+                </button>
+                </div>
             </div>
 
             <div class="messages-container" id="messages">
@@ -346,6 +351,35 @@
 
     </div>
 
+    <!-- Модальное окно настроек -->
+    <div id="settings-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; align-items: center; justify-content: center;">
+        <div style="background: var(--bg-secondary); border-radius: 20px; padding: 30px; max-width: 500px; width: 90%;">
+            <h2 style="margin-bottom: 20px;">⚙️ Настройки</h2>
+            
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; margin-bottom: 8px; color: var(--text-secondary);">API Ключ</label>
+                <input 
+                    type="text" 
+                    id="api-key-input" 
+                    placeholder="Вставьте ваш API ключ из Dashboard"
+                    style="width: 100%; padding: 12px; background: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: 10px; color: var(--text-primary); font-family: monospace;"
+                >
+                <p style="font-size: 12px; color: var(--text-tertiary); margin-top: 8px;">
+                    Получите API ключ в <a href="/dashboard" style="color: var(--accent-blue);">Dashboard</a>
+                </p>
+            </div>
+            
+            <div style="display: flex; gap: 10px;">
+                <button onclick="saveSettings()" class="btn btn-primary" style="flex: 1;">
+                    Сохранить
+                </button>
+                <button onclick="closeSettings()" class="btn btn-secondary" style="flex: 1;">
+                    Отмена
+                </button>
+            </div>
+        </div>
+    </div>
+
     <input type="file" id="file-input" style="display: none;" onchange="handleFileSelect(event)">
 
     <script>
@@ -354,6 +388,43 @@
         
         // Прикрепленный файл
         let attachedFile = null;
+        
+        // API ключ
+        let apiKey = localStorage.getItem('lumeai_api_key') || '';
+        
+        // Проверка API ключа при загрузке
+        window.addEventListener('DOMContentLoaded', () => {
+            if (!apiKey) {
+                setTimeout(() => {
+                    openSettings();
+                    alert('Пожалуйста, введите ваш API ключ из Dashboard для использования чата');
+                }, 500);
+            }
+        });
+        
+        // Открыть настройки
+        function openSettings() {
+            document.getElementById('settings-modal').style.display = 'flex';
+            document.getElementById('api-key-input').value = apiKey;
+        }
+        
+        // Закрыть настройки
+        function closeSettings() {
+            document.getElementById('settings-modal').style.display = 'none';
+        }
+        
+        // Сохранить настройки
+        function saveSettings() {
+            const newKey = document.getElementById('api-key-input').value.trim();
+            if (newKey) {
+                apiKey = newKey;
+                localStorage.setItem('lumeai_api_key', apiKey);
+                closeSettings();
+                addMessage('✅ API ключ сохранен!', 'assistant');
+            } else {
+                alert('Введите API ключ');
+            }
+        }
 
         // Отправка сообщения
         async function sendMessage() {
@@ -388,11 +459,17 @@
             try {
                 const model = document.getElementById('model-selector').value;
                 
-                // Получить API ключ из сессии или использовать тестовый
+                // Проверка API ключа
+                if (!apiKey) {
+                    throw new Error('API ключ не установлен. Откройте настройки (⚙️)');
+                }
+                
+                // Отправка запроса с API ключом
                 const response = await fetch('/api/v1/ai/chat/completions', {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${apiKey}`
                     },
                     body: JSON.stringify({
                         model: model,
