@@ -97,7 +97,7 @@ git push -u origin main
 git add .
 git commit -m "Update"
 git push
-ssh YOUR_USERNAME@YOUR_SERVER_IP
+ssh root@147.45.48.64
 cd ~/rest-api
 git pull
 npm install

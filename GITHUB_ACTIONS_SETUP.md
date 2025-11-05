@@ -12,8 +12,8 @@
 ### **Шаг 1: Создай SSH ключ на сервере**
 
 ```bash
-ssh YOUR_USERNAME@YOUR_SERVER_IP
-# Введи пароль
+ssh root@147.45.48.64
+# Введи пароль: 24162006gorA!
 
 # Создай SSH ключ для GitHub Actions
 ssh-keygen -t ed25519 -C "github-actions" -f ~/.ssh/github_actions -N ""
@@ -42,11 +42,11 @@ cat ~/.ssh/github_actions
 
 #### **Секрет 1: SERVER_HOST**
 - Name: `SERVER_HOST`
-- Value: `YOUR_SERVER_IP`
+- Value: `147.45.48.64`
 
 #### **Секрет 2: SERVER_USER**
 - Name: `SERVER_USER`
-- Value: `YOUR_USERNAME`
+- Value: `root`
 
 #### **Секрет 3: SERVER_SSH_KEY**
 - Name: `SERVER_SSH_KEY`
@@ -77,7 +77,7 @@ GitHub Actions будет автоматически деплоить при к�
 
 ```bash
 # На сервере
-ssh YOUR_USERNAME@YOUR_SERVER_IP
+ssh root@147.45.48.64
 
 # Создай ключ
 ssh-keygen -t ed25519 -C "github-actions" -f ~/.ssh/github_actions -N ""

@@ -34,7 +34,7 @@ cd d:\bukkit\rest-api
 
 # Настрой имя и email
 git config --global user.name "Belnash3"
-git config --global user.email "your-email@example.com"
+git config --global user.email "sahsaxboxvanx@gmail.com"
 
 # Проверь настройки
 git config --list
@@ -168,7 +168,7 @@ git log --oneline
 **На сервере один раз настрой:**
 
 ```bash
-ssh YOUR_USERNAME@YOUR_SERVER_IP
+ssh root@147.45.48.64
 
 # Перейди в папку проекта
 cd ~/rest-api
@@ -184,7 +184,7 @@ git remote add origin https://github.com/Belnash3/LumeAI.git
 **Каждый раз для обновления:**
 
 ```bash
-ssh YOUR_USERNAME@YOUR_SERVER_IP
+ssh root@147.45.48.64
 cd ~/rest-api
 git pull
 ./restart.sh app
@@ -292,7 +292,7 @@ git commit -m "Add new feature"
 git push
 
 # 5. Обнови на сервере
-ssh YOUR_USERNAME@YOUR_SERVER_IP "cd ~/rest-api && git pull && ./restart.sh app"
+ssh root@147.45.48.64 "cd ~/rest-api && git pull && ./restart.sh app"
 ```
 
 ### **Или используй скрипт deploy.ps1:**
@@ -340,7 +340,7 @@ const apiKey = process.env.GPT4FREE_API_KEY;
 
 ```bash
 # Настрой SSH ключ
-ssh-keygen -t ed25519 -C "your-email@example.com"
+ssh-keygen -t ed25519 -C "sahsaxboxvanx@gmail.com"
 
 # Добавь ключ на GitHub
 cat ~/.ssh/id_ed25519.pub

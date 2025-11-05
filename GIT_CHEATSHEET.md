@@ -85,13 +85,13 @@ git branch -d feature-name
 
 ```bash
 # Обновить код на сервере
-ssh YOUR_USERNAME@YOUR_SERVER_IP "cd ~/rest-api && git pull && ./restart.sh app"
+ssh root@147.45.48.64 "cd ~/rest-api && git pull && ./restart.sh app"
 
 # Посмотреть логи на сервере
-ssh YOUR_USERNAME@YOUR_SERVER_IP "pm2 logs lumeai --lines 50"
+ssh root@147.45.48.64 "pm2 logs lumeai --lines 50"
 
 # Проверить статус на сервере
-ssh YOUR_USERNAME@YOUR_SERVER_IP "cd ~/rest-api && git status"
+ssh root@147.45.48.64 "cd ~/rest-api && git status"
 ```
 
 ---
@@ -127,7 +127,7 @@ git config --list
 git config --global user.name "Belnash3"
 
 # Изменить email
-git config --global user.email "your-email@example.com"
+git config --global user.email "sahsaxboxvanx@gmail.com"
 
 # Посмотреть remote
 git remote -v
@@ -326,7 +326,7 @@ git status                            # Проверить изменения
 git add .                             # Добавить файлы
 git commit -m "Описание"              # Создать коммит
 git push                              # Загрузить на GitHub
-ssh YOUR_USERNAME@YOUR_SERVER_IP "cd ~/rest-api && git pull && ./restart.sh app"  # Обновить сервер
+ssh root@147.45.48.64 "cd ~/rest-api && git pull && ./restart.sh app"  # Обновить сервер
 ```
 
 ---

@@ -10,7 +10,7 @@ winget install Git.Git
 ### **2. Настрой Git:**
 ```bash
 git config --global user.name "Belnash3"
-git config --global user.email "your-email@example.com"
+git config --global user.email "sahsaxboxvanx@gmail.com"
 ```
 
 ### **3. Создай репозиторий на GitHub:**
@@ -78,7 +78,7 @@ git push
 
 ### **Вручную:**
 ```bash
-ssh YOUR_USERNAME@YOUR_SERVER_IP
+ssh root@147.45.48.64
 cd ~/rest-api
 git pull
 ./restart.sh app
@@ -86,7 +86,7 @@ git pull
 
 ### **Одной командой:**
 ```bash
-ssh YOUR_USERNAME@YOUR_SERVER_IP "cd ~/rest-api && git pull && ./restart.sh app"
+ssh root@147.45.48.64 "cd ~/rest-api && git pull && ./restart.sh app"
 ```
 
 ---
@@ -138,7 +138,7 @@ git pull
 
 ### **1. Создай SSH ключ:**
 ```bash
-ssh-keygen -t ed25519 -C "your-email@example.com"
+ssh-keygen -t ed25519 -C "sahsaxboxvanx@gmail.com"
 # Нажми Enter 3 раза (без пароля)
 ```
 
