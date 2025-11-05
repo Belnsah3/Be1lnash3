@@ -389,7 +389,7 @@
                 const model = document.getElementById('model-selector').value;
                 
                 // Получить API ключ из сессии или использовать тестовый
-                const response = await fetch('/api/v1/chat/completions', {
+                const response = await fetch('/api/v1/ai/chat/completions', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
