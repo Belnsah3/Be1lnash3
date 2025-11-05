@@ -97,11 +97,11 @@ app.get('/', (req, res) => {
   if (req.session && req.session.userId) {
     res.redirect('/dashboard');
   } else {
-    res.redirect('/login-new');
+    res.redirect('/login');
   }
 });
 
-// Login page (old)
+// Login page
 app.get('/login', (req, res) => {
   if (req.session && req.session.userId) {
     res.redirect('/dashboard');
@@ -110,21 +110,12 @@ app.get('/login', (req, res) => {
   }
 });
 
-// New login page
-app.get('/login-new', (req, res) => {
+// Registration page
+app.get('/register', (req, res) => {
   if (req.session && req.session.userId) {
     res.redirect('/dashboard');
   } else {
-    res.sendFile(path.join(__dirname, '../public/login-new.html'));
-  }
-});
-
-// New registration page
-app.get('/register-new', (req, res) => {
-  if (req.session && req.session.userId) {
-    res.redirect('/dashboard');
-  } else {
-    res.sendFile(path.join(__dirname, '../public/register-new.html'));
+    res.sendFile(path.join(__dirname, '../public/register.html'));
   }
 });
 
@@ -133,7 +124,7 @@ app.get('/dashboard', (req, res) => {
   if (req.session && req.session.userId) {
     res.sendFile(path.join(__dirname, '../public/dashboard.html'));
   } else {
-    res.redirect('/login-new');
+    res.redirect('/login');
   }
 });
 

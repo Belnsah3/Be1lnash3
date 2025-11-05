@@ -210,7 +210,7 @@ async function submitRegistration() {
         if (data.success) {
             showSuccess('✅ Регистрация успешна! Перенаправление...');
             setTimeout(() => {
-                window.location.href = '/login-new';
+                window.location.href = '/login';
             }, 1500);
         } else {
             showError(data.error || 'Ошибка регистрации');

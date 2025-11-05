@@ -3,455 +3,100 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Вход - LumeAI</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: linear-gradient(135deg, #2a2a3e 0%, #1a1a2e 100%);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-
-        .container {
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            max-width: 450px;
-            width: 100%;
-            padding: 50px 40px;
-            animation: slideUp 0.5s ease;
-        }
-
-        @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .logo {
-            text-align: center;
-            margin-bottom: 40px;
-        }
-
-        .logo h1 {
-            font-size: 32px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: 10px;
-        }
-
-        .logo p {
-            color: #666;
-            font-size: 14px;
-        }
-
-        .tabs {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 30px;
-            background: #f5f5f5;
-            border-radius: 10px;
-            padding: 5px;
-        }
-
-        .tab {
-            flex: 1;
-            padding: 12px;
-            border: none;
-            background: transparent;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 15px;
-            font-weight: 500;
-            color: #666;
-            transition: all 0.3s;
-        }
-
-        .tab.active {
-            background: white;
-            color: #667eea;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 8px;
-            color: #333;
-            font-weight: 500;
-            font-size: 14px;
-        }
-
-        input {
-            width: 100%;
-            padding: 14px 16px;
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
-            font-size: 15px;
-            transition: all 0.3s;
-            font-family: inherit;
-        }
-
-        input:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-
-        .btn {
-            width: 100%;
-            padding: 16px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            margin-top: 10px;
-        }
-
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
-        }
-
-        .btn:active {
-            transform: translateY(0);
-        }
-
-        .btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .alert {
-            padding: 12px 16px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            font-size: 14px;
-            display: none;
-        }
-
-        .alert.error {
-            background: #fee;
-            color: #c33;
-            border: 1px solid #fcc;
-        }
-
-        .alert.success {
-            background: #efe;
-            color: #3c3;
-            border: 1px solid #cfc;
-        }
-
-        .form-content {
-            display: none;
-        }
-
-        .form-content.active {
-            display: block;
-            animation: fadeIn 0.3s;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        .footer {
-            text-align: center;
-            margin-top: 30px;
-            color: #999;
-            font-size: 13px;
-        }
-
-        .footer a {
-            color: #667eea;
-            text-decoration: none;
-        }
-
-        .loader {
-            display: inline-block;
-            width: 16px;
-            height: 16px;
-            border: 2px solid #fff;
-            border-radius: 50%;
-            border-top-color: transparent;
-            animation: spin 0.8s linear infinite;
-            margin-right: 8px;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        /* 📱 МОБИЛЬНАЯ АДАПТАЦИЯ */
-        @media(max-width: 768px) {
-            body {
-                padding: 10px;
-            }
-
-            .container {
-                padding: 30px 25px;
-                border-radius: 15px;
-            }
-
-            .logo h1 {
-                font-size: 28px;
-            }
-
-            .logo p {
-                font-size: 13px;
-            }
-
-            .tabs {
-                gap: 5px;
-                padding: 4px;
-            }
-
-            .tab {
-                padding: 10px;
-                font-size: 14px;
-            }
-
-            .form-group label {
-                font-size: 13px;
-            }
-
-            .form-group input {
-                padding: 12px 14px;
-                font-size: 15px;
-            }
-
-            .btn {
-                padding: 14px;
-                font-size: 15px;
-            }
-
-            .footer {
-                font-size: 12px;
-            }
-        }
-
-        @media(max-width: 480px) {
-            .container {
-                padding: 25px 20px;
-            }
-
-            .logo {
-                margin-bottom: 30px;
-            }
-
-            .logo h1 {
-                font-size: 24px;
-            }
-
-            .tabs {
-                margin-bottom: 25px;
-            }
-        }
-
-        /* Улучшение для iOS Safari */
-        @supports (-webkit-touch-callout: none) {
-            .form-group input {
-                font-size: 16px; /* Предотвращает зум на iOS */
-            }
-        }
-    </style>
+    <title>Добро пожаловать - LumeAI</title>
+    <link rel="stylesheet" href="/css/new-theme.css">
 </head>
-<body>
-    <div class="container">
-        <div class="logo">
-            <h1>✨ LumeAI</h1>
-            <p>Доступ к мощным AI моделям через ваши API ключи</p>
-        </div>
-
-        <div class="tabs">
-            <button class="tab active" onclick="switchTab('login')">Вход</button>
-            <button class="tab" onclick="switchTab('register')">Регистрация</button>
-        </div>
-
-        <div id="alert" class="alert"></div>
-
-        <!-- Login Form -->
-        <div id="login-form" class="form-content active">
-            <form onsubmit="handleLogin(event)">
-                <div class="form-group">
-                    <label for="login-email">Email или Username</label>
-                    <input type="text" id="login-email" required placeholder="your@email.com или username">
+<body class="gradient-bg">
+    <div class="container" style="max-width: 550px; min-height: 100vh; display: flex; align-items: center; justify-content: center;">
+        
+        <div style="width: 100%;">
+            
+            <!-- Логотип -->
+            <div class="text-center mb-3">
+                <div style="width: 80px; height: 80px; margin: 0 auto 20px; background: var(--gradient-primary); border-radius: 20px; display: flex; align-items: center; justify-content: center; font-size: 40px; box-shadow: var(--shadow-glow);">
+                    💬
                 </div>
+                <h1 style="font-size: 36px; margin-bottom: 10px;">Добро пожаловать</h1>
+                <p class="text-muted">Войдите в свой аккаунт</p>
+            </div>
 
-                <div class="form-group">
-                    <label for="login-password">Пароль</label>
-                    <input type="password" id="login-password" required placeholder="••••••••">
-                </div>
+            <!-- Карточка с формой -->
+            <div class="card">
+                
+                <!-- Алерт -->
+                <div id="alert" class="alert alert-error hidden"></div>
 
-                <div class="form-group" id="twofa-group" style="display: none;">
-                    <label for="login-2fa">2FA Код</label>
-                    <input type="text" id="login-2fa" placeholder="123456" maxlength="6" pattern="[0-9]{6}">
-                </div>
+                <h2 class="mb-3">Адрес электронной почты</h2>
 
-                <button type="submit" class="btn" id="login-btn">
-                    Войти
+                <form onsubmit="handleLogin(event)">
+                    
+                    <!-- Email -->
+                    <div class="input-group">
+                        <div class="input-wrapper">
+                            <span class="icon">📧</span>
+                            <input type="text" id="login" placeholder="your@email.com" required autofocus>
+                        </div>
+                    </div>
+
+                    <!-- Пароль -->
+                    <div class="input-group">
+                        <label for="password" style="margin-bottom: 8px;">Пароль</label>
+                        <div class="input-wrapper">
+                            <span class="icon">🔒</span>
+                            <input type="password" id="password" placeholder="Введите пароль" required>
+                            <button type="button" onclick="togglePassword()" style="position: absolute; right: 16px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--text-tertiary); cursor: pointer; font-size: 18px;">
+                                👁️
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Запомнить меня и забыли пароль -->
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                        <div class="checkbox-wrapper" style="margin: 0;">
+                            <input type="checkbox" id="remember">
+                            <label for="remember">Запомнить меня</label>
+                        </div>
+                        <a href="/forgot-password" style="font-size: 14px;">Забыли пароль?</a>
+                    </div>
+
+                    <!-- 2FA поле (скрыто по умолчанию) -->
+                    <div class="input-group hidden" id="twofa-group">
+                        <label for="twofa">2FA Код</label>
+                        <div class="input-wrapper">
+                            <span class="icon">🔐</span>
+                            <input type="text" id="twofa" placeholder="123456" maxlength="6" pattern="[0-9]{6}">
+                        </div>
+                    </div>
+
+                    <!-- Кнопка входа -->
+                    <button type="submit" class="btn btn-primary" id="login-btn" style="width: 100%; font-size: 16px;">
+                        <span id="btn-text">Войти</span>
+                        <span id="btn-loader" class="loader hidden"></span>
+                        <span style="margin-left: auto;">→</span>
+                    </button>
+
+                </form>
+
+            </div>
+
+            <!-- Регистрация -->
+            <div class="text-center mt-3">
+                <p class="text-muted">
+                    Нет аккаунта? <a href="/register" style="font-weight: 600;">Зарегистрироваться</a>
+                </p>
+            </div>
+
+            <!-- Переключатель темы -->
+            <div class="text-center mt-2">
+                <button onclick="toggleTheme()" style="background: none; border: none; color: var(--text-tertiary); cursor: pointer; font-size: 24px; padding: 10px;">
+                    ☀️
                 </button>
-            </form>
-        </div>
+            </div>
 
-        <!-- Register Form -->
-        <div id="register-form" class="form-content">
-            <form onsubmit="handleRegister(event)">
-                <div class="form-group">
-                    <label for="register-name">Name</label>
-                    <input type="text" id="register-name" required placeholder="John Doe">
-                </div>
-
-                <div class="form-group">
-                    <label for="register-email">Email</label>
-                    <input type="email" id="register-email" required placeholder="your@email.com">
-                </div>
-
-                <div class="form-group">
-                    <label for="register-password">Password</label>
-                    <input type="password" id="register-password" required placeholder="••••••••" minlength="6">
-                </div>
-
-                <button type="submit" class="btn" id="register-btn">
-                    Create Account
-                </button>
-            </form>
         </div>
 
     </div>
 
-    <script>
-        function switchTab(tab) {
-            // Update tabs
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            event.target.classList.add('active');
-
-            // Update forms
-            document.querySelectorAll('.form-content').forEach(f => f.classList.remove('active'));
-            document.getElementById(`${tab}-form`).classList.add('active');
-
-            // Clear alert
-            hideAlert();
-        }
-
-        function showAlert(message, type = 'error') {
-            const alert = document.getElementById('alert');
-            alert.textContent = message;
-            alert.className = `alert ${type}`;
-            alert.style.display = 'block';
-        }
-
-        function hideAlert() {
-            document.getElementById('alert').style.display = 'none';
-        }
-
-        async function handleLogin(e) {
-            e.preventDefault();
-            hideAlert();
-
-            const btn = document.getElementById('login-btn');
-            const originalText = btn.innerHTML;
-            btn.disabled = true;
-            btn.innerHTML = '<span class="loader"></span>Вход...';
-
-            try {
-                const requestBody = {
-                    login: document.getElementById('login-email').value,
-                    password: document.getElementById('login-password').value
-                };
-
-                const twoFAInput = document.getElementById('login-2fa');
-                if (twoFAInput.value) {
-                    requestBody.twoFAToken = twoFAInput.value;
-                }
-
-                const response = await fetch('/api/v1/auth/login', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(requestBody)
-                });
-
-                const data = await response.json();
-
-                if (data.success) {
-                    showAlert('Вход выполнен! Перенаправление...', 'success');
-                    setTimeout(() => window.location.href = '/dashboard', 1000);
-                } else if (data.requires2FA) {
-                    // Показываем поле для 2FA
-                    document.getElementById('twofa-group').style.display = 'block';
-                    document.getElementById('login-2fa').focus();
-                    showAlert('Введите 2FA код из приложения', 'error');
-                } else {
-                    showAlert(data.error || 'Ошибка входа');
-                }
-            } catch (error) {
-                showAlert('Ошибка сети. Попробуйте снова.');
-            } finally {
-                btn.disabled = false;
-                btn.innerHTML = originalText;
-            }
-        }
-
-        async function handleRegister(e) {
-            e.preventDefault();
-            hideAlert();
-
-            const btn = document.getElementById('register-btn');
-            const originalText = btn.innerHTML;
-            btn.disabled = true;
-            btn.innerHTML = '<span class="loader"></span>Creating account...';
-
-            try {
-                const response = await fetch('/api/v1/auth/register', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        name: document.getElementById('register-name').value,
-                        email: document.getElementById('register-email').value,
-                        password: document.getElementById('register-password').value
-                    })
-                });
-
-                const data = await response.json();
-
-                if (data.success) {
-                    showAlert('Account created! Redirecting...', 'success');
-                    setTimeout(() => window.location.href = '/dashboard', 1000);
-                } else {
-                    showAlert(data.error || 'Registration failed');
-                }
-            } catch (error) {
-                showAlert('Network error. Please try again.');
-            } finally {
-                btn.disabled = false;
-                btn.innerHTML = originalText;
-            }
-        }
-    </script>
+    <script src="/js/login.js"></script>
 </body>
 </html>
