@@ -405,16 +405,9 @@ table tr:last-child td {
         <!-- Sidebar -->
         <aside class="sidebar">
             <div class="sidebar-title">Содержание</div>
-            <nav>
+            <nav id="sidebar-nav">
                 <ul>
-                    <li><a href="#intro" class="active">Введение</a></li>
-                    <li><a href="#what-is">Что такое Function Calling?</a></li>
-                    <li><a href="#how-works">Как это работает?</a></li>
-                    <li><a href="#file-tools">File Tools</a></li>
-                    <li><a href="#upload">Загрузка файлов</a></li>
-                    <li><a href="#examples">Примеры использования</a></li>
-                    <li><a href="#models">Поддерживаемые модели</a></li>
-                    <li><a href="#best-practices">Best Practices</a></li>
+                    <li><div style="color:#999;padding:10px 12px;font-size:13px;">Загрузка...</div></li>
                 </ul>
             </nav>
         </aside>
@@ -431,6 +424,17 @@ table tr:last-child td {
 
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 <script>
+// Функция для создания ID из текста
+function createId(text) {
+    // Убираем эмодзи и специальные символы
+    return text
+        .replace(/[^\w\s-]/g, '')
+        .trim()
+        .toLowerCase()
+        .replace(/\s+/g, '-')
+        .replace(/-+/g, '-');
+}
+
 // Загрузка и отображение markdown документации
 async function loadDocumentation() {
     try {
@@ -442,6 +446,9 @@ async function loadDocumentation() {
         
         // Отображаем
         document.getElementById('docs-content').innerHTML = html;
+        
+        // Добавляем ID к заголовкам и генерируем навигацию
+        generateNavigation();
         
         // Добавляем кнопки копирования для code blocks
         addCopyButtons();
@@ -459,6 +466,33 @@ async function loadDocumentation() {
             </div>
         `;
     }
+}
+
+// Генерация навигации из заголовков
+function generateNavigation() {
+    const content = document.getElementById('docs-content');
+    const headings = content.querySelectorAll('h2');
+    const sidebarNav = document.getElementById('sidebar-nav');
+    
+    if (headings.length === 0) {
+        sidebarNav.innerHTML = '<ul><li><div style="color:#999;padding:10px;">Нет заголовков</div></li></ul>';
+        return;
+    }
+    
+    let navHtml = '<ul>';
+    
+    headings.forEach((heading, index) => {
+        // Создаем ID для заголовка
+        const id = createId(heading.textContent);
+        heading.id = id;
+        
+        // Добавляем ссылку в навигацию
+        const isActive = index === 0 ? 'active' : '';
+        navHtml += `<li><a href="#${id}" class="${isActive}">${heading.textContent}</a></li>`;
+    });
+    
+    navHtml += '</ul>';
+    sidebarNav.innerHTML = navHtml;
 }
 
 // Добавление кнопок копирования
@@ -488,45 +522,76 @@ function addCopyButtons() {
 
 // Навигация по якорям
 function setupAnchorNavigation() {
-    const links = document.querySelectorAll('.sidebar a');
+    // Делегирование событий для динамически созданных ссылок
+    const sidebarNav = document.getElementById('sidebar-nav');
     
-    links.forEach(link => {
-        link.addEventListener('click', (e) => {
-            e.preventDefault();
-            
-            // Убираем active у всех
-            links.forEach(l => l.classList.remove('active'));
-            
-            // Добавляем active текущему
-            link.classList.add('active');
-            
-            // Скроллим к секции
-            const target = document.querySelector(link.getAttribute('href'));
-            if (target) {
-                target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }
-        });
+    sidebarNav.addEventListener('click', (e) => {
+        const link = e.target.closest('a');
+        if (!link) return;
+        
+        e.preventDefault();
+        
+        // Убираем active у всех
+        sidebarNav.querySelectorAll('a').forEach(l => l.classList.remove('active'));
+        
+        // Добавляем active текущему
+        link.classList.add('active');
+        
+        // Скроллим к секции с отступом для header
+        const targetId = link.getAttribute('href').substring(1);
+        const target = document.getElementById(targetId);
+        
+        if (target) {
+            const headerOffset = 100; // Отступ для sticky header
+            const elementPosition = target.getBoundingClientRect().top;
+            const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+
+            window.scrollTo({
+                top: offsetPosition,
+                behavior: 'smooth'
+            });
+        }
     });
     
     // Автоматическое обновление active link при скролле
+    let ticking = false;
+    
     window.addEventListener('scroll', () => {
-        const sections = document.querySelectorAll('h2[id]');
-        let current = '';
-        
-        sections.forEach(section => {
-            const sectionTop = section.offsetTop;
-            if (window.pageYOffset >= sectionTop - 100) {
-                current = section.getAttribute('id');
-            }
-        });
-        
-        links.forEach(link => {
+        if (!ticking) {
+            window.requestAnimationFrame(() => {
+                updateActiveLink();
+                ticking = false;
+            });
+            ticking = true;
+        }
+    });
+}
+
+// Обновление активной ссылки при скролле
+function updateActiveLink() {
+    const sections = document.querySelectorAll('h2[id]');
+    const sidebarNav = document.getElementById('sidebar-nav');
+    
+    if (!sections.length) return;
+    
+    let current = '';
+    const scrollPosition = window.pageYOffset + 150; // Отступ для определения текущей секции
+    
+    sections.forEach(section => {
+        const sectionTop = section.offsetTop;
+        if (scrollPosition >= sectionTop) {
+            current = section.getAttribute('id');
+        }
+    });
+    
+    if (current) {
+        sidebarNav.querySelectorAll('a').forEach(link => {
             link.classList.remove('active');
             if (link.getAttribute('href') === `#${current}`) {
                 link.classList.add('active');
             }
         });
-    });
+    }
 }
 
 // Загружаем при загрузке страницы
