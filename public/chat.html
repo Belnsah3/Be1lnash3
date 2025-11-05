@@ -61,20 +61,25 @@
         }
 
         .chat-item {
-            padding: 12px;
-            margin-bottom: 8px;
-            background: var(--bg-tertiary);
-            border-radius: 10px;
+            padding: 15px;
             cursor: pointer;
-            transition: all 0.3s;
+            border-radius: 10px;
+            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
         .chat-item:hover {
-            background: var(--bg-primary);
+            background: var(--bg-tertiary);
+        }
+        
+        .chat-item:hover .chat-actions {
+            opacity: 1 !important;
         }
 
         .chat-item.active {
-            background: var(--accent-blue);
+            background: var(--bg-tertiary);
         }
 
         /* Центральная область */
@@ -498,6 +503,18 @@
         let currentChatId = null;
         let chats = [];
         
+        // Модели генерации изображений
+        const imageGenerationModels = [
+            'dall-e-3',
+            'sd-3.5',
+            'sd-3.5-large',
+            'flux-schnell',
+            'flux-pro',
+            'midjourney',
+            'stable-diffusion',
+            'imagen-3'
+        ];
+        
         // Проверка API ключа и загрузка чатов при загрузке
         window.addEventListener('DOMContentLoaded', async () => {
             if (!apiKey) {
@@ -647,16 +664,38 @@
                 
                 const data = await response.json();
                 
-                if (data.choices && data.choices[0] && data.choices[0].message) {
-                    const aiMessage = data.choices[0].message.content;
-                    messageHistory.push({ role: 'assistant', content: aiMessage });
-                    addMessage(aiMessage, 'assistant');
-                    
-                    // Сохранить ответ в БД
-                    await saveMessage('assistant', aiMessage);
+                // Проверяем тип ответа
+                let aiMessage = '';
+                
+                // Для моделей генерации изображений
+                if (imageGenerationModels.includes(model)) {
+                    // Проверяем разные форматы ответа
+                    if (data.data && data.data[0] && data.data[0].url) {
+                        // Формат DALL-E
+                        aiMessage = `Вот сгенерированное изображение:\n\n${data.data[0].url}`;
+                    } else if (data.images && data.images[0]) {
+                        // Формат Stable Diffusion
+                        aiMessage = `Вот сгенерированное изображение:\n\n${data.images[0]}`;
+                    } else if (data.choices && data.choices[0] && data.choices[0].message) {
+                        // Стандартный формат с URL в тексте
+                        aiMessage = data.choices[0].message.content;
+                    } else {
+                        throw new Error('Invalid image generation response');
+                    }
                 } else {
-                    throw new Error('Invalid response format');
+                    // Для обычных моделей
+                    if (data.choices && data.choices[0] && data.choices[0].message) {
+                        aiMessage = data.choices[0].message.content;
+                    } else {
+                        throw new Error('Invalid response format');
+                    }
                 }
+                
+                messageHistory.push({ role: 'assistant', content: aiMessage });
+                addMessage(aiMessage, 'assistant');
+                
+                // Сохранить ответ в БД
+                await saveMessage('assistant', aiMessage);
             } catch (error) {
                 console.error('Error:', error);
                 // Удалить индикатор печати если есть
@@ -819,9 +858,19 @@
             }
             
             chatsList.innerHTML = chats.map(chat => `
-                <div class="chat-item ${chat.id === currentChatId ? 'active' : ''}" onclick="loadChat(${chat.id})">
-                    <div style="font-weight: 600; margin-bottom: 4px;">${chat.title}</div>
-                    <div style="font-size: 12px; color: var(--text-tertiary);">${formatDate(chat.updated_at)}</div>
+                <div class="chat-item ${chat.id === currentChatId ? 'active' : ''}" style="position: relative;">
+                    <div onclick="loadChat(${chat.id})" style="flex: 1; cursor: pointer;">
+                        <div style="font-weight: 600; margin-bottom: 4px;">${chat.title}</div>
+                        <div style="font-size: 12px; color: var(--text-tertiary);">${formatDate(chat.updated_at)}</div>
+                    </div>
+                    <div style="display: flex; gap: 5px; opacity: 0; transition: opacity 0.2s;" class="chat-actions">
+                        <button onclick="event.stopPropagation(); renameChat(${chat.id}, '${chat.title.replace(/'/g, "\\'")}')" 
+                                style="background: none; border: none; cursor: pointer; font-size: 16px; padding: 5px;" 
+                                title="Переименовать">✏️</button>
+                        <button onclick="event.stopPropagation(); deleteChat(${chat.id})" 
+                                style="background: none; border: none; cursor: pointer; font-size: 16px; padding: 5px; color: #ff4444;" 
+                                title="Удалить">🗑️</button>
+                    </div>
                 </div>
             `).join('');
         }
@@ -937,6 +986,61 @@
             if (diff < 3600000) return Math.floor(diff / 60000) + ' мин назад';
             if (diff < 86400000) return Math.floor(diff / 3600000) + ' ч назад';
             return date.toLocaleDateString('ru-RU');
+        }
+        
+        // Переименовать чат
+        async function renameChat(chatId, currentTitle) {
+            const newTitle = prompt('Введите новое название чата:', currentTitle);
+            if (!newTitle || newTitle === currentTitle) return;
+            
+            try {
+                const response = await fetch(`/api/v1/chats/${chatId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ title: newTitle })
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    await loadChats();
+                }
+            } catch (error) {
+                console.error('Error renaming chat:', error);
+                alert('Ошибка при переименовании чата');
+            }
+        }
+        
+        // Удалить чат
+        async function deleteChat(chatId) {
+            if (!confirm('Удалить этот чат?')) return;
+            
+            try {
+                const response = await fetch(`/api/v1/chats/${chatId}`, {
+                    method: 'DELETE'
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    // Если удален текущий чат - очистить
+                    if (currentChatId === chatId) {
+                        currentChatId = null;
+                        messageHistory = [];
+                        document.getElementById('messages').innerHTML = `
+                            <div class="message assistant">
+                                <div class="message-avatar">🤖</div>
+                                <div class="message-content">
+                                    Привет! Я AI ассистент. Чем могу помочь?
+                                </div>
+                            </div>
+                        `;
+                    }
+                    
+                    await loadChats();
+                }
+            } catch (error) {
+                console.error('Error deleting chat:', error);
+                alert('Ошибка при удалении чата');
+            }
         }
         
         // Читать файл как base64
