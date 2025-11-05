@@ -48,28 +48,112 @@ async function loadUserData() {
                 loadAdminPanel();
             }
 
-            loadAPIKeys();
-            load2FAStatus();
-            loadModels();
+            // Загружаем данные
+            await Promise.all([
+                loadAPIKeys(),
+                loadModels(),
+                loadStats()
+            ]);
         } else {
             console.error('Invalid response:', data);
             window.location.href = '/login';
         }
     } catch (error) {
-        console.error('Error loading user:', error);
-        // Не редиректим при ошибке сети, показываем сообщение
-        const container = document.querySelector('.container');
-        if (container) {
-            container.innerHTML = `
-                <div style="text-align:center;padding:60px 20px">
-                    <div style="font-size:48px;margin-bottom:20px">⚠️</div>
-                    <h2 style="margin-bottom:10px">Ошибка загрузки</h2>
-                    <p style="color:#999;margin-bottom:20px">${error.message}</p>
-                    <button class="btn btn-primary" onclick="location.reload()">Обновить страницу</button>
-                </div>
-            `;
-        }
+        console.error('Error loading user data:', error);
+        alert('Ошибка загрузки данных пользователя');
+    } finally {
+        isLoading = false;
     }
+}
+
+// Загрузка статистики
+async function loadStats() {
+    try {
+        const response = await fetch('/api/v1/stats');
+        const data = await response.json();
+
+        if (data.success && data.stats) {
+            const stats = data.stats;
+
+            // Обновляем карточки статистики
+            document.getElementById('stat-chats').textContent = stats.chatsCount || 0;
+            document.getElementById('stat-messages').textContent = stats.messagesCount || 0;
+            document.getElementById('stat-models').textContent = stats.models?.length || 0;
+            document.getElementById('stat-files').textContent = stats.filesCount || 0;
+
+            // Загружаем последние чаты
+            loadRecentChats(stats.recentChats || []);
+        }
+    } catch (error) {
+        console.error('Error loading stats:', error);
+    }
+}
+
+// Отображение последних чатов
+function loadRecentChats(chats) {
+    const container = document.getElementById('chats-container');
+    
+    if (!chats || chats.length === 0) {
+        container.innerHTML = `
+            <div class="empty-state">
+                <div class="empty-state-icon">💬</div>
+                <div>Нет чатов</div>
+                <p style="color:#999;margin-top:10px">Создайте свой первый чат!</p>
+                <button class="btn btn-primary" onclick="window.location.href='/chat'" style="margin-top:20px">
+                    Создать чат
+                </button>
+            </div>
+        `;
+        return;
+    }
+
+    const tableHtml = `
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Название</th>
+                    <th>Модель</th>
+                    <th>Сообщений</th>
+                    <th>Дата</th>
+                    <th>Действия</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${chats.map(chat => `
+                    <tr>
+                        <td data-label="Название">${chat.title || 'Новый чат'}</td>
+                        <td data-label="Модель">${chat.model || 'N/A'}</td>
+                        <td data-label="Сообщений">${chat.message_count || 0}</td>
+                        <td data-label="Дата">${formatChatDate(chat.updated_at)}</td>
+                        <td data-label="Действия">
+                            <button class="btn btn-primary" onclick="openChat(${chat.id})">Открыть</button>
+                        </td>
+                    </tr>
+                `).join('')}
+            </tbody>
+        </table>
+    `;
+    
+    container.innerHTML = tableHtml;
+}
+
+// Открыть чат
+function openChat(chatId) {
+    window.location.href = `/chat?id=${chatId}`;
+}
+
+// Форматирование даты
+function formatChatDate(dateString) {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diff = now - date;
+    
+    if (diff < 60000) return 'Только что';
+    if (diff < 3600000) return Math.floor(diff / 60000) + ' мин назад';
+    if (diff < 86400000) return Math.floor(diff / 3600000) + ' ч назад';
+    
+    const options = { day: 'numeric', month: 'short' };
+    return date.toLocaleDateString('ru-RU', options);
 }
 
 // Загрузка API ключей
@@ -617,6 +701,7 @@ function switchTab(tab) {
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
     event.target.classList.add('active');
 
+    document.getElementById('chats-section').style.display = tab === 'chats' ? 'block' : 'none';
     document.getElementById('keys-section').style.display = tab === 'keys' ? 'block' : 'none';
     document.getElementById('models-section').style.display = tab === 'models' ? 'block' : 'none';
     document.getElementById('settings-section').style.display = tab === 'settings' ? 'block' : 'none';

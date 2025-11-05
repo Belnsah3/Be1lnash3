@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Настройки - LumeAI</title>
+    <link rel="stylesheet" href="/css/new-theme.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: var(--bg-primary);
+        }
+
+        .settings-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .settings-header {
+            margin-bottom: 40px;
+        }
+
+        .settings-header h1 {
+            color: var(--text-primary);
+            font-size: 32px;
+            margin: 0 0 10px 0;
+        }
+
+        .settings-header p {
+            color: var(--text-secondary);
+            margin: 0;
+        }
+
+        .settings-section {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border-color);
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 0 0 20px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title span {
+            font-size: 24px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .form-label {
+            display: block;
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 14px;
+            font-family: inherit;
+            transition: all 0.3s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        textarea.form-input {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .avatar-section {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .avatar-preview {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: var(--bg-tertiary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            overflow: hidden;
+            border: 3px solid var(--border-color);
+        }
+
+        .avatar-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .avatar-actions {
+            flex: 1;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: none;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+
+        .btn-primary {
+            background: var(--accent-blue);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2563eb;
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-hover);
+        }
+
+        .btn-danger {
+            background: #dc2626;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #b91c1c;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .theme-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px;
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 60px;
+            height: 30px;
+            background: var(--bg-hover);
+            border-radius: 15px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .toggle-switch.active {
+            background: var(--accent-blue);
+        }
+
+        .toggle-slider {
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 24px;
+            height: 24px;
+            background: white;
+            border-radius: 50%;
+            transition: transform 0.3s;
+        }
+
+        .toggle-switch.active .toggle-slider {
+            transform: translateX(30px);
+        }
+
+        .api-key-display {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .api-key-input {
+            flex: 1;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        .nav-btn {
+            padding: 10px 20px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+            text-decoration: none;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .nav-btn:hover {
+            background: var(--bg-hover);
+            transform: translateY(-2px);
+        }
+
+        .success-message {
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            color: #22c55e;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .error-message {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #ef4444;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .settings-container {
+                padding: 20px 15px;
+            }
+
+            .settings-section {
+                padding: 20px;
+            }
+
+            .avatar-section {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="settings-container">
+        <div class="nav-buttons">
+            <a href="/dashboard" class="nav-btn">← Назад в Dashboard</a>
+            <a href="/chat" class="nav-btn">💬 Чат</a>
+        </div>
+
+        <div class="settings-header">
+            <h1>⚙️ Настройки</h1>
+            <p>Управление вашим профилем и настройками</p>
+        </div>
+
+        <div id="successMessage" class="success-message"></div>
+        <div id="errorMessage" class="error-message"></div>
+
+        <!-- Профиль -->
+        <div class="settings-section">
+            <h2 class="section-title"><span>👤</span> Профиль</h2>
+            
+            <div class="form-group">
+                <div class="avatar-section">
+                    <div class="avatar-preview" id="avatarPreview">
+                        👤
+                    </div>
+                    <div class="avatar-actions">
+                        <p style="color: var(--text-secondary); margin: 0 0 10px 0; font-size: 14px;">
+                            Загрузите новое фото профиля (макс. 5MB)
+                        </p>
+                        <input type="file" id="avatarInput" accept="image/*" style="display: none;">
+                        <div style="display: flex; gap: 10px;">
+                            <button class="btn btn-secondary" onclick="document.getElementById('avatarInput').click()">
+                                Выбрать файл
+                            </button>
+                            <button class="btn btn-primary" id="uploadAvatarBtn" style="display: none;">
+                                Загрузить
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Имя пользователя</label>
+                <input type="text" id="username" class="form-input" readonly>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Email</label>
+                <input type="email" id="email" class="form-input" readonly>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">О себе</label>
+                <textarea id="bio" class="form-input" placeholder="Расскажите о себе..."></textarea>
+            </div>
+
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="saveProfile()">Сохранить профиль</button>
+            </div>
+        </div>
+
+        <!-- Безопасность -->
+        <div class="settings-section">
+            <h2 class="section-title"><span>🔒</span> Безопасность</h2>
+            
+            <div class="form-group">
+                <label class="form-label">Текущий пароль</label>
+                <input type="password" id="currentPassword" class="form-input" placeholder="Введите текущий пароль">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Новый пароль</label>
+                <input type="password" id="newPassword" class="form-input" placeholder="Введите новый пароль">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Подтвердите пароль</label>
+                <input type="password" id="confirmPassword" class="form-input" placeholder="Подтвердите новый пароль">
+            </div>
+
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="changePassword()">Изменить пароль</button>
+            </div>
+        </div>
+
+        <!-- API Ключ -->
+        <div class="settings-section">
+            <h2 class="section-title"><span>🔑</span> API Ключ</h2>
+            <p style="color: var(--text-secondary); margin: 0 0 20px 0; font-size: 14px;">
+                API ключ используется для доступа к AI моделям в чате
+            </p>
+
+            <div class="form-group">
+                <label class="form-label">Ваш API ключ</label>
+                <div class="api-key-display">
+                    <input type="password" id="apiKey" class="form-input api-key-input" placeholder="Введите ваш API ключ">
+                    <button class="btn btn-secondary" onclick="toggleApiKeyVisibility()">👁️</button>
+                </div>
+            </div>
+
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="saveApiKey()">Сохранить ключ</button>
+                <button class="btn btn-danger" onclick="deleteApiKey()">Удалить ключ</button>
+            </div>
+        </div>
+
+        <!-- Внешний вид -->
+        <div class="settings-section">
+            <h2 class="section-title"><span>🎨</span> Внешний вид</h2>
+            
+            <div class="theme-toggle">
+                <div>
+                    <div style="color: var(--text-primary); font-weight: 500; margin-bottom: 4px;">Темная тема</div>
+                    <div style="color: var(--text-secondary); font-size: 13px;">Переключить на светлую тему</div>
+                </div>
+                <div class="toggle-switch active" id="themeToggle" onclick="toggleTheme()">
+                    <div class="toggle-slider"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentSettings = {};
+        let currentUser = {};
+        let selectedFile = null;
+
+        // Загрузка настроек
+        async function loadSettings() {
+            try {
+                const response = await fetch('/api/v1/settings');
+                const data = await response.json();
+
+                if (data.success) {
+                    currentSettings = data.settings;
+                    currentUser = data.user;
+
+                    // Заполняем форму
+                    document.getElementById('username').value = currentUser.username || '';
+                    document.getElementById('email').value = currentUser.email || '';
+                    document.getElementById('bio').value = currentUser.bio || '';
+
+                    // Аватар
+                    if (currentSettings.avatar_url) {
+                        document.getElementById('avatarPreview').innerHTML = 
+                            `<img src="${currentSettings.avatar_url}" alt="Avatar">`;
+                    }
+
+                    // API ключ
+                    if (currentSettings.api_key) {
+                        document.getElementById('apiKey').value = currentSettings.api_key;
+                    }
+
+                    // Тема
+                    const isDark = currentSettings.theme === 'dark';
+                    document.getElementById('themeToggle').classList.toggle('active', isDark);
+                }
+            } catch (error) {
+                showError('Ошибка загрузки настроек');
+            }
+        }
+
+        // Сохранение профиля
+        async function saveProfile() {
+            const bio = document.getElementById('bio').value;
+
+            try {
+                const response = await fetch('/api/v1/settings', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ bio })
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    showSuccess('Профиль обновлен!');
+                } else {
+                    showError(data.message || 'Ошибка сохранения');
+                }
+            } catch (error) {
+                showError('Ошибка сервера');
+            }
+        }
+
+        // Изменение пароля
+        async function changePassword() {
+            const currentPassword = document.getElementById('currentPassword').value;
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+
+            if (!currentPassword || !newPassword || !confirmPassword) {
+                showError('Заполните все поля');
+                return;
+            }
+
+            if (newPassword !== confirmPassword) {
+                showError('Пароли не совпадают');
+                return;
+            }
+
+            if (newPassword.length < 6) {
+                showError('Пароль должен быть минимум 6 символов');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/v1/settings/password', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ currentPassword, newPassword })
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    showSuccess('Пароль изменен!');
+                    document.getElementById('currentPassword').value = '';
+                    document.getElementById('newPassword').value = '';
+                    document.getElementById('confirmPassword').value = '';
+                } else {
+                    showError(data.message || 'Ошибка изменения пароля');
+                }
+            } catch (error) {
+                showError('Ошибка сервера');
+            }
+        }
+
+        // Загрузка аватара
+        document.getElementById('avatarInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                if (file.size > 5 * 1024 * 1024) {
+                    showError('Файл слишком большой (макс. 5MB)');
+                    return;
+                }
+
+                selectedFile = file;
+                
+                // Превью
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('avatarPreview').innerHTML = 
+                        `<img src="${e.target.result}" alt="Preview">`;
+                };
+                reader.readAsDataURL(file);
+
+                document.getElementById('uploadAvatarBtn').style.display = 'block';
+            }
+        });
+
+        document.getElementById('uploadAvatarBtn').addEventListener('click', async function() {
+            if (!selectedFile) return;
+
+            const formData = new FormData();
+            formData.append('avatar', selectedFile);
+
+            try {
+                const response = await fetch('/api/v1/settings/avatar', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    showSuccess('Аватар загружен!');
+                    document.getElementById('uploadAvatarBtn').style.display = 'none';
+                    selectedFile = null;
+                } else {
+                    showError(data.message || 'Ошибка загрузки');
+                }
+            } catch (error) {
+                showError('Ошибка сервера');
+            }
+        });
+
+        // Управление API ключом
+        async function saveApiKey() {
+            const apiKey = document.getElementById('apiKey').value.trim();
+
+            if (!apiKey) {
+                showError('Введите API ключ');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/v1/settings/api-key', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ apiKey })
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    showSuccess('API ключ сохранен!');
+                } else {
+                    showError(data.message || 'Ошибка сохранения');
+                }
+            } catch (error) {
+                showError('Ошибка сервера');
+            }
+        }
+
+        async function deleteApiKey() {
+            if (!confirm('Удалить API ключ?')) return;
+
+            try {
+                const response = await fetch('/api/v1/settings/api-key', {
+                    method: 'DELETE'
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    document.getElementById('apiKey').value = '';
+                    showSuccess('API ключ удален!');
+                } else {
+                    showError(data.message || 'Ошибка удаления');
+                }
+            } catch (error) {
+                showError('Ошибка сервера');
+            }
+        }
+
+        function toggleApiKeyVisibility() {
+            const input = document.getElementById('apiKey');
+            input.type = input.type === 'password' ? 'text' : 'password';
+        }
+
+        // Переключение темы
+        async function toggleTheme() {
+            const toggle = document.getElementById('themeToggle');
+            const isDark = toggle.classList.contains('active');
+            const newTheme = isDark ? 'light' : 'dark';
+
+            toggle.classList.toggle('active');
+
+            try {
+                const response = await fetch('/api/v1/settings', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ theme: newTheme })
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    showSuccess(`Тема изменена на ${newTheme === 'dark' ? 'темную' : 'светлую'}!`);
+                    // TODO: Применить тему к странице
+                }
+            } catch (error) {
+                showError('Ошибка изменения темы');
+            }
+        }
+
+        // Вспомогательные функции
+        function showSuccess(message) {
+            const el = document.getElementById('successMessage');
+            el.textContent = '✓ ' + message;
+            el.style.display = 'block';
+            setTimeout(() => el.style.display = 'none', 5000);
+        }
+
+        function showError(message) {
+            const el = document.getElementById('errorMessage');
+            el.textContent = '✗ ' + message;
+            el.style.display = 'block';
+            setTimeout(() => el.style.display = 'none', 5000);
+        }
+
+        // Инициализация
+        loadSettings();
+    </script>
+</body>
+</html>

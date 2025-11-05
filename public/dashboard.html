@@ -187,38 +187,52 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 </div>
 </div>
 <button class="btn btn-primary" onclick="window.location.href='/chat'" style="margin-right: 10px;">💬 Чат</button>
+<button class="btn btn-secondary" onclick="window.location.href='/settings'" style="margin-right: 10px;">⚙️ Настройки</button>
 <button class="btn btn-secondary" onclick="logout()">Выход</button>
 </div>
 </div>
 <div class="container">
 <div class="stats-grid">
 <div class="stat-card">
-<div class="stat-icon">🔑</div>
-<div class="stat-label">API Ключи</div>
-<div class="stat-value" id="stat-keys">0</div>
+<div class="stat-icon">💬</div>
+<div class="stat-label">Чатов</div>
+<div class="stat-value" id="stat-chats">0</div>
 </div>
 <div class="stat-card">
-<div class="stat-icon">📊</div>
-<div class="stat-label">Запросов</div>
-<div class="stat-value" id="stat-requests">0</div>
+<div class="stat-icon">📝</div>
+<div class="stat-label">Сообщений</div>
+<div class="stat-value" id="stat-messages">0</div>
 </div>
 <div class="stat-card">
 <div class="stat-icon">🤖</div>
 <div class="stat-label">Моделей</div>
-<div class="stat-value">69</div>
+<div class="stat-value" id="stat-models">0</div>
 </div>
 <div class="stat-card">
-<div class="stat-icon">⚡</div>
-<div class="stat-label">Лимит</div>
-<div class="stat-value" id="stat-limit">∞</div>
+<div class="stat-icon">📎</div>
+<div class="stat-label">Файлов</div>
+<div class="stat-value" id="stat-files">0</div>
 </div>
 </div>
 <div class="tabs">
-<button class="tab active" onclick="switchTab('keys')">API Ключи</button>
+<button class="tab active" onclick="switchTab('chats')">Последние чаты</button>
+<button class="tab" onclick="switchTab('keys')">API Ключи</button>
 <button class="tab" onclick="switchTab('models')">Модели</button>
 <button class="tab" onclick="switchTab('settings')">Настройки</button>
 </div>
-<div id="keys-section" class="section">
+<div id="chats-section" class="section">
+<div class="section-header">
+<h2 class="section-title">Последние чаты</h2>
+<button class="btn btn-primary" onclick="window.location.href='/chat'">➕ Новый чат</button>
+</div>
+<div id="chats-container">
+<div class="empty-state">
+<div class="empty-state-icon">💬</div>
+<div>Загрузка...</div>
+</div>
+</div>
+</div>
+<div id="keys-section" class="section" style="display:none">
 <div class="section-header">
 <h2 class="section-title">Мои API Ключи</h2>
 <button class="btn btn-primary" onclick="openCreateKeyModal()">➕ Создать ключ</button>
