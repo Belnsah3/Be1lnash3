@@ -1,8 +1,11 @@
-name: Deploy to Server
+# Временно отключено - настрой секреты в GitHub сначала!
+# Инструкция: см. GITHUB_ACTIONS_SETUP.md
+
+name: Deploy to Server (DISABLED)
 
 on:
-  push:
-    branches: [ main ]
+  # push:
+  #   branches: [ main ]
   workflow_dispatch:
 
 jobs:
@@ -16,9 +19,10 @@ jobs:
     - name: 📡 Deploy to server
       uses: appleboy/ssh-action@master
       with:
-        host: ${{ secrets.SERVER_HOST }}
-        username: ${{ secrets.SERVER_USER }}
-        key: ${{ secrets.SERVER_SSH_KEY }}
+        # Настрой секреты в GitHub: Settings → Secrets → Actions
+        host: ${{ secrets.SERVER_HOST || '147.45.48.64' }}
+        username: ${{ secrets.SERVER_USER || 'root' }}
+        key: ${{ secrets.SERVER_SSH_KEY || 'not-configured' }}
         script: |
           cd ~/rest-api
           echo "📥 Pulling latest changes..."

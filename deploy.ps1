@@ -88,14 +88,27 @@ if ($deployToServer -eq "" -or $deployToServer -eq "y") {
     Write-Host ""
     Write-Host "[SERVER] Connecting to server..." -ForegroundColor Yellow
     
-    # Test SSH connection
-    $null = ssh -o ConnectTimeout=5 root@147.45.48.64 "echo OK" 2>$null
+    # Проверка SSH ключа
+    $sshKey = "$env:USERPROFILE\.ssh\lumeai_key"
+    if (-not (Test-Path $sshKey)) {
+        Write-Host "[ERROR] SSH ключ не найден!" -ForegroundColor Red
+        Write-Host "" 
+        Write-Host "Выполни ОДИН раз:" -ForegroundColor Yellow
+        Write-Host "  .\setup-ssh-auto.ps1" -ForegroundColor Cyan
+        Write-Host ""
+        Write-Host "Это настроит беспарольный доступ к серверу!" -ForegroundColor Green
+        exit 1
+    }
+    
+    # Test SSH connection с ключом
+    $null = ssh -i $sshKey -o ConnectTimeout=5 root@147.45.48.64 "echo OK" 2>$null
     
     if ($LASTEXITCODE -ne 0) {
-        Write-Host "[ERROR] Cannot connect to server" -ForegroundColor Red
-        Write-Host "Check:" -ForegroundColor Yellow
-        Write-Host "  1. Server is online: ping 147.45.48.64" -ForegroundColor White
-        Write-Host "  2. SSH works: ssh root@147.45.48.64" -ForegroundColor White
+        Write-Host "[ERROR] Не удается подключиться к серверу" -ForegroundColor Red
+        Write-Host ""
+        Write-Host "Попробуй:" -ForegroundColor Yellow
+        Write-Host "  1. Перенастроить SSH: .\setup-ssh-auto.ps1" -ForegroundColor White
+        Write-Host "  2. Проверить сервер: ping 147.45.48.64" -ForegroundColor White
         exit 1
     }
     
@@ -124,7 +137,7 @@ echo '[3/3] Restarting application...'
     } else {
         Write-Host ""
         Write-Host "[WARNING] Possible errors during server update" -ForegroundColor Yellow
-        Write-Host "Check logs: ssh root@147.45.48.64 'pm2 logs lumeai'" -ForegroundColor White
+        Write-Host "Check logs: ssh root@147.45.48.64 `'pm2 logs lumeai`'" -ForegroundColor White
     }
 } else {
     Write-Host ""
