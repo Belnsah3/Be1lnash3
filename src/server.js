@@ -128,6 +128,15 @@ app.get('/dashboard', (req, res) => {
   }
 });
 
+// Chat page
+app.get('/chat', (req, res) => {
+  if (req.session && req.session.userId) {
+    res.sendFile(path.join(__dirname, '../public/chat.html'));
+  } else {
+    res.redirect('/login');
+  }
+});
+
 // JSON info endpoint
 app.get('/api', (req, res) => {
   res.json({
