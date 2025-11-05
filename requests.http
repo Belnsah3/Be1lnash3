@@ -1,0 +1,185 @@
+### REST API Test Requests
+### Используйте расширение REST Client для VS Code или аналогичное
+
+@baseUrl = http://localhost:3000/api/v1
+@contentType = application/json
+
+################################################################################
+### USERS API
+################################################################################
+
+### Получить всех пользователей
+GET {{baseUrl}}/users
+
+### Получить пользователя по ID
+GET {{baseUrl}}/users/1
+
+### Фильтрация пользователей по имени
+GET {{baseUrl}}/users?name=Иван
+
+### Фильтрация по возрасту
+GET {{baseUrl}}/users?minAge=25&maxAge=35
+
+### Создать нового пользователя
+POST {{baseUrl}}/users
+Content-Type: {{contentType}}
+
+{
+  "name": "Алексей Новиков",
+  "email": "alexey@example.com",
+  "age": 27
+}
+
+### Полное обновление пользователя (PUT)
+PUT {{baseUrl}}/users/1
+Content-Type: {{contentType}}
+
+{
+  "name": "Иван Иванович Иванов",
+  "email": "ivan.ivanov@example.com",
+  "age": 32
+}
+
+### Частичное обновление пользователя (PATCH)
+PATCH {{baseUrl}}/users/1
+Content-Type: {{contentType}}
+
+{
+  "age": 33
+}
+
+### Удалить пользователя
+DELETE {{baseUrl}}/users/999
+
+################################################################################
+### PRODUCTS API
+################################################################################
+
+### Получить все товары
+GET {{baseUrl}}/products
+
+### Получить товар по ID
+GET {{baseUrl}}/products/1
+
+### Фильтрация по категории
+GET {{baseUrl}}/products?category=Электроника
+
+### Фильтрация по наличию
+GET {{baseUrl}}/products?inStock=true
+
+### Фильтрация по цене
+GET {{baseUrl}}/products?minPrice=100&maxPrice=500
+
+### Сортировка по цене (возрастание)
+GET {{baseUrl}}/products?sortBy=price&order=asc
+
+### Сортировка по цене (убывание)
+GET {{baseUrl}}/products?sortBy=price&order=desc
+
+### Комбинированная фильтрация и сортировка
+GET {{baseUrl}}/products?category=Электроника&inStock=true&sortBy=price&order=asc
+
+### Создать новый товар
+POST {{baseUrl}}/products
+Content-Type: {{contentType}}
+
+{
+  "name": "Беспроводная мышь",
+  "description": "Эргономичная беспроводная мышь",
+  "price": 29.99,
+  "category": "Аксессуары",
+  "inStock": true
+}
+
+### Полное обновление товара (PUT)
+PUT {{baseUrl}}/products/1
+Content-Type: {{contentType}}
+
+{
+  "name": "Ноутбук Gaming",
+  "description": "Игровой ноутбук с RTX 4060",
+  "price": 1299.99,
+  "category": "Электроника",
+  "inStock": true
+}
+
+### Частичное обновление товара (PATCH)
+PATCH {{baseUrl}}/products/1
+Content-Type: {{contentType}}
+
+{
+  "price": 899.99,
+  "inStock": false
+}
+
+### Удалить товар
+DELETE {{baseUrl}}/products/999
+
+################################################################################
+### ТЕСТОВЫЕ СЦЕНАРИИ
+################################################################################
+
+### Создать пользователя и запомнить ID
+# @name createUser
+POST {{baseUrl}}/users
+Content-Type: {{contentType}}
+
+{
+  "name": "Тестовый Пользователь",
+  "email": "test@example.com",
+  "age": 25
+}
+
+### Использовать ID из предыдущего запроса
+# GET {{baseUrl}}/users/{{createUser.response.body.data.id}}
+
+### Создать товар с минимальными данными
+POST {{baseUrl}}/products
+Content-Type: {{contentType}}
+
+{
+  "name": "Тестовый товар",
+  "price": 99.99
+}
+
+### Попытка создать пользователя с существующим email (ошибка 400)
+POST {{baseUrl}}/users
+Content-Type: {{contentType}}
+
+{
+  "name": "Дубликат",
+  "email": "ivan@example.com"
+}
+
+### Попытка создать товар без обязательных полей (ошибка 400)
+POST {{baseUrl}}/products
+Content-Type: {{contentType}}
+
+{
+  "description": "Товар без имени и цены"
+}
+
+### Попытка создать товар с отрицательной ценой (ошибка 400)
+POST {{baseUrl}}/products
+Content-Type: {{contentType}}
+
+{
+  "name": "Товар",
+  "price": -10
+}
+
+### Получить несуществующего пользователя (ошибка 404)
+GET {{baseUrl}}/users/99999
+
+### Получить несуществующий товар (ошибка 404)
+GET {{baseUrl}}/products/99999
+
+################################################################################
+### КОРНЕВЫЕ ENDPOINTS
+################################################################################
+
+### Корневая страница API
+GET http://localhost:3000/
+
+### Документация Swagger (открыть в браузере)
+# http://localhost:3000/api-docs

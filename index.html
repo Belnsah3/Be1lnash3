@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>REST API - Главная</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 42px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 18px;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .section {
+            margin-bottom: 40px;
+        }
+
+        .section h2 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            background: #f9f9f9;
+            border-radius: 12px;
+            padding: 24px;
+            transition: transform 0.3s, box-shadow 0.3s;
+            border: 2px solid transparent;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.2);
+            border-color: #667eea;
+        }
+
+        .card-icon {
+            font-size: 32px;
+            margin-bottom: 12px;
+        }
+
+        .card h3 {
+            font-size: 20px;
+            margin-bottom: 8px;
+            color: #333;
+        }
+
+        .card p {
+            color: #666;
+            margin-bottom: 16px;
+            line-height: 1.6;
+        }
+
+        .card a {
+            display: inline-block;
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: transform 0.2s;
+        }
+
+        .card a:hover {
+            transform: scale(1.05);
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-top: 20px;
+        }
+
+        .feature {
+            background: white;
+            padding: 16px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .feature h4 {
+            font-size: 16px;
+            margin-bottom: 8px;
+            color: #333;
+        }
+
+        .feature p {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .footer {
+            background: #f5f5f5;
+            padding: 20px 40px;
+            text-align: center;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            background: #667eea;
+            color: white;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-left: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 REST API</h1>
+            <p>Полнофункциональный REST API с AI интеграцией</p>
+        </div>
+
+        <div class="content">
+            <div class="section">
+                <h2>🎨 Интерфейсы</h2>
+                <div class="cards">
+                    <div class="card">
+                        <div class="card-icon">📚</div>
+                        <h3>Swagger UI</h3>
+                        <p>Интерактивная документация API с возможностью тестирования всех эндпоинтов прямо в браузере.</p>
+                        <a href="/api-docs">Открыть документацию</a>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-icon">🔌</div>
+                        <h3>API Endpoints</h3>
+                        <p>RESTful API endpoints для работы с пользователями, продуктами и AI моделями через Python G4F.</p>
+                        <a href="/api/v1">Открыть API</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>✨ Возможности</h2>
+                <div class="features">
+                    <div class="feature">
+                        <h4>🤖 AI Модели</h4>
+                        <p>GPT-4, DeepSeek, Gemini через G4F</p>
+                    </div>
+                    <div class="feature">
+                        <h4>📖 OpenAPI 3.0</h4>
+                        <p>Полная спецификация API</p>
+                    </div>
+                    <div class="feature">
+                        <h4>🎨 Красивый UI</h4>
+                        <p>Современный и удобный интерфейс</p>
+                    </div>
+                    <div class="feature">
+                        <h4>⚡ Быстро</h4>
+                        <p>Express.js + FastAPI</p>
+                    </div>
+                    <div class="feature">
+                        <h4>🔒 Безопасно</h4>
+                        <p>CORS, валидация данных</p>
+                    </div>
+                    <div class="feature">
+                        <h4>🐳 Docker</h4>
+                        <p>Готовая контейнеризация</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>🔗 API Endpoints</h2>
+                <div class="cards">
+                    <div class="card">
+                        <div class="card-icon">👥</div>
+                        <h3>Users API</h3>
+                        <p>CRUD операции для управления пользователями</p>
+                        <a href="/api/v1/users">GET /api/v1/users</a>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-icon">📦</div>
+                        <h3>Products API</h3>
+                        <p>Управление товарами с фильтрацией и сортировкой</p>
+                        <a href="/api/v1/products">GET /api/v1/products</a>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-icon">🤖</div>
+                        <h3>AI API</h3>
+                        <p>Интеграция с G4F для доступа к AI моделям</p>
+                        <a href="/api/v1/ai/test">GET /api/v1/ai/test</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>REST API v1.0.0 | Made with ❤️ | Powered by Express.js, FastAPI & G4F</p>
+        </div>
+    </div>
+
+    <script>
+        // Добавляем анимацию при загрузке
+        document.addEventListener('DOMContentLoaded', () => {
+            const cards = document.querySelectorAll('.card');
+            cards.forEach((card, index) => {
+                setTimeout(() => {
+                    card.style.opacity = '0';
+                    card.style.transform = 'translateY(20px)';
+                    setTimeout(() => {
+                        card.style.transition = 'all 0.5s ease';
+                        card.style.opacity = '1';
+                        card.style.transform = 'translateY(0)';
+                    }, 50);
+                }, index * 100);
+            });
+        });
+    </script>
+</body>
+</html>

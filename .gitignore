@@ -1,0 +1,39 @@
+node_modules/
+.env
+*.log
+.DS_Store
+
+# Database
+data/*.db
+data/*.db-journal
+data/*.db-shm
+data/*.db-wal
+
+# Python
+python-g4f/venv/
+python-g4f/__pycache__/
+python-g4f/*.pyc
+python-g4f/.pytest_cache/
+python-g4f/.env
+
+# Docker
+docker-compose.override.yml
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+Thumbs.db
+desktop.ini
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Session files
+sessions/

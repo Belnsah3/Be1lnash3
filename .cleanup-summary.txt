@@ -1,0 +1,53 @@
+✅ ОЧИСТКА ЗАВЕРШЕНА
+
+Удалены следующие файлы:
+- check-users.js
+- restore-user.js
+- delete-duplicate.js
+- test-api-keys.js
+- test-gpt4free.js
+- gpt4free-proxy.js
+- chat_claude.py
+- chat_claude_simple.py
+- test_g4f_api.py
+- LOGIN_FIX.md
+- LOGIN_INSTRUCTIONS.md
+- USERS_GUIDE.md
+- FINAL_README.md
+- ADMIN_SYSTEM.md
+- FINAL_SYSTEM.md
+- INSTALLATION.md
+- API_KEYS_GUIDE.md
+- API_REFERENCE.md
+- CHAT_CLAUDE_README.md
+- CLAUDE_SONNET_4_5.md
+- CLEANUP_DONE.md
+- CONTRIBUTING.md
+- DASHBOARD_FULL.md
+- EXAMPLES.md
+- FINAL_SETUP.md
+- G4F_INTERFERENCE_API.md
+- G4F_OPENAI_API.md
+- G4F_ПРАВДА.md
+- GPT4FREE_PROXY_README.md
+- INSTALL.md
+- INTEGRATION_COMPLETE.md
+- LUMEAI_COMPLETE.md
+- MODELS_INFO.md
+- PROJECT_OVERVIEW.md
+- PUTER_REMOVED.md
+- PYTHON_G4F_GUIDE.md
+- QUICKSTART.md
+- QUICK_START_CHAT.md
+- SETUP_PYTHON_G4F.md
+- START_HERE.md
+- WEB_DASHBOARD_README.md
+- WEB_PROGRESS.md
+
+Оставлены только необходимые файлы:
+✅ README.md (7.82 KB) - Главная документация
+✅ UBUNTU_INSTALL.md (7.58 KB) - Инструкция для Ubuntu
+✅ install.sh (3.64 KB) - Bash скрипт установки
+✅ setup_ubuntu.py (11.12 KB) - Python скрипт установки
+
+Проект готов к использованию!

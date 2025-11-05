@@ -1,0 +1,47 @@
+{
+  "name": "rest-api",
+  "version": "1.0.0",
+  "description": "REST API с полной документацией Swagger/OpenAPI",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "gpt4free": "node gpt4free-proxy.js",
+    "test:gpt4free": "node test-gpt4free.js",
+    "start:with-ai": "concurrently \"npm run gpt4free\" \"npm start\"",
+    "start:g4f": "cd python-g4f && start.ps1",
+    "start:all": "concurrently \"npm run start:g4f\" \"npm start\"",
+    "docker:up": "docker-compose -f docker-compose.full.yml up -d",
+    "docker:down": "docker-compose -f docker-compose.full.yml down",
+    "docker:logs": "docker-compose -f docker-compose.full.yml logs -f"
+  },
+  "keywords": [
+    "rest",
+    "api",
+    "express",
+    "swagger",
+    "openapi"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^1.13.2",
+    "bcryptjs": "^3.0.3",
+    "better-sqlite3": "^12.4.1",
+    "body-parser": "^1.20.2",
+    "connect-sqlite3": "^0.9.16",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.21.2",
+    "express-session": "^1.18.2",
+    "qrcode": "^1.5.4",
+    "speakeasy": "^2.0.0",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.0"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1",
+    "nodemon": "^3.0.1"
+  }
+}
