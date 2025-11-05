@@ -577,8 +577,19 @@
             // Добавить в историю
             messageHistory.push({ role: 'user', content: message });
             
+            // Подготовить информацию о файле для сохранения
+            let fileInfo = null;
+            if (attachedFile) {
+                fileInfo = {
+                    filename: attachedFile.name,
+                    type: attachedFile.type,
+                    size: attachedFile.size,
+                    data: fileData // base64 для изображений
+                };
+            }
+            
             // Сохранить в БД
-            await saveMessage('user', message);
+            await saveMessage('user', message, fileInfo);
             
             // Показать индикатор печати
             const typingId = addMessage('Печатает...', 'assistant');
@@ -876,7 +887,7 @@
         }
         
         // Сохранить сообщение в БД
-        async function saveMessage(role, content) {
+        async function saveMessage(role, content, fileInfo = null) {
             try {
                 // Создать новый чат если его нет
                 if (!currentChatId) {
@@ -897,11 +908,16 @@
                     }
                 }
                 
-                // Сохранить сообщение
+                // Сохранить сообщение с файлом
+                const body = { role, content };
+                if (fileInfo) {
+                    body.file = fileInfo;
+                }
+                
                 await fetch(`/api/v1/chats/${currentChatId}/messages`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ role, content })
+                    body: JSON.stringify(body)
                 });
                 
                 // Обновить список чатов

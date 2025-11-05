@@ -77,7 +77,7 @@ router.get('/:chatId/messages', requireAuth, (req, res) => {
 router.post('/:chatId/messages', requireAuth, (req, res) => {
     try {
         const { chatId } = req.params;
-        const { role, content } = req.body;
+        const { role, content, file } = req.body;
         
         // Проверка что чат принадлежит пользователю
         const chat = db.prepare('SELECT * FROM chats WHERE id = ? AND user_id = ?')
@@ -93,10 +93,20 @@ router.post('/:chatId/messages', requireAuth, (req, res) => {
             VALUES (?, ?, ?)
         `).run(chatId, role, content);
         
+        const messageId = result.lastInsertRowid;
+        
+        // Если есть файл - сохранить его
+        if (file) {
+            db.prepare(`
+                INSERT INTO files (message_id, filename, file_type, file_size, file_data)
+                VALUES (?, ?, ?, ?, ?)
+            `).run(messageId, file.filename, file.type, file.size, file.data);
+        }
+        
         // Обновить время чата
         db.prepare('UPDATE chats SET updated_at = CURRENT_TIMESTAMP WHERE id = ?').run(chatId);
         
-        const message = db.prepare('SELECT * FROM messages WHERE id = ?').get(result.lastInsertRowid);
+        const message = db.prepare('SELECT * FROM messages WHERE id = ?').get(messageId);
         
         res.json({ success: true, message });
     } catch (error) {
