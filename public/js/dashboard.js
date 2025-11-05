@@ -695,6 +695,14 @@ function renderModels() {
             </div>
         </div>
         
+        <!-- Featured Models -->
+        <div class="featured-models">
+            <h2 style="margin-bottom:20px;color:#fff">⭐ Популярные модели</h2>
+            <div class="featured-grid" id="featured-models">
+                <!-- Will be filled by renderFeaturedModels -->
+            </div>
+        </div>
+        
         <!-- Filters -->
         <div class="filters-container">
             <input type="text" class="search-box" placeholder="🔍 Поиск моделей..." onkeyup="filterModels(this.value)">
@@ -727,14 +735,6 @@ function renderModels() {
                     <div class="filter-chip" onclick="setFilter('supportsTools', 'true')">🔧 Поддерживает</div>
                     <div class="filter-chip" onclick="setFilter('supportsTools', 'false')">❌ Не поддерживает</div>
                 </div>
-            </div>
-        </div>
-        
-        <!-- Featured Models -->
-        <div class="featured-models">
-            <h2 style="margin-bottom:20px;color:#fff">⭐ Популярные модели</h2>
-            <div class="featured-grid" id="featured-models">
-                <!-- Will be filled by renderFeaturedModels -->
             </div>
         </div>
         

@@ -283,6 +283,11 @@ app.get('/function-calling', (req, res) => {
   res.sendFile(path.join(__dirname, '../public/function-calling.html'));
 });
 
+// Роутер для API Endpoints страницы
+app.get('/api-endpoints', (req, res) => {
+  res.sendFile(path.join(__dirname, '../public/api-endpoints.html'));
+});
+
 // Обслуживание markdown файла для документации
 app.get('/FUNCTION_CALLING_GUIDE.md', (req, res) => {
   res.sendFile(path.join(__dirname, '../FUNCTION_CALLING_GUIDE.md'), {

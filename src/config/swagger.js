@@ -28,14 +28,9 @@ const options = {
 - И многое другое!
 
 ## 📚 Дополнительная документация:
-- [Все API Endpoints](https://github.com/yourusername/lumeai/blob/main/API_ENDPOINTS.md)
-- [Быстрый старт](https://github.com/yourusername/lumeai/blob/main/QUICK_START.md)
-- [Установка на Ubuntu](https://github.com/yourusername/lumeai/blob/main/UBUNTU_INSTALL.md)
+- [Все API Endpoints](/api-endpoints) - Полный список всех доступных endpoints
+- [Function Calling Guide](/function-calling) - Руководство по использованию Function Calling
       `,
-      contact: {
-        name: 'LumeAI Support',
-        email: 'sahsaxboxvanx@gmail.com'
-      },
       license: {
         name: 'MIT',
         url: 'https://opensource.org/licenses/MIT'
