@@ -655,7 +655,7 @@ function showAlert(id, msg, type) {
 // Выход
 function logout() {
     fetch('/api/v1/auth/logout', { method: 'POST' })
-        .then(() => window.location.href = '/login');
+        .then(() => window.location.href = '/login-new');
 }
 
 // АДМИН-ПАНЕЛЬ (только для супер-админа)
