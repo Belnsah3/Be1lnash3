@@ -698,7 +698,21 @@ function renderModels() {
         <div style="margin-bottom:30px;padding:20px;background:#3a3a3a;border-radius:10px">
             <h3 style="margin-bottom:10px">📚 Документация</h3>
             <p style="color:#999;margin-bottom:15px">Полная документация по использованию API</p>
-            <a href="/api-docs" target="_blank" class="btn btn-primary">Открыть документацию</a>
+            <a href="/api-docs" target="_blank" class="btn btn-primary" style="margin-right:10px">Открыть документацию</a>
+            <a href="https://github.com/Belnsah3/Be1lnash3/blob/main/FUNCTION_CALLING_GUIDE.md" target="_blank" class="btn btn-secondary">🔧 Function Calling Guide</a>
+        </div>
+    `;
+    
+    // Добавляем легенду
+    html += `
+        <div style="margin-bottom:30px;padding:15px;background:#2a2a2a;border:1px solid #3a3a3a;border-radius:10px">
+            <div style="display:flex;gap:20px;align-items:center">
+                <span style="color:#999">Легенда:</span>
+                <span style="display:flex;align-items:center;gap:5px">
+                    <span style="color:#4ade80">🔧</span>
+                    <span style="color:#999;font-size:13px">Поддержка Function Calling (Tools)</span>
+                </span>
+            </div>
         </div>
     `;
 
@@ -718,9 +732,13 @@ function renderModels() {
         `;
 
         categories[category].forEach(model => {
+            const toolsIcon = model.supportsTools ? '<span title="Поддерживает Function Calling" style="color:#4ade80;margin-left:8px">🔧</span>' : '';
             html += `
                 <tr>
-                    <td><code class="key-value">${model.name}</code></td>
+                    <td>
+                        <code class="key-value">${model.name}</code>
+                        ${toolsIcon}
+                    </td>
                     <td>
                         <button onclick="copyModelName('${model.name}')" class="btn btn-secondary" style="padding:8px 16px;font-size:12px">
                             📋 Копировать
