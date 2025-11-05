@@ -241,6 +241,40 @@
             opacity: 1;
             background: rgba(255, 255, 255, 0.2);
         }
+        
+        /* Typing indicator */
+        .typing-indicator {
+            display: inline-flex;
+            gap: 4px;
+            padding: 4px;
+        }
+        
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--text-secondary);
+            animation: typing 1.4s infinite;
+        }
+        
+        .typing-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        
+        .typing-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        
+        @keyframes typing {
+            0%, 60%, 100% {
+                opacity: 0.3;
+                transform: translateY(0);
+            }
+            30% {
+                opacity: 1;
+                transform: translateY(-10px);
+            }
+        }
 
         .input-container {
             padding: 20px;
@@ -572,6 +606,9 @@
                         <option value="ling-1t">Ling 1T</option>
                     </optgroup>
                 </select>
+                <button class="action-btn" onclick="exportChat()" title="Экспорт чата">
+                    💾
+                </button>
                 <button class="action-btn" onclick="openSettings()" title="Настройки">
                     ⚙️
                 </button>
@@ -779,8 +816,8 @@
             // Сохранить в БД
             await saveMessage('user', message, fileInfo);
             
-            // Показать индикатор печати
-            const typingId = addMessage('Печатает...', 'assistant');
+            // Показать анимированный индикатор печати
+            const typingId = addTypingIndicator();
             
             // Получить ответ от AI
             try {
@@ -876,6 +913,41 @@
                 }
                 addMessage('❌ Ошибка: ' + error.message, 'assistant');
             }
+        }
+        
+        // Добавить анимированный typing indicator
+        function addTypingIndicator() {
+            const container = document.getElementById('messages');
+            const messageDiv = document.createElement('div');
+            const messageId = 'typing-' + Date.now();
+            messageDiv.id = messageId;
+            messageDiv.className = 'message assistant';
+            
+            const avatar = document.createElement('div');
+            avatar.className = 'message-avatar';
+            avatar.textContent = '🤖';
+            
+            const content = document.createElement('div');
+            content.className = 'message-content';
+            
+            const typingIndicator = document.createElement('div');
+            typingIndicator.className = 'typing-indicator';
+            
+            for (let i = 0; i < 3; i++) {
+                const dot = document.createElement('div');
+                dot.className = 'typing-dot';
+                typingIndicator.appendChild(dot);
+            }
+            
+            content.appendChild(typingIndicator);
+            messageDiv.appendChild(avatar);
+            messageDiv.appendChild(content);
+            container.appendChild(messageDiv);
+            
+            // Прокрутить вниз
+            container.scrollTop = container.scrollHeight;
+            
+            return messageId;
         }
 
         // Добавить сообщение
@@ -1264,6 +1336,40 @@
                 console.error('Error deleting chat:', error);
                 alert('Ошибка при удалении чата');
             }
+        }
+        
+        // Экспортировать чат
+        function exportChat() {
+            if (messageHistory.length === 0) {
+                alert('Нет сообщений для экспорта');
+                return;
+            }
+            
+            // Формируем текст чата
+            let chatText = `LumeAI - Экспорт чата\n`;
+            chatText += `Дата: ${new Date().toLocaleString('ru-RU')}\n`;
+            chatText += `Модель: ${document.getElementById('model-selector').value}\n`;
+            chatText += `\n${'='.repeat(50)}\n\n`;
+            
+            messageHistory.forEach((msg, index) => {
+                const role = msg.role === 'user' ? 'Вы' : 'AI';
+                const content = typeof msg.content === 'string' 
+                    ? msg.content 
+                    : msg.content.map(c => c.text || '[Изображение]').join('\n');
+                
+                chatText += `[${role}]\n${content}\n\n${'-'.repeat(50)}\n\n`;
+            });
+            
+            // Создаем файл и скачиваем
+            const blob = new Blob([chatText], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `lumeai-chat-${new Date().getTime()}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
         }
         
         // Читать файл как base64
