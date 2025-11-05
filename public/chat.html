@@ -311,6 +311,20 @@
             </div>
 
             <div class="input-container">
+                <!-- Превью прикрепленного файла -->
+                <div id="file-preview" style="display: none; padding: 10px; background: var(--bg-tertiary); border-radius: 10px; margin-bottom: 10px;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <img id="file-preview-img" style="max-width: 100px; max-height: 100px; border-radius: 8px; display: none;">
+                        <div style="flex: 1;">
+                            <div id="file-preview-name" style="font-weight: 600; margin-bottom: 4px;"></div>
+                            <div id="file-preview-size" style="font-size: 12px; color: var(--text-tertiary);"></div>
+                        </div>
+                        <button onclick="removeFile()" style="background: var(--accent-red); color: white; border: none; border-radius: 8px; padding: 8px 12px; cursor: pointer;">
+                            ✕
+                        </button>
+                    </div>
+                </div>
+                
                 <div class="input-wrapper">
                     <textarea 
                         class="input-field" 
@@ -337,17 +351,32 @@
     <script>
         // История сообщений
         let messageHistory = [];
+        
+        // Прикрепленный файл
+        let attachedFile = null;
 
         // Отправка сообщения
         async function sendMessage() {
             const input = document.getElementById('message-input');
             const message = input.value.trim();
             
-            if (!message) return;
+            // Проверка что есть сообщение или файл
+            if (!message && !attachedFile) return;
+            
+            // Формируем сообщение с файлом если есть
+            let userMessage = message;
+            if (attachedFile) {
+                userMessage = `📎 ${attachedFile.name}\n\n${message}`;
+            }
             
             // Добавить сообщение пользователя
-            addMessage(message, 'user');
+            addMessage(userMessage, 'user');
             input.value = '';
+            
+            // Убрать превью файла
+            if (attachedFile) {
+                removeFile();
+            }
             
             // Добавить в историю
             messageHistory.push({ role: 'user', content: message });
@@ -441,10 +470,51 @@
         // Обработка выбора файла
         function handleFileSelect(event) {
             const file = event.target.files[0];
-            if (file) {
-                addMessage(`📎 Файл: ${file.name}`, 'user');
-                // TODO: Загрузить файл на сервер
+            if (!file) return;
+            
+            attachedFile = file;
+            
+            // Показать превью
+            const preview = document.getElementById('file-preview');
+            const previewName = document.getElementById('file-preview-name');
+            const previewSize = document.getElementById('file-preview-size');
+            const previewImg = document.getElementById('file-preview-img');
+            
+            previewName.textContent = file.name;
+            previewSize.textContent = formatFileSize(file.size);
+            
+            // Если это изображение - показать превью
+            if (file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    previewImg.src = e.target.result;
+                    previewImg.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            } else {
+                previewImg.style.display = 'none';
             }
+            
+            preview.style.display = 'block';
+            
+            // Очистить input
+            event.target.value = '';
+        }
+        
+        // Удалить файл
+        function removeFile() {
+            attachedFile = null;
+            document.getElementById('file-preview').style.display = 'none';
+            document.getElementById('file-preview-img').src = '';
+        }
+        
+        // Форматировать размер файла
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
         }
 
         // Новый чат
