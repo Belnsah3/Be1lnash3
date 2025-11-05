@@ -1,140 +1,139 @@
-# 🚀 LumeAI - Скрипт автоматического деплоя
+# LumeAI - Deploy Script
 
 param(
     [string]$Message = "Update project"
 )
 
-Write-Host "🚀 LumeAI Deploy Script" -ForegroundColor Cyan
-Write-Host "======================" -ForegroundColor Cyan
+Write-Host "LumeAI Deploy Script" -ForegroundColor Cyan
+Write-Host "====================" -ForegroundColor Cyan
 Write-Host ""
 
-# Проверка Git
+# Check Git
 if (-not (Get-Command git -ErrorAction SilentlyContinue)) {
-    Write-Host "❌ Git не установлен!" -ForegroundColor Red
-    Write-Host "Установи Git: https://git-scm.com/download/win" -ForegroundColor Yellow
+    Write-Host "[ERROR] Git is not installed!" -ForegroundColor Red
+    Write-Host "Install Git: https://git-scm.com/download/win" -ForegroundColor Yellow
     exit 1
 }
 
-# 1. Проверка изменений
-Write-Host "📝 Проверка изменений..." -ForegroundColor Yellow
+# 1. Check changes
+Write-Host "[1/6] Checking changes..." -ForegroundColor Yellow
 $status = git status --porcelain
 
 if (-not $status) {
-    Write-Host "✅ Нет изменений для коммита" -ForegroundColor Green
+    Write-Host "[OK] No changes to commit" -ForegroundColor Green
     
-    # Спросить, обновить ли сервер
-    $update = Read-Host "Обновить сервер? (y/n)"
+    $update = Read-Host "Update server? (y/n)"
     if ($update -eq "y") {
         Write-Host ""
-        Write-Host "📡 Обновление сервера..." -ForegroundColor Yellow
+        Write-Host "[SERVER] Updating server..." -ForegroundColor Yellow
         ssh root@147.45.48.64 "cd ~/rest-api && git pull && ./restart.sh app"
-        Write-Host "✅ Сервер обновлен!" -ForegroundColor Green
+        Write-Host "[OK] Server updated!" -ForegroundColor Green
     }
     exit 0
 }
 
-Write-Host "Изменено файлов: $($status.Count)" -ForegroundColor Cyan
+Write-Host "Changed files: $($status.Count)" -ForegroundColor Cyan
 Write-Host ""
 
-# 2. Показать изменения
-Write-Host "📋 Измененные файлы:" -ForegroundColor Yellow
+# 2. Show changes
+Write-Host "[2/6] Changed files:" -ForegroundColor Yellow
 git status --short
 Write-Host ""
 
-# 3. Добавить все файлы
-Write-Host "➕ Добавление файлов в Git..." -ForegroundColor Yellow
+# 3. Add files
+Write-Host "[3/6] Adding files to Git..." -ForegroundColor Yellow
 git add .
 
 if ($LASTEXITCODE -ne 0) {
-    Write-Host "❌ Ошибка при добавлении файлов" -ForegroundColor Red
+    Write-Host "[ERROR] Failed to add files" -ForegroundColor Red
     exit 1
 }
 
-Write-Host "✅ Файлы добавлены" -ForegroundColor Green
+Write-Host "[OK] Files added" -ForegroundColor Green
 Write-Host ""
 
-# 4. Создать коммит
-Write-Host "💾 Создание коммита: '$Message'" -ForegroundColor Yellow
+# 4. Create commit
+Write-Host "[4/6] Creating commit: '$Message'" -ForegroundColor Yellow
 git commit -m $Message
 
 if ($LASTEXITCODE -ne 0) {
-    Write-Host "❌ Ошибка при создании коммита" -ForegroundColor Red
+    Write-Host "[ERROR] Failed to create commit" -ForegroundColor Red
     exit 1
 }
 
-Write-Host "✅ Коммит создан" -ForegroundColor Green
+Write-Host "[OK] Commit created" -ForegroundColor Green
 Write-Host ""
 
-# 5. Загрузить на GitHub
-Write-Host "⬆️  Загрузка на GitHub..." -ForegroundColor Yellow
+# 5. Push to GitHub
+Write-Host "[5/6] Pushing to GitHub..." -ForegroundColor Yellow
 git push
 
 if ($LASTEXITCODE -ne 0) {
-    Write-Host "❌ Ошибка при загрузке на GitHub" -ForegroundColor Red
+    Write-Host "[ERROR] Failed to push to GitHub" -ForegroundColor Red
     Write-Host ""
-    Write-Host "Возможные причины:" -ForegroundColor Yellow
-    Write-Host "  1. Не настроен remote: git remote add origin <url>" -ForegroundColor White
-    Write-Host "  2. Нет прав доступа: проверь токен или SSH ключ" -ForegroundColor White
-    Write-Host "  3. Нет интернета" -ForegroundColor White
+    Write-Host "Possible reasons:" -ForegroundColor Yellow
+    Write-Host "  1. Remote not configured: git remote add origin <url>" -ForegroundColor White
+    Write-Host "  2. No access: check token or SSH key" -ForegroundColor White
+    Write-Host "  3. No internet connection" -ForegroundColor White
     exit 1
 }
 
-Write-Host "✅ Загружено на GitHub" -ForegroundColor Green
+Write-Host "[OK] Pushed to GitHub" -ForegroundColor Green
 Write-Host ""
 
-# 6. Обновить сервер
-$deployToServer = Read-Host "Обновить сервер? (y/n, по умолчанию y)"
+# 6. Update server
+$deployToServer = Read-Host "[6/6] Update server? (y/n, default y)"
 
 if ($deployToServer -eq "" -or $deployToServer -eq "y") {
     Write-Host ""
-    Write-Host "📡 Подключение к серверу..." -ForegroundColor Yellow
+    Write-Host "[SERVER] Connecting to server..." -ForegroundColor Yellow
     
-    # Проверка SSH
-    $sshTest = ssh -o ConnectTimeout=5 root@147.45.48.64 "echo OK" 2>$null
+    # Test SSH connection
+    $null = ssh -o ConnectTimeout=5 root@147.45.48.64 "echo OK" 2>$null
     
     if ($LASTEXITCODE -ne 0) {
-        Write-Host "❌ Не удалось подключиться к серверу" -ForegroundColor Red
-        Write-Host "Проверь:" -ForegroundColor Yellow
-        Write-Host "  1. Сервер доступен: ping 147.45.48.64" -ForegroundColor White
-        Write-Host "  2. SSH работает: ssh root@147.45.48.64" -ForegroundColor White
+        Write-Host "[ERROR] Cannot connect to server" -ForegroundColor Red
+        Write-Host "Check:" -ForegroundColor Yellow
+        Write-Host "  1. Server is online: ping 147.45.48.64" -ForegroundColor White
+        Write-Host "  2. SSH works: ssh root@147.45.48.64" -ForegroundColor White
         exit 1
     }
     
-    Write-Host "✅ Подключено к серверу" -ForegroundColor Green
+    Write-Host "[OK] Connected to server" -ForegroundColor Green
     Write-Host ""
-    Write-Host "🔄 Обновление кода на сервере..." -ForegroundColor Yellow
+    Write-Host "[SERVER] Updating code on server..." -ForegroundColor Yellow
     
-    # Выполнить команды на сервере
+    # Execute commands on server
     ssh root@147.45.48.64 @"
 cd ~/rest-api
-echo '📥 Скачивание изменений...'
+echo '[1/3] Pulling changes...'
 git pull
 echo ''
-echo '📦 Установка зависимостей...'
+echo '[2/3] Installing dependencies...'
 npm install --production
 echo ''
-echo '🔄 Перезапуск приложения...'
+echo '[3/3] Restarting application...'
 ./restart.sh app
 "@
     
     if ($LASTEXITCODE -eq 0) {
         Write-Host ""
-        Write-Host "✅ Сервер успешно обновлен!" -ForegroundColor Green
+        Write-Host "[SUCCESS] Server updated successfully!" -ForegroundColor Green
         Write-Host ""
-        Write-Host "🌐 Проверь: https://lumeai.ru" -ForegroundColor Cyan
+        Write-Host "Check: https://lumeai.ru" -ForegroundColor Cyan
     } else {
         Write-Host ""
-        Write-Host "⚠️  Возможны ошибки при обновлении сервера" -ForegroundColor Yellow
-        Write-Host "Проверь логи: ssh root@147.45.48.64 'pm2 logs lumeai'" -ForegroundColor White
+        Write-Host "[WARNING] Possible errors during server update" -ForegroundColor Yellow
+        Write-Host "Check logs: ssh root@147.45.48.64 'pm2 logs lumeai'" -ForegroundColor White
     }
 } else {
     Write-Host ""
-    Write-Host "⏭️  Пропущено обновление сервера" -ForegroundColor Yellow
-    Write-Host "Для обновления вручную:" -ForegroundColor White
+    Write-Host "[SKIP] Server update skipped" -ForegroundColor Yellow
+    Write-Host "To update manually:" -ForegroundColor White
     Write-Host "  ssh root@147.45.48.64" -ForegroundColor Cyan
     Write-Host "  cd ~/rest-api && git pull && ./restart.sh app" -ForegroundColor Cyan
 }
 
 Write-Host ""
-Write-Host "🎉 Готово!" -ForegroundColor Green
+Write-Host "[DONE] Deployment complete!" -ForegroundColor Green
 Write-Host ""
