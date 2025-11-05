@@ -69,6 +69,40 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .loader{display:inline-block;width:16px;height:16px;border:2px solid #fff;border-radius:50%;border-top-color:transparent;animation:spin .8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 
+/* OpenRouter-Style Models Section */
+.models-hero{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);padding:40px;border-radius:20px;margin-bottom:30px;text-align:center}
+.models-hero h1{font-size:42px;font-weight:700;margin-bottom:15px;text-shadow:0 2px 10px rgba(0,0,0,.3)}
+.models-hero p{font-size:18px;opacity:.9}
+.filters-container{background:#2a2a2a;border:1px solid #3a3a3a;border-radius:15px;padding:25px;margin-bottom:30px}
+.filter-group{margin-bottom:20px}
+.filter-label{color:#999;font-size:13px;font-weight:600;text-transform:uppercase;margin-bottom:12px;display:block}
+.filter-chips{display:flex;flex-wrap:wrap;gap:8px}
+.filter-chip{padding:8px 16px;background:#3a3a3a;border:1px solid #3a3a3a;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;transition:all .3s;color:#ccc}
+.filter-chip:hover{background:#4a4a4a;border-color:#667eea}
+.filter-chip.active{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);border-color:#667eea;color:#fff}
+.search-box{width:100%;padding:14px 20px;background:#1a1a1a;border:1px solid #3a3a3a;border-radius:12px;color:#fff;font-size:15px;margin-bottom:20px}
+.search-box:focus{outline:none;border-color:#667eea;box-shadow:0 0 0 3px rgba(102,126,234,.1)}
+.model-card{background:#2a2a2a;border:1px solid #3a3a3a;border-radius:15px;padding:25px;margin-bottom:20px;transition:all .3s;position:relative;overflow:hidden}
+.model-card:hover{border-color:#667eea;box-shadow:0 10px 30px rgba(102,126,234,.2);transform:translateY(-3px)}
+.model-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);opacity:0;transition:opacity .3s}
+.model-card:hover::before{opacity:1}
+.model-header{display:flex;justify-content:space-between;align-items:start;margin-bottom:15px}
+.model-name{font-size:20px;font-weight:700;color:#fff;margin-bottom:5px}
+.model-provider{color:#999;font-size:13px}
+.model-stats{display:flex;gap:20px;flex-wrap:wrap;margin-top:15px;padding-top:15px;border-top:1px solid #3a3a3a}
+.model-stat{flex:1;min-width:100px}
+.model-stat-label{color:#999;font-size:11px;text-transform:uppercase;margin-bottom:5px}
+.model-stat-value{color:#fff;font-size:16px;font-weight:600}
+.model-badges{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:15px}
+.model-badge{padding:4px 10px;border-radius:6px;font-size:11px;font-weight:600;text-transform:uppercase}
+.model-badge.multimodal{background:rgba(102,126,234,.2);color:#667eea}
+.model-badge.tools{background:rgba(74,222,128,.2);color:#4ade80}
+.model-badge.free{background:rgba(251,191,36,.2);color:#fbbf24}
+.featured-models{margin-bottom:40px}
+.featured-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px}
+.sort-bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:15px}
+.model-count{color:#999;font-size:14px}
+
 /* 📱 МОБИЛЬНАЯ АДАПТАЦИЯ */
 @media(max-width:768px){
   /* Контейнер */
@@ -98,6 +132,21 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
   
   /* Секции */
   .section{padding:20px 15px;margin-bottom:20px}
+  
+  /* Модели в стиле OpenRouter */
+  .models-hero{padding:25px 20px}
+  .models-hero h1{font-size:28px}
+  .models-hero p{font-size:15px}
+  .filters-container{padding:20px 15px}
+  .filter-chips{gap:6px}
+  .filter-chip{padding:6px 12px;font-size:12px}
+  .search-box{padding:12px 15px;font-size:14px}
+  .featured-grid{grid-template-columns:1fr;gap:15px}
+  .model-card{padding:20px}
+  .model-name{font-size:18px}
+  .model-header{flex-direction:column;gap:10px}
+  .model-stats{gap:15px}
+  .sort-bar{flex-direction:column;align-items:stretch}
   .section-header{flex-direction:column;align-items:flex-start;gap:15px}
   .section-title{font-size:18px}
   

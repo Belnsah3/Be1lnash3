@@ -657,7 +657,15 @@ async function loadModels() {
     }
 }
 
-// Отрисовка моделей
+// Состояние фильтров
+let modelFilters = {
+    search: '',
+    category: 'all',
+    type: 'all',
+    supportsTools: 'all'
+};
+
+// Отрисовка моделей в стиле OpenRouter
 function renderModels() {
     const container = document.getElementById('models-container');
     
@@ -666,92 +674,216 @@ function renderModels() {
         return;
     }
     
-    // Группируем по категориям
-    const categories = {};
-    allModels.forEach(model => {
-        if (!categories[model.category]) {
-            categories[model.category] = [];
-        }
-        categories[model.category].push(model);
-    });
-
-    let html = '<div id="alert-models" class="alert"></div>';
-    
-    // Добавляем API endpoint
-    const apiEndpoint = `${window.location.protocol}//${window.location.host}/api/v1/ai/chat/completions`;
-    html += `
-        <div style="margin-bottom:30px;padding:20px;background:#3a3a3a;border-radius:10px">
-            <h3 style="margin-bottom:10px">🔗 API Endpoint</h3>
-            <p style="color:#999;margin-bottom:10px">Используйте этот URL для обращения к AI:</p>
-            <div style="display:flex;gap:10px;align-items:center;margin-bottom:15px">
-                <code style="flex:1;padding:12px;background:#1a1a1a;border-radius:8px;color:#667eea;font-size:14px">${apiEndpoint}</code>
-                <button onclick="copyEndpoint('${apiEndpoint}')" class="btn btn-secondary">📋 Копировать</button>
+    let html = `
+        <!-- Hero Section -->
+        <div class="models-hero">
+            <h1>🌟 AI Models</h1>
+            <p>Доступ ко всем популярным AI моделям через единый API</p>
+        </div>
+        
+        <!-- API Endpoint -->
+        <div style="margin-bottom:30px;padding:25px;background:#2a2a2a;border:1px solid #3a3a3a;border-radius:15px">
+            <h3 style="margin-bottom:15px;color:#667eea">🔗 API Endpoint</h3>
+            <p style="color:#999;margin-bottom:15px">Используйте этот URL для обращения к AI</p>
+            <div style="display:flex;gap:10px;align-items:center;margin-bottom:15px;flex-wrap:wrap">
+                <code style="flex:1;min-width:250px;padding:14px;background:#1a1a1a;border-radius:10px;color:#667eea;font-size:14px;word-break:break-all">${window.location.protocol}//${window.location.host}/api/v1/ai/chat/completions</code>
+                <button onclick="copyEndpoint('${window.location.protocol}//${window.location.host}/api/v1/ai/chat/completions')" class="btn btn-secondary btn-sm">📋 Копировать</button>
             </div>
-            <p style="color:#999;font-size:13px;margin-bottom:15px">
-                💡 Совместимо с OpenAI API - используйте в любом приложении, поддерживающем OpenAI формат
-            </p>
-        </div>
-    `;
-    
-    // Добавляем ссылку на документацию
-    html += `
-        <div style="margin-bottom:30px;padding:20px;background:#3a3a3a;border-radius:10px">
-            <h3 style="margin-bottom:10px">📚 Документация</h3>
-            <p style="color:#999;margin-bottom:15px">Полная документация по использованию API</p>
-            <a href="/api-docs" target="_blank" class="btn btn-primary" style="margin-right:10px">Открыть документацию</a>
-            <a href="https://github.com/Belnsah3/Be1lnash3/blob/main/FUNCTION_CALLING_GUIDE.md" target="_blank" class="btn btn-secondary">🔧 Function Calling Guide</a>
-        </div>
-    `;
-    
-    // Добавляем легенду
-    html += `
-        <div style="margin-bottom:30px;padding:15px;background:#2a2a2a;border:1px solid #3a3a3a;border-radius:10px">
-            <div style="display:flex;gap:20px;align-items:center">
-                <span style="color:#999">Легенда:</span>
-                <span style="display:flex;align-items:center;gap:5px">
-                    <span style="color:#4ade80">🔧</span>
-                    <span style="color:#999;font-size:13px">Поддержка Function Calling (Tools)</span>
-                </span>
+            <div style="display:flex;gap:10px;flex-wrap:wrap">
+                <a href="/api-docs" target="_blank" class="btn btn-primary btn-sm">📚 Документация</a>
+                <a href="https://github.com/Belnsah3/Be1lnash3/blob/main/FUNCTION_CALLING_GUIDE.md" target="_blank" class="btn btn-secondary btn-sm">🔧 Function Calling</a>
             </div>
         </div>
+        
+        <!-- Filters -->
+        <div class="filters-container">
+            <input type="text" class="search-box" placeholder="🔍 Поиск моделей..." onkeyup="filterModels(this.value)">
+            
+            <div class="filter-group">
+                <span class="filter-label">Категория</span>
+                <div class="filter-chips">
+                    <div class="filter-chip active" onclick="setFilter('category', 'all')">Все</div>
+                    ${[...new Set(allModels.map(m => m.category))].sort().map(cat => 
+                        `<div class="filter-chip" onclick="setFilter('category', '${cat}')">${cat}</div>`
+                    ).join('')}
+                </div>
+            </div>
+            
+            <div class="filter-group">
+                <span class="filter-label">Тип</span>
+                <div class="filter-chips">
+                    <div class="filter-chip active" onclick="setFilter('type', 'all')">Все</div>
+                    <div class="filter-chip" onclick="setFilter('type', 'text')">📝 Text</div>
+                    <div class="filter-chip" onclick="setFilter('type', 'multimodal')">🎨 Multimodal</div>
+                    <div class="filter-chip" onclick="setFilter('type', 'image')">🖼️ Image</div>
+                    <div class="filter-chip" onclick="setFilter('type', 'video')">🎬 Video</div>
+                </div>
+            </div>
+            
+            <div class="filter-group">
+                <span class="filter-label">Function Calling</span>
+                <div class="filter-chips">
+                    <div class="filter-chip active" onclick="setFilter('supportsTools', 'all')">Все</div>
+                    <div class="filter-chip" onclick="setFilter('supportsTools', 'true')">🔧 Поддерживает</div>
+                    <div class="filter-chip" onclick="setFilter('supportsTools', 'false')">❌ Не поддерживает</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Featured Models -->
+        <div class="featured-models">
+            <h2 style="margin-bottom:20px;color:#fff">⭐ Популярные модели</h2>
+            <div class="featured-grid" id="featured-models">
+                <!-- Will be filled by renderFeaturedModels -->
+            </div>
+        </div>
+        
+        <!-- All Models -->
+        <div class="sort-bar">
+            <div class="model-count"><span id="filtered-count">${allModels.length}</span> из ${allModels.length} моделей</div>
+            <select onchange="sortModels(this.value)" style="padding:10px 15px;background:#3a3a3a;border:1px solid #3a3a3a;border-radius:8px;color:#fff;font-size:13px;cursor:pointer">
+                <option value="name">По названию</option>
+                <option value="category">По категории</option>
+                <option value="type">По типу</option>
+            </select>
+        </div>
+        
+        <div id="models-list">
+            <!-- Will be filled by renderModelsList -->
+        </div>
     `;
-
-    // Отрисовываем модели по категориям
-    Object.keys(categories).sort().forEach(category => {
-        html += `
-            <div style="margin-bottom:30px">
-                <h3 style="margin-bottom:15px;color:#667eea">${category}</h3>
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>Название модели</th>
-                            <th>Действия</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-        `;
-
-        categories[category].forEach(model => {
-            const toolsIcon = model.supportsTools ? '<span title="Поддерживает Function Calling" style="color:#4ade80;margin-left:8px">🔧</span>' : '';
-            html += `
-                <tr>
-                    <td>
-                        <code class="key-value">${model.name}</code>
-                        ${toolsIcon}
-                    </td>
-                    <td>
-                        <button onclick="copyModelName('${model.name}')" class="btn btn-secondary" style="padding:8px 16px;font-size:12px">
-                            📋 Копировать
-                        </button>
-                    </td>
-                </tr>
-            `;
-        });
-
-        html += '</tbody></table></div>';
-    });
-
+    
     container.innerHTML = html;
+    renderFeaturedModels();
+    renderModelsList();
+}
+
+// Отрисовка популярных моделей
+function renderFeaturedModels() {
+    const featured = [
+        'gpt-5-chat', 'claude-sonnet-4.5', 'gemini-2.5-pro', 
+        'deepseek-v3.1', 'grok-4', 'qwen3-coder'
+    ];
+    
+    const featuredModels = allModels.filter(m => featured.includes(m.name));
+    const container = document.getElementById('featured-models');
+    
+    if (!container) return;
+    
+    container.innerHTML = featuredModels.map(model => `
+        <div class="model-card">
+            <div class="model-header">
+                <div>
+                    <div class="model-name">${model.name}</div>
+                    <div class="model-provider">by ${model.category}</div>
+                </div>
+            </div>
+            <div class="model-badges">
+                <span class="model-badge ${model.type}">${model.type.toUpperCase()}</span>
+                ${model.supportsTools ? '<span class="model-badge tools">🔧 TOOLS</span>' : ''}
+            </div>
+            <button onclick="copyModelName('${model.name}')" class="btn btn-primary btn-sm" style="width:100%">
+                📋 Копировать имя модели
+            </button>
+        </div>
+    `).join('');
+}
+
+// Отрисовка списка моделей
+function renderModelsList() {
+    const container = document.getElementById('models-list');
+    if (!container) return;
+    
+    let filtered = allModels.filter(model => {
+        // Search filter
+        if (modelFilters.search && !model.name.toLowerCase().includes(modelFilters.search.toLowerCase())) {
+            return false;
+        }
+        
+        // Category filter
+        if (modelFilters.category !== 'all' && model.category !== modelFilters.category) {
+            return false;
+        }
+        
+        // Type filter
+        if (modelFilters.type !== 'all' && model.type !== modelFilters.type) {
+            return false;
+        }
+        
+        // Tools filter
+        if (modelFilters.supportsTools !== 'all') {
+            const supports = modelFilters.supportsTools === 'true';
+            if (model.supportsTools !== supports) {
+                return false;
+            }
+        }
+        
+        return true;
+    });
+    
+    // Update count
+    const countEl = document.getElementById('filtered-count');
+    if (countEl) countEl.textContent = filtered.length;
+    
+    if (filtered.length === 0) {
+        container.innerHTML = `
+            <div class="empty-state">
+                <div class="empty-state-icon">🔍</div>
+                <div>Модели не найдены</div>
+                <p style="color:#666;margin-top:10px">Попробуйте изменить фильтры</p>
+            </div>
+        `;
+        return;
+    }
+    
+    container.innerHTML = filtered.map(model => `
+        <div class="model-card">
+            <div class="model-header">
+                <div>
+                    <div class="model-name">${model.name}</div>
+                    <div class="model-provider">by ${model.category}</div>
+                </div>
+                <button onclick="copyModelName('${model.name}')" class="btn btn-secondary btn-sm">
+                    📋 Копировать
+                </button>
+            </div>
+            <div class="model-badges">
+                <span class="model-badge ${model.type}">${model.type.toUpperCase()}</span>
+                ${model.supportsTools ? '<span class="model-badge tools">🔧 TOOLS</span>' : ''}
+            </div>
+        </div>
+    `).join('');
+}
+
+// Фильтрация моделей
+function filterModels(search) {
+    modelFilters.search = search;
+    renderModelsList();
+}
+
+// Установка фильтра
+function setFilter(filterType, value) {
+    modelFilters[filterType] = value;
+    
+    // Update active state
+    document.querySelectorAll(`.filter-chip`).forEach(chip => {
+        chip.classList.remove('active');
+    });
+    event.target.classList.add('active');
+    
+    renderModelsList();
+}
+
+// Сортировка моделей
+function sortModels(sortBy) {
+    if (sortBy === 'name') {
+        allModels.sort((a, b) => a.name.localeCompare(b.name));
+    } else if (sortBy === 'category') {
+        allModels.sort((a, b) => a.category.localeCompare(b.category));
+    } else if (sortBy === 'type') {
+        allModels.sort((a, b) => a.type.localeCompare(b.type));
+    }
+    renderModelsList();
 }
 
 // Переключение табов
