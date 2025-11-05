@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const axios = require('axios');
 const { requireApiKey, logRequest } = require('../middleware/auth');
+const { injectTools, processToolCalls, createFollowUpMessages, supportsTools } = require('../middleware/function-calling');
 
 // GPT4Free.pro API - бесплатный AI провайдер (OpenAI-compatible)
 // Endpoints: POST /v1/chat/completions, POST /v1/images/generations, GET /v1/models
@@ -126,7 +127,7 @@ const DEFAULT_MODEL = 'gpt-4';
  */
 router.post('/chat/completions', requireApiKey, async (req, res) => {
   try {
-    const { messages, model = DEFAULT_MODEL, stream = false, provider, api = 'interference' } = req.body;
+    const { messages, model = DEFAULT_MODEL, stream = false, provider, api = 'interference', tools } = req.body;
     
     console.log('📥 Входящий запрос:', {
       url: req.originalUrl,
@@ -136,6 +137,7 @@ router.post('/chat/completions', requireApiKey, async (req, res) => {
       messagesCount: messages?.length,
       firstMessage: messages?.[0],
       api,
+      toolsCount: tools?.length || 0,
       headers: {
         'content-type': req.headers['content-type'],
         'user-agent': req.headers['user-agent']
@@ -207,11 +209,35 @@ router.post('/chat/completions', requireApiKey, async (req, res) => {
     }
     
     // Для не-streaming запросов
-    const requestBody = {
+    let requestBody = {
       model: model,
       messages: messages,
       stream: false
     };
+
+    // Обработка Function Calling (tools)
+    let hasTools = false;
+    if (tools && tools.length > 0) {
+      console.log(`🔧 Клиент передал ${tools.length} tools`);
+      
+      try {
+        // Проверяем поддержку модели
+        if (!supportsTools(model)) {
+          console.warn(`⚠️ Модель ${model} может не поддерживать tools`);
+        }
+        
+        // Добавляем tools в запрос
+        requestBody = injectTools(requestBody, tools);
+        hasTools = true;
+        console.log('✅ Tools добавлены в запрос');
+      } catch (error) {
+        console.error('❌ Ошибка добавления tools:', error.message);
+        return res.status(400).json({
+          success: false,
+          error: error.message
+        });
+      }
+    }
     
     const gpt4freeResponse = await axios.post(`${GPT4FREE_PRO_API}/v1/chat/completions`, requestBody, {
       timeout: 60000,
@@ -298,8 +324,53 @@ router.post('/chat/completions', requireApiKey, async (req, res) => {
       // Если это уже объект, возвращаем как есть
       console.log('📦 Получен обычный ответ');
       
+      let responseData = rawData;
+
+      // Обработка Function Calling - проверяем есть ли tool_calls
+      if (hasTools && responseData.choices?.[0]?.message?.tool_calls) {
+        console.log('🔧 Обнаружены tool_calls в ответе AI');
+        
+        try {
+          const context = {
+            userId: req.user?.id,
+            apiKeyId: req.apiKey?.id,
+            timeout: 5000
+          };
+
+          // Обрабатываем tool_calls
+          const { toolResults, needsSecondCall } = await processToolCalls(responseData, context);
+
+          if (needsSecondCall && toolResults) {
+            console.log('🔄 Отправляем второй запрос к AI с результатами функций');
+
+            // Создаем новые сообщения с результатами
+            const followUpMessages = createFollowUpMessages(messages, responseData, toolResults);
+
+            // Второй запрос к AI
+            const secondRequest = {
+              model: model,
+              messages: followUpMessages,
+              stream: false
+            };
+
+            const secondResponse = await axios.post(`${GPT4FREE_PRO_API}/v1/chat/completions`, secondRequest, {
+              timeout: 60000,
+              headers: {
+                'Content-Type': 'application/json'
+              }
+            });
+
+            console.log('✅ Получен финальный ответ после выполнения функций');
+            responseData = secondResponse.data;
+          }
+        } catch (error) {
+          console.error('❌ Ошибка обработки tool_calls:', error);
+          // Продолжаем с исходным ответом
+        }
+      }
+      
       if (!res.headersSent) {
-        res.json(rawData);
+        res.json(responseData);
         console.log('✅ Ответ отправлен клиенту');
       } else {
         console.log('⚠️ Ответ уже был отправлен ранее!');
