@@ -110,7 +110,7 @@ git push
 ### **Вариант 3: Обновить только сервер**
 
 ```bash
-ssh root@147.45.48.64 "cd ~/rest-api && git pull && ./restart.sh app"
+ssh YOUR_USERNAME@YOUR_SERVER_IP "cd ~/rest-api && git pull && ./restart.sh app"
 ```
 
 ---
@@ -162,7 +162,7 @@ git log --oneline -5
 ### **Шаг 1: Создай SSH ключ на сервере**
 
 ```bash
-ssh root@147.45.48.64
+ssh YOUR_USERNAME@YOUR_SERVER_IP
 
 # Создай ключ
 ssh-keygen -t ed25519 -C "github-actions"
@@ -184,7 +184,7 @@ cat ~/.ssh/id_ed25519
 
 **Секрет 1:**
 - Name: `SERVER_HOST`
-- Value: `147.45.48.64`
+- Value: `YOUR_SERVER_IP`
 
 **Секрет 2:**
 - Name: `SERVER_USER`
@@ -230,10 +230,10 @@ git remote add origin https://github.com/Belnash3/LumeAI.git
 **Решение:**
 ```bash
 # Проверь доступность сервера
-ping 147.45.48.64
+ping YOUR_SERVER_IP
 
 # Проверь SSH
-ssh root@147.45.48.64
+ssh YOUR_USERNAME@YOUR_SERVER_IP
 
 # Если не работает - обнови вручную через SSH
 ```

@@ -170,7 +170,7 @@ public/uploads/
 
 ### **1. Обнови сервер:**
 ```bash
-ssh root@147.45.48.64 "cd ~/rest-api/rest-api && git pull && pm2 restart lumeai"
+ssh YOUR_USERNAME@YOUR_SERVER_IP "cd ~/rest-api/rest-api && git pull && pm2 restart lumeai"
 ```
 
 ### **2. Открой настройки:**
