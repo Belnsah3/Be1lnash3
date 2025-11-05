@@ -775,7 +775,8 @@
                         chats.unshift(data.chat);
                         renderChatsList();
                     } else {
-                        throw new Error('Failed to create chat');
+                        console.error('Failed to create chat');
+                        return;
                     }
                 }
                 
@@ -786,12 +787,8 @@
                     body: JSON.stringify({ role, content })
                 });
                 
-                // Обновить время чата в списке
-                const chat = chats.find(c => c.id === currentChatId);
-                if (chat) {
-                    chat.updated_at = new Date().toISOString();
-                    renderChatsList();
-                }
+                // Обновить список чатов
+                await loadChats();
             } catch (error) {
                 console.error('Error saving message:', error);
             }
