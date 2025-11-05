@@ -538,15 +538,31 @@
         // Отправка сообщения
         async function sendMessage() {
             const input = document.getElementById('message-input');
-            const message = input.value.trim();
+            let message = input.value.trim();
             
             // Проверка что есть сообщение или файл
             if (!message && !attachedFile) return;
             
+            // Если только файл без текста - создаем описание
+            if (!message && attachedFile) {
+                if (attachedFile.type.startsWith('image/')) {
+                    message = 'Что на этом изображении?';
+                } else {
+                    message = `Проанализируй этот файл: ${attachedFile.name}`;
+                }
+            }
+            
             // Формируем сообщение с файлом если есть
             let userMessage = message;
+            let fileData = null;
+            
             if (attachedFile) {
                 userMessage = `📎 ${attachedFile.name}\n\n${message}`;
+                
+                // Читаем файл как base64 для изображений
+                if (attachedFile.type.startsWith('image/')) {
+                    fileData = await readFileAsBase64(attachedFile);
+                }
             }
             
             // Добавить сообщение пользователя
@@ -576,6 +592,27 @@
                     throw new Error('API ключ не установлен. Откройте настройки (⚙️)');
                 }
                 
+                // Формируем запрос с учетом изображений
+                let requestMessages = messageHistory;
+                
+                // Если есть изображение - добавляем его в последнее сообщение
+                if (fileData) {
+                    requestMessages = [...messageHistory];
+                    const lastMsg = requestMessages[requestMessages.length - 1];
+                    lastMsg.content = [
+                        {
+                            type: 'text',
+                            text: message
+                        },
+                        {
+                            type: 'image_url',
+                            image_url: {
+                                url: fileData
+                            }
+                        }
+                    ];
+                }
+                
                 // Отправка запроса с API ключом
                 const response = await fetch('/api/v1/ai/chat/completions', {
                     method: 'POST',
@@ -585,7 +622,7 @@
                     },
                     body: JSON.stringify({
                         model: model,
-                        messages: messageHistory,
+                        messages: requestMessages,
                         stream: false
                     })
                 });
@@ -634,7 +671,39 @@
             
             const content = document.createElement('div');
             content.className = 'message-content';
-            content.textContent = text;
+            
+            // Проверяем наличие изображений в тексте (base64 или URL)
+            const imageRegex = /(https?:\/\/[^\s]+\.(?:jpg|jpeg|png|gif|webp)|data:image\/[^;]+;base64,[^\s]+)/gi;
+            const images = text.match(imageRegex);
+            
+            if (images && images.length > 0) {
+                // Убираем URL изображений из текста
+                let cleanText = text;
+                images.forEach(img => {
+                    cleanText = cleanText.replace(img, '');
+                });
+                
+                // Добавляем текст
+                if (cleanText.trim()) {
+                    const textNode = document.createElement('div');
+                    textNode.textContent = cleanText.trim();
+                    content.appendChild(textNode);
+                }
+                
+                // Добавляем изображения
+                images.forEach(imgUrl => {
+                    const img = document.createElement('img');
+                    img.src = imgUrl;
+                    img.style.maxWidth = '100%';
+                    img.style.borderRadius = '10px';
+                    img.style.marginTop = '10px';
+                    img.style.cursor = 'pointer';
+                    img.onclick = () => window.open(imgUrl, '_blank');
+                    content.appendChild(img);
+                });
+            } else {
+                content.textContent = text;
+            }
             
             messageDiv.appendChild(avatar);
             messageDiv.appendChild(content);
@@ -852,6 +921,16 @@
             if (diff < 3600000) return Math.floor(diff / 60000) + ' мин назад';
             if (diff < 86400000) return Math.floor(diff / 3600000) + ' ч назад';
             return date.toLocaleDateString('ru-RU');
+        }
+        
+        // Читать файл как base64
+        function readFileAsBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
         }
         
         // Переключение мобильного меню
