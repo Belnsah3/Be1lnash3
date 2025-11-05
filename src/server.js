@@ -8,9 +8,13 @@ const path = require('path');
 const { sessionMiddleware } = require('./middleware/session');
 const db = require('./database/db');
 const { startLimitResetScheduler } = require('./utils/limitReset');
+const { initializeFunctions } = require('./functions/init');
 
 // Загрузка переменных окружения
 dotenv.config();
+
+// Инициализация Function Calling
+initializeFunctions();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
