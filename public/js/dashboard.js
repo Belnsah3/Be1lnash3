@@ -107,13 +107,31 @@ function loadRecentChats(chats) {
             </thead>
             <tbody>
                 ${chats.map(chat => `
-                    <tr>
-                        <td data-label="Название">${chat.title || 'Новый чат'}</td>
-                        <td data-label="Модель">${chat.model || 'N/A'}</td>
-                        <td data-label="Сообщений">${chat.message_count || 0}</td>
-                        <td data-label="Дата">${formatChatDate(chat.updated_at)}</td>
+                    <tr id="chat-${chat.id}">
+                        <td data-label="Название">
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <span style="font-size: 20px;">💬</span>
+                                <strong>${escapeHtml(chat.title || 'Новый чат')}</strong>
+                            </div>
+                        </td>
+                        <td data-label="Модель">
+                            <span class="badge badge-model">${escapeHtml(chat.model || 'N/A')}</span>
+                        </td>
+                        <td data-label="Сообщений">
+                            <span class="badge badge-count">${chat.message_count || 0}</span>
+                        </td>
+                        <td data-label="Дата">
+                            <span style="color: #888;">${formatChatDate(chat.updated_at)}</span>
+                        </td>
                         <td data-label="Действия">
-                            <button class="btn btn-primary" onclick="openChat(${chat.id})">Открыть</button>
+                            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                                <button class="btn btn-primary btn-sm" onclick="openChat(${chat.id})" title="Открыть чат">
+                                    📖 Открыть
+                                </button>
+                                <button class="btn btn-danger btn-sm" onclick="deleteChat(${chat.id})" title="Удалить чат">
+                                    🗑️ Удалить
+                                </button>
+                            </div>
                         </td>
                     </tr>
                 `).join('')}
@@ -127,6 +145,53 @@ function loadRecentChats(chats) {
 // Открыть чат
 function openChat(chatId) {
     window.location.href = `/chat?id=${chatId}`;
+}
+
+// Удалить чат
+async function deleteChat(chatId) {
+    if (!confirm('Вы уверены что хотите удалить этот чат? Все сообщения будут удалены.')) {
+        return;
+    }
+
+    try {
+        const response = await fetch(`/api/v1/chats/${chatId}`, {
+            method: 'DELETE'
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            // Удаляем строку из таблицы с анимацией
+            const row = document.getElementById(`chat-${chatId}`);
+            if (row) {
+                row.style.opacity = '0';
+                row.style.transition = 'opacity 0.3s';
+                setTimeout(() => {
+                    row.remove();
+                    
+                    // Если чатов не осталось, показываем пустое состояние
+                    const tbody = document.querySelector('#chats-container tbody');
+                    if (tbody && tbody.children.length === 0) {
+                        loadStats(); // Перезагружаем статистику и чаты
+                    }
+                }, 300);
+            }
+
+            showAlert('alert-chats', 'Чат успешно удален', 'success');
+        } else {
+            showAlert('alert-chats', data.error || 'Ошибка удаления чата', 'error');
+        }
+    } catch (error) {
+        console.error('Error deleting chat:', error);
+        showAlert('alert-chats', 'Ошибка удаления чата', 'error');
+    }
+}
+
+// Экранирование HTML
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
 }
 
 // Форматирование даты
