@@ -69,6 +69,7 @@ app.use('/api/v1/admin', adminRoutes);
 app.use('/api/v1/models', modelsRoutes);
 app.use('/api/v1/settings', require('./routes/settings'));
 app.use('/api/v1/stats', require('./routes/stats'));
+app.use('/api/v1/files', require('./routes/files'));
 
 // Дополнительные роуты для совместимости с разными клиентами
 app.use('/v1', aiRoutes);  // Для клиентов которые добавляют /v1

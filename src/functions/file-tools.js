@@ -2,10 +2,24 @@ const fs = require('fs').promises;
 const path = require('path');
 const config = require('../config/functions');
 
+// Базовая директория для загрузок пользователей
+const UPLOADS_BASE = path.join(__dirname, '../../uploads');
+
+/**
+ * Получить базовую папку для API ключа
+ */
+function getUserBasePath(context) {
+    if (!context || !context.apiKeyId) {
+        throw new Error('API key context required');
+    }
+    
+    return path.join(UPLOADS_BASE, `api_${context.apiKeyId}`);
+}
+
 /**
  * Валидация пути - проверка на path traversal и доступность
  */
-function validatePath(requestedPath) {
+function validatePath(requestedPath, context) {
     // Нормализация пути
     const normalized = path.normalize(requestedPath);
     
@@ -14,31 +28,16 @@ function validatePath(requestedPath) {
         throw new Error('Path traversal detected');
     }
 
-    // Проверка что путь начинается с одной из разрешенных базовых папок
-    const isAllowed = config.allowedBasePaths.some(basePath => {
-        const resolved = path.resolve(basePath, normalized);
-        return resolved.startsWith(path.resolve(basePath));
-    });
-
-    if (!isAllowed) {
-        throw new Error('Access to this path is not allowed');
-    }
-
     return normalized;
 }
 
 /**
  * Получить абсолютный путь из относительного
  */
-function resolvePath(relativePath) {
-    // Пробуем найти файл в одной из разрешенных папок
-    for (const basePath of config.allowedBasePaths) {
-        const fullPath = path.join(basePath, relativePath);
-        return fullPath;
-    }
-    
-    // Если не нашли, используем первую базовую папку
-    return path.join(config.allowedBasePaths[0], relativePath);
+function resolvePath(relativePath, context) {
+    // Используем папку пользователя на основе API ключа
+    const userBase = getUserBasePath(context);
+    return path.join(userBase, relativePath);
 }
 
 /**
@@ -53,12 +52,12 @@ function isAllowedExtension(filePath) {
  * Функция: read_file
  * Читает содержимое файла
  */
-async function readFile(args) {
+async function readFile(args, context) {
     const { path: filePath, encoding = 'utf-8' } = args;
 
     try {
-        validatePath(filePath);
-        const fullPath = resolvePath(filePath);
+        validatePath(filePath, context);
+        const fullPath = resolvePath(filePath, context);
 
         // Проверка существования файла
         const stats = await fs.stat(fullPath);
@@ -105,7 +104,7 @@ async function readFile(args) {
  * Функция: list_directory
  * Список файлов в папке
  */
-async function listDirectory(args) {
+async function listDirectory(args, context) {
     const { 
         path: dirPath, 
         recursive = false, 
@@ -114,8 +113,8 @@ async function listDirectory(args) {
     } = args;
 
     try {
-        validatePath(dirPath);
-        const fullPath = resolvePath(dirPath);
+        validatePath(dirPath, context);
+        const fullPath = resolvePath(dirPath, context);
 
         // Проверка существования папки
         const stats = await fs.stat(fullPath);
@@ -208,7 +207,7 @@ function matchPattern(filename, pattern) {
  * Функция: search_in_files
  * Поиск текста в файлах
  */
-async function searchInFiles(args) {
+async function searchInFiles(args, context) {
     const {
         path: searchPath,
         query,
@@ -218,8 +217,8 @@ async function searchInFiles(args) {
     } = args;
 
     try {
-        validatePath(searchPath);
-        const fullPath = resolvePath(searchPath);
+        validatePath(searchPath, context);
+        const fullPath = resolvePath(searchPath, context);
 
         const files = [];
         await scanDirectory(fullPath, '', files, true, file_pattern, 0, config.maxRecursionDepth);
@@ -297,12 +296,12 @@ function getContext(lines, index, maxLength) {
  * Функция: get_file_info
  * Получить информацию о файле
  */
-async function getFileInfo(args) {
+async function getFileInfo(args, context) {
     const { path: filePath } = args;
 
     try {
-        validatePath(filePath);
-        const fullPath = resolvePath(filePath);
+        validatePath(filePath, context);
+        const fullPath = resolvePath(filePath, context);
 
         const stats = await fs.stat(fullPath);
 
