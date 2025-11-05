@@ -365,8 +365,11 @@
                     style="width: 100%; padding: 12px; background: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: 10px; color: var(--text-primary); font-family: monospace;"
                 >
                 <p style="font-size: 12px; color: var(--text-tertiary); margin-top: 8px;">
-                    Получите API ключ в <a href="/dashboard" style="color: var(--accent-blue);">Dashboard</a>
+                    Получите API ключ в Dashboard
                 </p>
+                <button onclick="window.location.href='/dashboard'" class="btn btn-secondary" style="width: 100%; margin-top: 10px;">
+                    🔑 Перейти в Dashboard
+                </button>
             </div>
             
             <div style="display: flex; gap: 10px;">
@@ -392,14 +395,21 @@
         // API ключ
         let apiKey = localStorage.getItem('lumeai_api_key') || '';
         
-        // Проверка API ключа при загрузке
-        window.addEventListener('DOMContentLoaded', () => {
+        // Текущий чат
+        let currentChatId = null;
+        let chats = [];
+        
+        // Проверка API ключа и загрузка чатов при загрузке
+        window.addEventListener('DOMContentLoaded', async () => {
             if (!apiKey) {
                 setTimeout(() => {
                     openSettings();
                     alert('Пожалуйста, введите ваш API ключ из Dashboard для использования чата');
                 }, 500);
             }
+            
+            // Загрузить список чатов
+            await loadChats();
         });
         
         // Открыть настройки
@@ -452,6 +462,9 @@
             // Добавить в историю
             messageHistory.push({ role: 'user', content: message });
             
+            // Сохранить в БД
+            await saveMessage('user', message);
+            
             // Показать индикатор печати
             const typingId = addMessage('Печатает...', 'assistant');
             
@@ -491,6 +504,9 @@
                     const aiMessage = data.choices[0].message.content;
                     messageHistory.push({ role: 'assistant', content: aiMessage });
                     addMessage(aiMessage, 'assistant');
+                    
+                    // Сохранить ответ в БД
+                    await saveMessage('assistant', aiMessage);
                 } else {
                     throw new Error('Invalid response format');
                 }
@@ -594,20 +610,134 @@
             return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
         }
 
-        // Новый чат
-        function createNewChat() {
-            // Очистить историю
-            messageHistory = [];
+        // Загрузить список чатов
+        async function loadChats() {
+            try {
+                const response = await fetch('/api/v1/chats');
+                const data = await response.json();
+                
+                if (data.success) {
+                    chats = data.chats;
+                    renderChatsList();
+                    
+                    // Если есть чаты - загрузить первый
+                    if (chats.length > 0) {
+                        await loadChat(chats[0].id);
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading chats:', error);
+            }
+        }
+        
+        // Отобразить список чатов
+        function renderChatsList() {
+            const chatsList = document.getElementById('chats-list');
             
-            // Очистить сообщения
-            document.getElementById('messages').innerHTML = `
-                <div class="message assistant">
-                    <div class="message-avatar">🤖</div>
-                    <div class="message-content">
-                        Привет! Я AI ассистент. Чем могу помочь?
-                    </div>
+            if (chats.length === 0) {
+                chatsList.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--text-tertiary);">Нет чатов</div>';
+                return;
+            }
+            
+            chatsList.innerHTML = chats.map(chat => `
+                <div class="chat-item ${chat.id === currentChatId ? 'active' : ''}" onclick="loadChat(${chat.id})">
+                    <div style="font-weight: 600; margin-bottom: 4px;">${chat.title}</div>
+                    <div style="font-size: 12px; color: var(--text-tertiary);">${formatDate(chat.updated_at)}</div>
                 </div>
-            `;
+            `).join('');
+        }
+        
+        // Загрузить чат
+        async function loadChat(chatId) {
+            try {
+                currentChatId = chatId;
+                
+                // Обновить UI
+                renderChatsList();
+                
+                // Загрузить сообщения
+                const response = await fetch(`/api/v1/chats/${chatId}/messages`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Очистить контейнер
+                    document.getElementById('messages').innerHTML = '';
+                    
+                    // Загрузить историю
+                    messageHistory = data.messages.map(m => ({ role: m.role, content: m.content }));
+                    
+                    // Отобразить сообщения
+                    data.messages.forEach(msg => {
+                        addMessage(msg.content, msg.role);
+                    });
+                }
+            } catch (error) {
+                console.error('Error loading chat:', error);
+            }
+        }
+        
+        // Создать новый чат
+        async function createNewChat() {
+            try {
+                const response = await fetch('/api/v1/chats', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ title: 'Новый чат' })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    chats.unshift(data.chat);
+                    await loadChat(data.chat.id);
+                }
+            } catch (error) {
+                console.error('Error creating chat:', error);
+                // Fallback - очистить локально
+                currentChatId = null;
+                messageHistory = [];
+                document.getElementById('messages').innerHTML = `
+                    <div class="message assistant">
+                        <div class="message-avatar">🤖</div>
+                        <div class="message-content">
+                            Привет! Я AI ассистент. Чем могу помочь?
+                        </div>
+                    </div>
+                `;
+            }
+        }
+        
+        // Сохранить сообщение в БД
+        async function saveMessage(role, content) {
+            if (!currentChatId) {
+                // Создать новый чат если его нет
+                await createNewChat();
+            }
+            
+            try {
+                await fetch(`/api/v1/chats/${currentChatId}/messages`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ role, content })
+                });
+                
+                // Обновить список чатов
+                await loadChats();
+            } catch (error) {
+                console.error('Error saving message:', error);
+            }
+        }
+        
+        // Форматировать дату
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            const now = new Date();
+            const diff = now - date;
+            
+            if (diff < 60000) return 'Только что';
+            if (diff < 3600000) return Math.floor(diff / 60000) + ' мин назад';
+            if (diff < 86400000) return Math.floor(diff / 3600000) + ' ч назад';
+            return date.toLocaleDateString('ru-RU');
         }
     </script>
 </body>
