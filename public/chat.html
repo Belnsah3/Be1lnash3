@@ -760,20 +760,38 @@
         
         // Сохранить сообщение в БД
         async function saveMessage(role, content) {
-            if (!currentChatId) {
-                // Создать новый чат если его нет
-                await createNewChat();
-            }
-            
             try {
+                // Создать новый чат если его нет
+                if (!currentChatId) {
+                    const response = await fetch('/api/v1/chats', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ title: 'Новый чат' })
+                    });
+                    
+                    const data = await response.json();
+                    if (data.success) {
+                        currentChatId = data.chat.id;
+                        chats.unshift(data.chat);
+                        renderChatsList();
+                    } else {
+                        throw new Error('Failed to create chat');
+                    }
+                }
+                
+                // Сохранить сообщение
                 await fetch(`/api/v1/chats/${currentChatId}/messages`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ role, content })
                 });
                 
-                // Обновить список чатов
-                await loadChats();
+                // Обновить время чата в списке
+                const chat = chats.find(c => c.id === currentChatId);
+                if (chat) {
+                    chat.updated_at = new Date().toISOString();
+                    renderChatsList();
+                }
             } catch (error) {
                 console.error('Error saving message:', error);
             }
