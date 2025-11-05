@@ -60,6 +60,7 @@ app.use('/api/v1/ai', aiRoutes);
 app.use('/api/v1/keys', keysRoutes);
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/2fa', twoFARoutes);
+app.use('/api/v1/chats', require('./routes/chats'));
 app.use('/api/v1/admin', adminRoutes);
 app.use('/api/v1/models', modelsRoutes);
 

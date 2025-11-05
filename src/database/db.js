@@ -64,23 +64,16 @@ function initDatabase() {
         )
     `);
 
-    // Таблица истории запросов
+    // Таблица логов запросов
     db.exec(`
         CREATE TABLE IF NOT EXISTS request_logs (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            api_key_id INTEGER NOT NULL,
-            user_id INTEGER NOT NULL,
-            model TEXT NOT NULL,
-            prompt_tokens INTEGER DEFAULT 0,
-            completion_tokens INTEGER DEFAULT 0,
-            total_tokens INTEGER DEFAULT 0,
-            tokens_used INTEGER DEFAULT 0,
-            success BOOLEAN DEFAULT 1,
-            error_message TEXT,
-            response_time INTEGER DEFAULT 0,
+            api_key_id INTEGER,
+            endpoint TEXT NOT NULL,
+            method TEXT NOT NULL,
+            status_code INTEGER,
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY (api_key_id) REFERENCES api_keys(id) ON DELETE CASCADE,
-            FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+            FOREIGN KEY (api_key_id) REFERENCES api_keys(id) ON DELETE CASCADE
         )
     `);
     
@@ -101,12 +94,39 @@ function initDatabase() {
         db.exec(`ALTER TABLE request_logs ADD COLUMN response_time INTEGER DEFAULT 0`);
     } catch (e) {}
 
+    // Таблица чатов
+    db.exec(`
+        CREATE TABLE IF NOT EXISTS chats (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            title TEXT DEFAULT 'Новый чат',
+            model TEXT DEFAULT 'gpt-3.5-turbo',
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+        )
+    `);
+    
+    // Таблица сообщений
+    db.exec(`
+        CREATE TABLE IF NOT EXISTS messages (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            chat_id INTEGER NOT NULL,
+            role TEXT NOT NULL,
+            content TEXT NOT NULL,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (chat_id) REFERENCES chats(id) ON DELETE CASCADE
+        )
+    `);
+
     // Индексы для быстрого поиска
     db.exec(`
         CREATE INDEX IF NOT EXISTS idx_api_keys_user ON api_keys(user_id);
         CREATE INDEX IF NOT EXISTS idx_api_keys_key ON api_keys(key);
         CREATE INDEX IF NOT EXISTS idx_request_logs_key ON request_logs(api_key_id);
         CREATE INDEX IF NOT EXISTS idx_request_logs_date ON request_logs(created_at);
+        CREATE INDEX IF NOT EXISTS idx_chats_user ON chats(user_id);
+        CREATE INDEX IF NOT EXISTS idx_messages_chat ON messages(chat_id);
     `);
 
     console.log('✅ База данных инициализирована');
