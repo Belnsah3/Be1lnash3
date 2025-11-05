@@ -30,19 +30,6 @@ async function loadUserData() {
             document.getElementById('user-role').textContent = currentUser.role || 'user';
             document.getElementById('user-avatar').textContent = (currentUser.name || 'U').charAt(0).toUpperCase();
 
-            // Обновляем статистику лимитов
-            if (currentUser.role === 'admin' || currentUser.is_super_admin) {
-                document.getElementById('stat-limit').textContent = '∞';
-                const changeEl = document.querySelector('.stat-card:nth-child(4) .stat-change');
-                if (changeEl) changeEl.textContent = 'Без ограничений';
-            } else {
-                document.getElementById('stat-limit').textContent = currentUser.weekly_limit || 10000;
-                const labelEl = document.querySelector('.stat-card:nth-child(4) .stat-label');
-                const changeEl = document.querySelector('.stat-card:nth-child(4) .stat-change');
-                if (labelEl) labelEl.textContent = 'Недельный лимит';
-                if (changeEl) changeEl.textContent = `Использовано: ${currentUser.weekly_used || 0}`;
-            }
-
             // Если супер-админ, загружаем админ-панель
             if (currentUser.is_super_admin) {
                 loadAdminPanel();
@@ -169,18 +156,6 @@ async function loadAPIKeys() {
 
         if (data.success && data.keys) {
             apiKeys = data.keys;
-            
-            const statKeysEl = document.getElementById('stat-keys');
-            if (statKeysEl) {
-                statKeysEl.textContent = apiKeys.length;
-            }
-
-            const totalRequests = apiKeys.reduce((sum, key) => sum + (key.used_requests || 0), 0);
-            const statRequestsEl = document.getElementById('stat-requests');
-            if (statRequestsEl) {
-                statRequestsEl.textContent = totalRequests;
-            }
-
             renderAPIKeys();
         } else {
             console.error('Invalid keys response:', data);
