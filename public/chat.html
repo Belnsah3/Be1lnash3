@@ -334,75 +334,134 @@
                 <h2>Чат с AI</h2>
                 <div style="display: flex; gap: 10px; align-items: center;">
                     <select class="model-selector" id="model-selector">
-                    <option value="deepseek-v3.1">DeepSeek V3.1</option>
-                    <option value="command-a">Command A</option>
-                    <option value="seed-oss">Seed OSS</option>
-                    <option value="flux-schnell">Flux Schnell</option>
-                    <option value="deepseek-chat">DeepSeek Chat</option>
-                    <option value="deepseek-reasoner">DeepSeek Reasoner</option>
-                    <option value="glm-4.6">GLM 4.6</option>
-                    <option value="gpt-5-nano">GPT-5 Nano</option>
-                    <option value="o1-pro">O1 Pro</option>
-                    <option value="claude-sonnet-4">Claude Sonnet 4</option>
-                    <option value="claude-3-7-sonnet">Claude 3.7 Sonnet</option>
-                    <option value="claude-sonnet-4.5">Claude Sonnet 4.5</option>
-                    <option value="claude-haiku-4.5">Claude Haiku 4.5</option>
-                    <option value="hermes-4-405b">Hermes 4 405B</option>
-                    <option value="hermes-3-405b">Hermes 3 405B</option>
-                    <option value="qwen3-coder">Qwen3 Coder</option>
-                    <option value="qwen3-coder-big">Qwen3 Coder Big</option>
-                    <option value="qwq-32b-fast">QwQ 32B Fast</option>
-                    <option value="gpt-oss-120b">GPT OSS 120B</option>
-                    <option value="llama-3.3">Llama 3.3</option>
-                    <option value="nova-micro">Nova Micro</option>
-                    <option value="nova-lite">Nova Lite</option>
-                    <option value="nova-pro">Nova Pro</option>
-                    <option value="kimi-k2">Kimi K2</option>
-                    <option value="kimi-k2-0905">Kimi K2 0905</option>
-                    <option value="llama-4-maverick">Llama 4 Maverick</option>
-                    <option value="llama-4-scout">Llama 4 Scout</option>
-                    <option value="gemini-2.5-flash-lite">Gemini 2.5 Flash Lite</option>
-                    <option value="gemini-2.5-flash">Gemini 2.5 Flash</option>
-                    <option value="gemini-2.5-pro">Gemini 2.5 Pro</option>
-                    <option value="lucid-origin">Lucid Origin</option>
-                    <option value="sdxl">SDXL</option>
-                    <option value="cogvideox-flash">CogVideoX Flash</option>
-                    <option value="nano-banana">Nano Banana</option>
-                    <option value="grok-4">Grok 4</option>
-                    <option value="grok-4-think">Grok 4 Think</option>
-                    <option value="grok-code-1">Grok Code 1</option>
-                    <option value="grok-3-mini">Grok 3 Mini</option>
-                    <option value="gpt-image-1">GPT Image 1</option>
-                    <option value="gpt-5-chat">GPT-5 Chat</option>
-                    <option value="gpt-5-mini">GPT-5 Mini</option>
-                    <option value="qwen2.5-coder-32b">Qwen2.5 Coder 32B</option>
-                    <option value="qwen3-omni">Qwen3 Omni</option>
-                    <option value="qwen3-next">Qwen3 Next</option>
-                    <option value="deepseek-r1-0528">DeepSeek R1 0528</option>
-                    <option value="mistral-small-3.1-24b">Mistral Small 3.1 24B</option>
-                    <option value="gpt-4.1-mini">GPT-4.1 Mini</option>
-                    <option value="gpt-4.1-nano">GPT-4.1 Nano</option>
-                    <option value="o4-mini">O4 Mini</option>
-                    <option value="o3-mini">O3 Mini</option>
-                    <option value="gpt-4o-mini">GPT-4o Mini</option>
-                    <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
-                    <option value="deepseek-v3">DeepSeek V3</option>
-                    <option value="deepseek-v3.2">DeepSeek V3.2</option>
-                    <option value="deepseek-r1">DeepSeek R1</option>
-                    <option value="glm-4.5">GLM 4.5</option>
-                    <option value="glm-4.5-air">GLM 4.5 Air</option>
-                    <option value="ring-1t">Ring 1T</option>
-                    <option value="ling-1t">Ling 1T</option>
-                    <option value="ernie-4.5">ERNIE 4.5</option>
-                    <option value="sonar">Sonar</option>
-                    <option value="mistral-medium-3">Mistral Medium 3</option>
-                    <option value="goliath-120b">Goliath 120B</option>
-                    <option value="sd-3.5">SD 3.5</option>
-                    <option value="sd-3.5-large">SD 3.5 Large</option>
-                    <option value="dall-e-3">DALL-E 3</option>
-                    <option value="cliptagger-12b">ClipTagger 12B</option>
-                    <option value="gemma-3n-e4b">Gemma 3N E4B</option>
-                    <option value="nemotron-ultra-235b">Nemotron Ultra 235B</option>
+                    <!-- OpenAI -->
+                    <optgroup label="🤖 OpenAI">
+                        <option value="gpt-5-chat">GPT-5 Chat</option>
+                        <option value="gpt-5-nano">GPT-5 Nano</option>
+                        <option value="gpt-5-mini">GPT-5 Mini</option>
+                        <option value="gpt-4.1-mini">GPT-4.1 Mini</option>
+                        <option value="gpt-4.1-nano">GPT-4.1 Nano</option>
+                        <option value="gpt-4o-mini">GPT-4o Mini</option>
+                        <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
+                        <option value="o1-pro">O1 Pro</option>
+                        <option value="o4-mini">O4 Mini</option>
+                        <option value="o3-mini">O3 Mini</option>
+                        <option value="gpt-oss-120b">GPT OSS 120B</option>
+                        <option value="gpt-image-1">🎨 GPT Image-1</option>
+                        <option value="dall-e-3">🎨 DALL-E 3</option>
+                    </optgroup>
+                    
+                    <!-- Google -->
+                    <optgroup label="🔍 Google">
+                        <option value="gemini-2.5-pro">Gemini 2.5 Pro</option>
+                        <option value="gemini-2.5-flash">Gemini 2.5 Flash</option>
+                        <option value="gemini-2.5-flash-lite">Gemini 2.5 Flash Lite</option>
+                        <option value="gemma-3n-e4b">Gemma 3N E4B</option>
+                        <option value="nano-banana">🎨 Nano Banana</option>
+                    </optgroup>
+                    
+                    <!-- DeepSeek -->
+                    <optgroup label="🧠 DeepSeek">
+                        <option value="deepseek-v3.1">DeepSeek V3.1</option>
+                        <option value="deepseek-v3.2">DeepSeek V3.2</option>
+                        <option value="deepseek-v3">DeepSeek V3</option>
+                        <option value="deepseek-chat">DeepSeek Chat</option>
+                        <option value="deepseek-reasoner">DeepSeek Reasoner</option>
+                        <option value="deepseek-r1">DeepSeek R1</option>
+                        <option value="deepseek-r1-0528">DeepSeek R1-0528</option>
+                    </optgroup>
+                    
+                    <!-- Anthropic -->
+                    <optgroup label="🎭 Anthropic (Claude)">
+                        <option value="claude-sonnet-4.5">Claude Sonnet 4.5</option>
+                        <option value="claude-sonnet-4">Claude Sonnet 4</option>
+                        <option value="claude-3-7-sonnet">Claude 3.7 Sonnet</option>
+                        <option value="claude-haiku-4.5">Claude Haiku 4.5</option>
+                    </optgroup>
+                    
+                    <!-- Qwen / Alibaba -->
+                    <optgroup label="💻 Qwen (Alibaba)">
+                        <option value="qwen3-omni">Qwen3 Omni (Multi)</option>
+                        <option value="qwen3-coder">Qwen3 Coder</option>
+                        <option value="qwen3-coder-big">Qwen3 Coder Big</option>
+                        <option value="qwen2.5-coder-32b">Qwen2.5 Coder 32B</option>
+                        <option value="qwen3-next">Qwen3 Next</option>
+                        <option value="qwq-32b-fast">QwQ 32B Fast</option>
+                    </optgroup>
+                    
+                    <!-- Meta / Llama -->
+                    <optgroup label="🦙 Meta (Llama)">
+                        <option value="llama-4-maverick">Llama 4 Maverick</option>
+                        <option value="llama-4-scout">Llama 4 Scout</option>
+                        <option value="llama-3.3">Llama 3.3</option>
+                    </optgroup>
+                    
+                    <!-- xAI (Grok) -->
+                    <optgroup label="⚡ xAI (Grok)">
+                        <option value="grok-4">Grok 4</option>
+                        <option value="grok-4-think">Grok 4 Think</option>
+                        <option value="grok-code-1">Grok Code 1</option>
+                        <option value="grok-3-mini">Grok 3 Mini</option>
+                    </optgroup>
+                    
+                    <!-- Mistral AI -->
+                    <optgroup label="🌪️ Mistral AI">
+                        <option value="mistral-medium-3">Mistral Medium 3</option>
+                        <option value="mistral-small-3.1-24b">Mistral Small 3.1 24B</option>
+                    </optgroup>
+                    
+                    <!-- GLM (Zhipu AI) -->
+                    <optgroup label="🎯 GLM (Zhipu AI)">
+                        <option value="glm-4.6">GLM 4.6 (Multi)</option>
+                        <option value="glm-4.5">GLM 4.5</option>
+                        <option value="glm-4.5-air">GLM 4.5 Air</option>
+                    </optgroup>
+                    
+                    <!-- AWS -->
+                    <optgroup label="☁️ AWS">
+                        <option value="nova-pro">Nova Pro</option>
+                        <option value="nova-lite">Nova Lite</option>
+                        <option value="nova-micro">Nova Micro</option>
+                    </optgroup>
+                    
+                    <!-- Moonshot AI -->
+                    <optgroup label="🌙 Moonshot AI">
+                        <option value="kimi-k2">Kimi K2</option>
+                        <option value="kimi-k2-0905">Kimi K2 0905</option>
+                    </optgroup>
+                    
+                    <!-- Nous Research -->
+                    <optgroup label="🔬 Nous Research">
+                        <option value="hermes-4-405b">Hermes 4 405B</option>
+                        <option value="hermes-3-405b">Hermes 3 405B</option>
+                    </optgroup>
+                    
+                    <!-- Stability AI -->
+                    <optgroup label="🎨 Stability AI">
+                        <option value="sd-3.5-large">🎨 SD 3.5 Large</option>
+                        <option value="sd-3.5">🎨 SD 3.5</option>
+                        <option value="sdxl">🎨 SDXL</option>
+                        <option value="cogvideox-flash">📹 CogVideoX Flash</option>
+                    </optgroup>
+                    
+                    <!-- Flux -->
+                    <optgroup label="⚡ Flux">
+                        <option value="flux-schnell">🎨 Flux Schnell</option>
+                        <option value="seed-oss">Seed OSS</option>
+                    </optgroup>
+                    
+                    <!-- Другие -->
+                    <optgroup label="🌐 Другие">
+                        <option value="command-a">Command A (Cohere)</option>
+                        <option value="ernie-4.5">Ernie 4.5 (Baidu)</option>
+                        <option value="nemotron-ultra-235b">Nemotron Ultra 235B (NVIDIA)</option>
+                        <option value="sonar">Sonar (Perplexity)</option>
+                        <option value="cliptagger-12b">🖼️ ClipTagger 12B</option>
+                        <option value="goliath-120b">Goliath 120B</option>
+                        <option value="lucid-origin">Lucid Origin</option>
+                        <option value="ring-1t">Ring 1T</option>
+                        <option value="ling-1t">Ling 1T</option>
+                    </optgroup>
                 </select>
                 <button class="action-btn" onclick="openSettings()" title="Настройки">
                     ⚙️
@@ -505,14 +564,17 @@
         
         // Модели генерации изображений
         const imageGenerationModels = [
+            // OpenAI
+            'gpt-image-1',
             'dall-e-3',
+            // Google
+            'nano-banana',
+            // Stability AI
+            'sdxl',
             'sd-3.5',
             'sd-3.5-large',
-            'flux-schnell',
-            'flux-pro',
-            'midjourney',
-            'stable-diffusion',
-            'imagen-3'
+            // Flux
+            'flux-schnell'
         ];
         
         // Проверка API ключа и загрузка чатов при загрузке
