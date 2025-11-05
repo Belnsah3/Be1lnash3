@@ -424,40 +424,75 @@ table tr:last-child td {
 
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 <script>
-// Функция для создания ID из текста
+// Функция для создания ID из текста (убирает все кроме латиницы, цифр и дефисов)
 function createId(text) {
-    // Убираем эмодзи и специальные символы
-    return text
-        .replace(/[^\w\s-]/g, '')
-        .trim()
-        .toLowerCase()
-        .replace(/\s+/g, '-')
-        .replace(/-+/g, '-');
+    // Транслитерация русских букв
+    const translitMap = {
+        'а': 'a', 'б': 'b', 'в': 'v', 'г': 'g', 'д': 'd', 'е': 'e', 'ё': 'yo', 'ж': 'zh', 'з': 'z',
+        'и': 'i', 'й': 'y', 'к': 'k', 'л': 'l', 'м': 'm', 'н': 'n', 'о': 'o', 'п': 'p', 'р': 'r',
+        'с': 's', 'т': 't', 'у': 'u', 'ф': 'f', 'х': 'h', 'ц': 'ts', 'ч': 'ch', 'ш': 'sh', 'щ': 'sch',
+        'ъ': '', 'ы': 'y', 'ь': '', 'э': 'e', 'ю': 'yu', 'я': 'ya'
+    };
+    
+    let result = text.toLowerCase();
+    
+    // Транслитерируем русские буквы
+    result = result.split('').map(char => translitMap[char] || char).join('');
+    
+    // Убираем все кроме букв, цифр, пробелов и дефисов
+    result = result.replace(/[^a-z0-9\s-]/g, '');
+    
+    // Заменяем пробелы на дефисы
+    result = result.trim().replace(/\s+/g, '-');
+    
+    // Убираем множественные дефисы
+    result = result.replace(/-+/g, '-');
+    
+    return result;
 }
 
 // Загрузка и отображение markdown документации
 async function loadDocumentation() {
     try {
+        console.log('🔄 Загрузка документации...');
+        
         const response = await fetch('/FUNCTION_CALLING_GUIDE.md');
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
         const markdown = await response.text();
+        console.log('✅ Markdown загружен, размер:', markdown.length);
+        
+        // Проверяем что marked загружен
+        if (typeof marked === 'undefined') {
+            throw new Error('Библиотека marked.js не загружена');
+        }
         
         // Конвертируем markdown в HTML
         const html = marked.parse(markdown);
+        console.log('✅ HTML сгенерирован');
         
         // Отображаем
         document.getElementById('docs-content').innerHTML = html;
+        console.log('✅ Контент отображен');
         
-        // Добавляем ID к заголовкам и генерируем навигацию
-        generateNavigation();
-        
-        // Добавляем кнопки копирования для code blocks
-        addCopyButtons();
-        
-        // Настраиваем навигацию по якорям
-        setupAnchorNavigation();
+        // Даем браузеру время отрисовать
+        setTimeout(() => {
+            // Добавляем ID к заголовкам и генерируем навигацию
+            generateNavigation();
+            
+            // Добавляем кнопки копирования для code blocks
+            addCopyButtons();
+            
+            // Настраиваем навигацию по якорям
+            setupAnchorNavigation();
+            
+            console.log('✅ Навигация настроена');
+        }, 100);
         
     } catch (error) {
-        console.error('Error loading documentation:', error);
+        console.error('❌ Ошибка загрузки документации:', error);
         document.getElementById('docs-content').innerHTML = `
             <div style="text-align: center; padding: 60px 20px;">
                 <div style="font-size: 48px; margin-bottom: 20px;">⚠️</div>
@@ -470,29 +505,40 @@ async function loadDocumentation() {
 
 // Генерация навигации из заголовков
 function generateNavigation() {
+    console.log('📝 Генерация навигации...');
+    
     const content = document.getElementById('docs-content');
     const headings = content.querySelectorAll('h2');
     const sidebarNav = document.getElementById('sidebar-nav');
     
+    console.log('📌 Найдено заголовков H2:', headings.length);
+    
     if (headings.length === 0) {
-        sidebarNav.innerHTML = '<ul><li><div style="color:#999;padding:10px;">Нет заголовков</div></li></ul>';
+        console.warn('⚠️ Заголовки H2 не найдены');
+        sidebarNav.innerHTML = '<ul><li><div style="color:#999;padding:10px 12px;font-size:13px;">Заголовки не найдены</div></li></ul>';
         return;
     }
     
     let navHtml = '<ul>';
     
     headings.forEach((heading, index) => {
-        // Создаем ID для заголовка
-        const id = createId(heading.textContent);
+        const text = heading.textContent;
+        const id = createId(text);
+        
+        // Устанавливаем ID заголовку
         heading.id = id;
         
+        console.log(`  ${index + 1}. "${text}" → #${id}`);
+        
         // Добавляем ссылку в навигацию
-        const isActive = index === 0 ? 'active' : '';
-        navHtml += `<li><a href="#${id}" class="${isActive}">${heading.textContent}</a></li>`;
+        const isActive = index === 0 ? ' active' : '';
+        navHtml += `<li><a href="#${id}" class="${isActive}">${text}</a></li>`;
     });
     
     navHtml += '</ul>';
     sidebarNav.innerHTML = navHtml;
+    
+    console.log('✅ Навигация сгенерирована');
 }
 
 // Добавление кнопок копирования
@@ -522,14 +568,24 @@ function addCopyButtons() {
 
 // Навигация по якорям
 function setupAnchorNavigation() {
+    console.log('🔗 Настройка навигации по якорям...');
+    
     // Делегирование событий для динамически созданных ссылок
     const sidebarNav = document.getElementById('sidebar-nav');
+    
+    if (!sidebarNav) {
+        console.error('❌ Элемент sidebar-nav не найден');
+        return;
+    }
     
     sidebarNav.addEventListener('click', (e) => {
         const link = e.target.closest('a');
         if (!link) return;
         
         e.preventDefault();
+        
+        const href = link.getAttribute('href');
+        console.log('🖱️ Клик по ссылке:', href);
         
         // Убираем active у всех
         sidebarNav.querySelectorAll('a').forEach(l => l.classList.remove('active'));
@@ -538,10 +594,11 @@ function setupAnchorNavigation() {
         link.classList.add('active');
         
         // Скроллим к секции с отступом для header
-        const targetId = link.getAttribute('href').substring(1);
+        const targetId = href.substring(1);
         const target = document.getElementById(targetId);
         
         if (target) {
+            console.log('✅ Цель найдена, скроллим к:', targetId);
             const headerOffset = 100; // Отступ для sticky header
             const elementPosition = target.getBoundingClientRect().top;
             const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
@@ -550,6 +607,8 @@ function setupAnchorNavigation() {
                 top: offsetPosition,
                 behavior: 'smooth'
             });
+        } else {
+            console.error('❌ Элемент не найден:', targetId);
         }
     });
     
@@ -594,8 +653,42 @@ function updateActiveLink() {
     }
 }
 
-// Загружаем при загрузке страницы
-loadDocumentation();
+// Загружаем после полной загрузки DOM и marked.js
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initDocs);
+} else {
+    initDocs();
+}
+
+function initDocs() {
+    console.log('🚀 Инициализация документации...');
+    
+    // Проверяем что marked загружен
+    if (typeof marked === 'undefined') {
+        console.error('❌ marked.js не загружен, пробуем загрузить заново...');
+        // Пробуем загрузить еще раз
+        const script = document.createElement('script');
+        script.src = 'https://cdn.jsdelivr.net/npm/marked/marked.min.js';
+        script.onload = () => {
+            console.log('✅ marked.js загружен');
+            loadDocumentation();
+        };
+        script.onerror = () => {
+            console.error('❌ Не удалось загрузить marked.js');
+            document.getElementById('docs-content').innerHTML = `
+                <div style="text-align: center; padding: 60px 20px;">
+                    <div style="font-size: 48px; margin-bottom: 20px;">⚠️</div>
+                    <div style="color: #ef4444;">Ошибка загрузки библиотеки</div>
+                    <p style="color: #999; margin-top: 10px;">Не удалось загрузить marked.js</p>
+                </div>
+            `;
+        };
+        document.head.appendChild(script);
+    } else {
+        console.log('✅ marked.js уже загружен');
+        loadDocumentation();
+    }
+}
 </script>
 
 </body>
