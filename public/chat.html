@@ -10,7 +10,6 @@
             margin: 0;
             padding: 0;
             background: var(--bg-primary);
-            overflow: hidden;
         }
 
         .chat-container {
@@ -194,13 +193,21 @@
 
         /* Адаптивность */
         @media (max-width: 768px) {
-            body {
-                overflow: hidden;
-            }
-            
             .chat-container {
                 width: 100vw;
                 height: 100vh;
+                overflow: hidden;
+            }
+            
+            .chat-main {
+                height: 100vh;
+                overflow: hidden;
+            }
+            
+            .messages-container {
+                flex: 1;
+                overflow-y: auto;
+                -webkit-overflow-scrolling: touch;
             }
             
             .sidebar {
