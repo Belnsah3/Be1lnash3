@@ -63,6 +63,8 @@ app.use('/api/v1/2fa', twoFARoutes);
 app.use('/api/v1/chats', require('./routes/chats'));
 app.use('/api/v1/admin', adminRoutes);
 app.use('/api/v1/models', modelsRoutes);
+app.use('/api/v1/settings', require('./routes/settings'));
+app.use('/api/v1/stats', require('./routes/stats'));
 
 // Дополнительные роуты для совместимости с разными клиентами
 app.use('/v1', aiRoutes);  // Для клиентов которые добавляют /v1
@@ -133,6 +135,15 @@ app.get('/dashboard', (req, res) => {
 app.get('/chat', (req, res) => {
   if (req.session && req.session.userId) {
     res.sendFile(path.join(__dirname, '../public/chat.html'));
+  } else {
+    res.redirect('/login');
+  }
+});
+
+// Settings page
+app.get('/settings', (req, res) => {
+  if (req.session && req.session.userId) {
+    res.sendFile(path.join(__dirname, '../public/settings.html'));
   } else {
     res.redirect('/login');
   }

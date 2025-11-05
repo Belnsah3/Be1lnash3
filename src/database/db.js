@@ -132,6 +132,23 @@ function initDatabase() {
             FOREIGN KEY (message_id) REFERENCES messages(id) ON DELETE CASCADE
         )
     `);
+    
+    // Таблица настроек пользователя
+    db.exec(`
+        CREATE TABLE IF NOT EXISTS user_settings (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER UNIQUE NOT NULL,
+            api_key TEXT,
+            theme TEXT DEFAULT 'dark',
+            avatar_url TEXT,
+            privacy_settings TEXT DEFAULT '{}',
+            notification_settings TEXT DEFAULT '{}',
+            language TEXT DEFAULT 'ru',
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+        )
+    `);
 
     // Индексы для быстрого поиска
     db.exec(`
@@ -142,6 +159,7 @@ function initDatabase() {
         CREATE INDEX IF NOT EXISTS idx_chats_user ON chats(user_id);
         CREATE INDEX IF NOT EXISTS idx_messages_chat ON messages(chat_id);
         CREATE INDEX IF NOT EXISTS idx_files_message ON files(message_id);
+        CREATE INDEX IF NOT EXISTS idx_user_settings_user ON user_settings(user_id);
     `);
 
     console.log('✅ База данных инициализирована');
