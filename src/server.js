@@ -278,6 +278,20 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
   customfavIcon
 }));
 
+// Роутер для Function Calling документации
+app.get('/function-calling', (req, res) => {
+  res.sendFile(path.join(__dirname, '../public/function-calling.html'));
+});
+
+// Обслуживание markdown файла для документации
+app.get('/FUNCTION_CALLING_GUIDE.md', (req, res) => {
+  res.sendFile(path.join(__dirname, '../FUNCTION_CALLING_GUIDE.md'), {
+    headers: {
+      'Content-Type': 'text/markdown; charset=utf-8'
+    }
+  });
+});
+
 // Статические файлы для веб-интерфейса
 app.use(express.static(path.join(__dirname, '../public')));
 

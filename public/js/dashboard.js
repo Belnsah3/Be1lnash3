@@ -691,7 +691,7 @@ function renderModels() {
             </div>
             <div style="display:flex;gap:10px;flex-wrap:wrap">
                 <a href="/api-docs" target="_blank" class="btn btn-primary btn-sm">📚 Документация</a>
-                <a href="https://github.com/Belnsah3/Be1lnash3/blob/main/FUNCTION_CALLING_GUIDE.md" target="_blank" class="btn btn-secondary btn-sm">🔧 Function Calling</a>
+                <a href="/function-calling" target="_blank" class="btn btn-secondary btn-sm">🔧 Function Calling</a>
             </div>
         </div>
         
