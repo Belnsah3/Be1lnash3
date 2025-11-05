@@ -4,6 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Чат - LumeAI</title>
+    
+    <!-- Markdown и подсветка кода -->
+    <script src="https://cdn.jsdelivr.net/npm/marked@11.1.1/marked.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    
     <link rel="stylesheet" href="/css/new-theme.css">
     <style>
         body {
@@ -143,6 +149,97 @@
 
         .message.user .message-content {
             background: var(--accent-blue);
+        }
+        
+        /* Markdown стили */
+        .message-content pre {
+            background: #1e1e1e;
+            padding: 12px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 8px 0;
+        }
+        
+        .message-content code {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+        
+        .message-content pre code {
+            background: none;
+            padding: 0;
+        }
+        
+        .message-content blockquote {
+            border-left: 3px solid var(--accent-blue);
+            padding-left: 12px;
+            margin: 8px 0;
+            color: var(--text-secondary);
+        }
+        
+        .message-content a {
+            color: var(--accent-blue);
+            text-decoration: none;
+        }
+        
+        .message-content a:hover {
+            text-decoration: underline;
+        }
+        
+        .message-content img {
+            max-width: 100%;
+            border-radius: 8px;
+            margin: 8px 0;
+        }
+        
+        .message-content ul, .message-content ol {
+            padding-left: 20px;
+            margin: 8px 0;
+        }
+        
+        .message-content table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 8px 0;
+        }
+        
+        .message-content table th,
+        .message-content table td {
+            border: 1px solid var(--border-color);
+            padding: 8px;
+            text-align: left;
+        }
+        
+        .message-content table th {
+            background: var(--bg-tertiary);
+        }
+        
+        /* Кнопка копирования кода */
+        .code-block-wrapper {
+            position: relative;
+        }
+        
+        .copy-code-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: var(--text-primary);
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+        
+        .copy-code-btn:hover {
+            opacity: 1;
+            background: rgba(255, 255, 255, 0.2);
         }
 
         .input-container {
@@ -317,6 +414,18 @@
                 <h2>Чаты</h2>
                 <button class="new-chat-btn" onclick="createNewChat()">+ Новый чат</button>
             </div>
+            
+            <!-- Поиск по чатам -->
+            <div style="padding: 10px;">
+                <input 
+                    type="text" 
+                    id="chat-search" 
+                    placeholder="🔍 Поиск по чатам..."
+                    style="width: 100%; padding: 10px; background: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); font-family: inherit;"
+                    oninput="filterChats(this.value)"
+                />
+            </div>
+            
             <div class="chats-list" id="chats-list">
                 <div class="chat-item active">
                     <div style="font-weight: 600; margin-bottom: 4px;">Новый чат</div>
@@ -795,10 +904,14 @@
                     cleanText = cleanText.replace(img, '');
                 });
                 
-                // Добавляем текст
+                // Добавляем текст с Markdown для AI
                 if (cleanText.trim()) {
                     const textNode = document.createElement('div');
-                    textNode.textContent = cleanText.trim();
+                    if (role === 'assistant') {
+                        textNode.innerHTML = marked.parse(cleanText.trim());
+                    } else {
+                        textNode.textContent = cleanText.trim();
+                    }
                     content.appendChild(textNode);
                 }
                 
@@ -814,7 +927,36 @@
                     content.appendChild(img);
                 });
             } else {
-                content.textContent = text;
+                // Рендерим Markdown для сообщений AI
+                if (role === 'assistant') {
+                    content.innerHTML = marked.parse(text);
+                } else {
+                    content.textContent = text;
+                }
+            }
+            
+            // Подсветка кода
+            if (role === 'assistant') {
+                content.querySelectorAll('pre code').forEach((block) => {
+                    hljs.highlightElement(block);
+                    
+                    // Добавляем кнопку копирования
+                    const pre = block.parentElement;
+                    const wrapper = document.createElement('div');
+                    wrapper.className = 'code-block-wrapper';
+                    pre.parentNode.insertBefore(wrapper, pre);
+                    wrapper.appendChild(pre);
+                    
+                    const copyBtn = document.createElement('button');
+                    copyBtn.className = 'copy-code-btn';
+                    copyBtn.textContent = 'Копировать';
+                    copyBtn.onclick = () => {
+                        navigator.clipboard.writeText(block.textContent);
+                        copyBtn.textContent = 'Скопировано!';
+                        setTimeout(() => copyBtn.textContent = 'Копировать', 2000);
+                    };
+                    wrapper.appendChild(copyBtn);
+                });
             }
             
             messageDiv.appendChild(avatar);
@@ -1048,6 +1190,25 @@
             if (diff < 3600000) return Math.floor(diff / 60000) + ' мин назад';
             if (diff < 86400000) return Math.floor(diff / 3600000) + ' ч назад';
             return date.toLocaleDateString('ru-RU');
+        }
+        
+        // Поиск по чатам
+        function filterChats(searchQuery) {
+            const query = searchQuery.toLowerCase().trim();
+            const chatItems = document.querySelectorAll('.chat-item');
+            
+            chatItems.forEach(item => {
+                const titleElement = item.querySelector('div:first-child');
+                if (!titleElement) return;
+                
+                const title = titleElement.textContent.toLowerCase();
+                
+                if (title.includes(query)) {
+                    item.style.display = '';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
         }
         
         // Переименовать чат
