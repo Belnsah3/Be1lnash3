@@ -4,9 +4,10 @@ const axios = require('axios');
 const { requireApiKey, logRequest } = require('../middleware/auth');
 const { injectTools, processToolCalls, createFollowUpMessages, supportsTools } = require('../middleware/function-calling');
 
-// GPT4Free.pro API - бесплатный AI провайдер (OpenAI-compatible)
-// Endpoints: POST /v1/chat/completions, POST /v1/images/generations, GET /v1/models
-const GPT4FREE_PRO_API = process.env.GPT4FREE_PRO_API || 'https://gpt4free.pro';
+// Python G4F API - локальный FastAPI сервис с g4f библиотекой
+// Endpoints: POST /v1/chat/completions, GET /v1/models
+const PYTHON_G4F_API = process.env.PYTHON_G4F_API || 'http://localhost:5000';
+const PYTHON_G4F_ADMIN_KEY = process.env.PYTHON_G4F_ADMIN_KEY || '56ce83efbb8ae2467f567ced95023b0958cda1f8a0704d84b6b7040628e1c632';
 
 // Конфигурация по умолчанию
 const DEFAULT_MODEL = 'gpt-4';
@@ -168,44 +169,14 @@ router.post('/chat/completions', requireApiKey, async (req, res) => {
       }
     }
     
-    // Отправляем запрос к GPT4Free.pro (OpenAI-compatible API)
-    console.log('🌐 Отправка запроса к GPT4Free.pro...');
+    // Отправляем запрос к Python G4F API
+    console.log('🐍 Отправка запроса к Python G4F...');
     console.log('📝 Модель:', model);
     console.log('📨 Сообщений:', messages.length);
     
-    // Если клиент запрашивает streaming - отправляем как есть от GPT4Free.pro
+    // Streaming пока не поддерживается в Python версии
     if (stream === true) {
-      console.log('🌊 Клиент запросил streaming режим');
-      
-      const requestBody = {
-        model: model,
-        messages: messages,
-        stream: true
-      };
-      
-      const gpt4freeResponse = await axios.post(`${GPT4FREE_PRO_API}/v1/chat/completions`, requestBody, {
-        timeout: 60000,
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        responseType: 'stream'
-      });
-      
-      // Устанавливаем заголовки для SSE
-      res.setHeader('Content-Type', 'text/event-stream');
-      res.setHeader('Cache-Control', 'no-cache');
-      res.setHeader('Connection', 'keep-alive');
-      
-      console.log('✅ Начинаем streaming от GPT4Free.pro к клиенту');
-      
-      // Пробрасываем stream напрямую
-      gpt4freeResponse.data.pipe(res);
-      
-      gpt4freeResponse.data.on('end', () => {
-        console.log('✅ Streaming завершен');
-      });
-      
-      return;
+      console.log('⚠️ Streaming режим пока не поддерживается Python G4F, используем обычный режим');
     }
     
     // Для не-streaming запросов
@@ -239,143 +210,85 @@ router.post('/chat/completions', requireApiKey, async (req, res) => {
       }
     }
     
-    const gpt4freeResponse = await axios.post(`${GPT4FREE_PRO_API}/v1/chat/completions`, requestBody, {
-      timeout: 60000,
+    // Отправляем запрос к Python G4F
+    const pythonG4fResponse = await axios.post(`${PYTHON_G4F_API}/v1/chat/completions`, requestBody, {
+      timeout: 120000, // 2 минуты для g4f
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'X-API-Key': req.apiKeyValue || PYTHON_G4F_ADMIN_KEY // Используем API ключ пользователя или admin ключ
       }
     });
     
-    console.log('✅ Ответ получен от GPT4Free.pro');
-    console.log('📊 Статус:', gpt4freeResponse.status);
+    console.log('✅ Ответ получен от Python G4F');
+    console.log('📊 Статус:', pythonG4fResponse.status);
     
-    // GPT4Free.pro возвращает streaming ответ в формате SSE (Server-Sent Events)
-    // Нужно распарсить его и собрать в полный ответ
-    const rawData = gpt4freeResponse.data;
+    // Python G4F возвращает ответ в формате: {success: true, data: {...}}
+    const rawData = pythonG4fResponse.data;
     
-    // Если это строка (streaming формат), парсим её
-    if (typeof rawData === 'string') {
-      console.log('📦 Получен streaming ответ, парсим...');
-      
-      // Разбиваем на строки и парсим каждый chunk
-      const lines = rawData.split('\n').filter(line => line.trim().startsWith('data: '));
-      let fullContent = '';
-      let lastChunk = null;
-      
-      for (const line of lines) {
-        const data = line.replace('data: ', '').trim();
-        if (data === '[DONE]') break;
-        
-        try {
-          const chunk = JSON.parse(data);
-          if (chunk.choices && chunk.choices[0] && chunk.choices[0].delta && chunk.choices[0].delta.content) {
-            fullContent += chunk.choices[0].delta.content;
-          }
-          lastChunk = chunk;
-        } catch (e) {
-          // Игнорируем ошибки парсинга
-        }
-      }
-      
-      console.log('✅ Собран полный ответ:', fullContent.substring(0, 100) + '...');
-      
-      // Формируем ответ в OpenAI формате
-      const responseData = {
-        id: lastChunk?.id || `chatcmpl-${Date.now()}`,
-        object: 'chat.completion',
-        created: lastChunk?.created || Math.floor(Date.now() / 1000),
-        model: model,
-        choices: [{
-          index: 0,
-          message: {
-            role: 'assistant',
-            content: fullContent
-          },
-          finish_reason: 'stop'
-        }],
-        usage: lastChunk?.usage || {
-          prompt_tokens: 0,
-          completion_tokens: 0,
-          total_tokens: 0
-        }
-      };
-      
-      console.log('📤 Отправка ответа клиенту...');
-      console.log('📊 Размер ответа:', JSON.stringify(responseData).length, 'байт');
-      console.log('📋 Структура ответа:', {
-        id: responseData.id,
-        model: responseData.model,
-        contentLength: responseData.choices[0].message.content.length,
-        hasUsage: !!responseData.usage
+    // Проверяем успешность
+    if (!rawData.success) {
+      console.error('❌ Ошибка от Python G4F:', rawData.error);
+      return res.status(500).json({
+        success: false,
+        error: rawData.error || 'Ошибка при обращении к AI'
       });
-      
-      // Проверяем что ответ еще не отправлен
-      if (!res.headersSent) {
-        // Устанавливаем заголовки явно
-        res.setHeader('Content-Type', 'application/json');
-        res.status(200).json(responseData);
-        console.log('✅ Ответ отправлен клиенту (status 200)');
-      } else {
-        console.log('⚠️ Ответ уже был отправлен ранее!');
-      }
-      return;
-      
-    } else {
-      // Если это уже объект, возвращаем как есть
-      console.log('📦 Получен обычный ответ');
-      
-      let responseData = rawData;
+    }
+    
+    console.log('📦 Получен ответ от Python G4F');
+    
+    // Извлекаем данные
+    let responseData = rawData.data;
 
-      // Обработка Function Calling - проверяем есть ли tool_calls
-      if (hasTools && responseData.choices?.[0]?.message?.tool_calls) {
-        console.log('🔧 Обнаружены tool_calls в ответе AI');
-        
-        try {
-          const context = {
-            userId: req.user?.id,
-            apiKeyId: req.apiKey?.id,
-            timeout: 5000
+    // Обработка Function Calling - проверяем есть ли tool_calls
+    if (hasTools && responseData.choices?.[0]?.message?.tool_calls) {
+      console.log('🔧 Обнаружены tool_calls в ответе AI');
+      
+      try {
+        const context = {
+          userId: req.user?.id,
+          apiKeyId: req.apiKey?.id,
+          timeout: 5000
+        };
+
+        // Обрабатываем tool_calls
+        const { toolResults, needsSecondCall } = await processToolCalls(responseData, context);
+
+        if (needsSecondCall && toolResults) {
+          console.log('🔄 Отправляем второй запрос к AI с результатами функций');
+
+          // Создаем новые сообщения с результатами
+          const followUpMessages = createFollowUpMessages(messages, responseData, toolResults);
+
+          // Второй запрос к AI
+          const secondRequest = {
+            model: model,
+            messages: followUpMessages,
+            stream: false
           };
 
-          // Обрабатываем tool_calls
-          const { toolResults, needsSecondCall } = await processToolCalls(responseData, context);
+          const secondResponse = await axios.post(`${PYTHON_G4F_API}/v1/chat/completions`, secondRequest, {
+            timeout: 120000,
+            headers: {
+              'Content-Type': 'application/json',
+              'X-API-Key': req.apiKeyValue || PYTHON_G4F_ADMIN_KEY
+            }
+          });
 
-          if (needsSecondCall && toolResults) {
-            console.log('🔄 Отправляем второй запрос к AI с результатами функций');
-
-            // Создаем новые сообщения с результатами
-            const followUpMessages = createFollowUpMessages(messages, responseData, toolResults);
-
-            // Второй запрос к AI
-            const secondRequest = {
-              model: model,
-              messages: followUpMessages,
-              stream: false
-            };
-
-            const secondResponse = await axios.post(`${GPT4FREE_PRO_API}/v1/chat/completions`, secondRequest, {
-              timeout: 60000,
-              headers: {
-                'Content-Type': 'application/json'
-              }
-            });
-
-            console.log('✅ Получен финальный ответ после выполнения функций');
-            responseData = secondResponse.data;
-          }
-        } catch (error) {
-          console.error('❌ Ошибка обработки tool_calls:', error);
-          // Продолжаем с исходным ответом
+          console.log('✅ Получен финальный ответ после выполнения функций');
+          responseData = secondResponse.data.data; // Python G4F возвращает {success, data}
         }
+      } catch (error) {
+        console.error('❌ Ошибка обработки tool_calls:', error);
+        // Продолжаем с исходным ответом
       }
-      
-      if (!res.headersSent) {
-        res.json(responseData);
-        console.log('✅ Ответ отправлен клиенту');
-      } else {
-        console.log('⚠️ Ответ уже был отправлен ранее!');
-      }
-      return;
+    }
+    
+    // Отправляем ответ клиенту
+    if (!res.headersSent) {
+      res.json(responseData);
+      console.log('✅ Ответ отправлен клиенту');
+    } else {
+      console.log('⚠️ Ответ уже был отправлен ранее!');
     }
     
   } catch (error) {
@@ -426,7 +339,11 @@ router.post('/chat/completions', requireApiKey, async (req, res) => {
  */
 router.get('/models', async (req, res) => {
   try {
-    const response = await axios.get(`${G4F_API_URL}/v1/models`);
+    const response = await axios.get(`${PYTHON_G4F_API}/v1/models`, {
+      headers: {
+        'X-API-Key': PYTHON_G4F_ADMIN_KEY
+      }
+    });
     res.json(response.data);
   } catch (error) {
     console.error('Ошибка получения моделей:', error);
@@ -474,7 +391,11 @@ router.get('/models', async (req, res) => {
  */
 router.get('/providers', async (req, res) => {
   try {
-    const response = await axios.get(`${G4F_API_URL}/v1/providers`);
+    const response = await axios.get(`${PYTHON_G4F_API}/v1/providers`, {
+      headers: {
+        'X-API-Key': PYTHON_G4F_ADMIN_KEY
+      }
+    });
     res.json(response.data);
   } catch (error) {
     console.error('Ошибка получения провайдеров:', error);
@@ -515,7 +436,11 @@ router.get('/providers', async (req, res) => {
  */
 router.get('/test', async (req, res) => {
   try {
-    const response = await axios.get(`${G4F_API_URL}/v1/test`);
+    const response = await axios.get(`${PYTHON_G4F_API}/v1/test`, {
+      headers: {
+        'X-API-Key': PYTHON_G4F_ADMIN_KEY
+      }
+    });
     res.json(response.data);
   } catch (error) {
     console.error('Ошибка тестового запроса:', error);
