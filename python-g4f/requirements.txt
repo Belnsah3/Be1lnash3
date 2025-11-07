@@ -1,6 +1,7 @@
 fastapi==0.115.5
 uvicorn[standard]==0.32.1
-g4f[all]==0.3.11.5
+g4f[all]>=6.5.7
 pydantic==2.10.3
 python-dotenv==1.0.1
-tortoise-orm
+tortoise-orm[asyncpg]==0.21.7
+aiosqlite==0.20.0
