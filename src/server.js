@@ -357,7 +357,7 @@ app.get('/', (req, res) => {
   if (req.session && req.session.userId) {
     res.redirect('/dashboard');
   } else {
-    res.redirect('/login');
+    res.sendFile(path.join(__dirname, '../public/index.html'));
   }
 });
 
