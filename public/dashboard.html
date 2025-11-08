@@ -445,18 +445,8 @@
     <script>
         // Проверка авторизации
         async function checkAuth() {
-            try {
-                const response = await fetch('/api/v1/users/me');
-                if (!response.ok) {
-                    window.location.href = '/login';
-                    return false;
-                }
-                return true;
-            } catch (error) {
-                console.error('Auth check failed:', error);
-                window.location.href = '/login';
-                return false;
-            }
+            // Временно отключено - проверка через server.js
+            return true;
         }
 
         // Загрузка статистики
