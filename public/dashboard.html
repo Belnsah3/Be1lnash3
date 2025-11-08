@@ -1,95 +1,80 @@
 <!DOCTYPE html>
-<html lang="ru" data-theme="dark">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - LumeAI</title>
-    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        :root {
-            --primary: 263 70% 50%;
-            --primary-foreground: 0 0% 100%;
-            --secondary: 240 4% 16%;
-            --secondary-foreground: 0 0% 100%;
-            --accent: 240 5% 26%;
-            --accent-foreground: 0 0% 100%;
-            --background: 240 10% 3.9%;
-            --foreground: 0 0% 98%;
-            --card: 240 10% 3.9%;
-            --card-foreground: 0 0% 98%;
-            --border: 240 3.7% 15.9%;
-            --input: 240 3.7% 15.9%;
-            --ring: 263 70% 50%;
-            --muted: 240 3.7% 15.9%;
-            --muted-foreground: 240 5% 64.9%;
-        }
-
-        [data-theme="light"] {
-            --primary: 263 70% 50%;
-            --primary-foreground: 0 0% 100%;
-            --secondary: 240 4.8% 95.9%;
-            --secondary-foreground: 240 5.9% 10%;
-            --accent: 240 4.8% 95.9%;
-            --accent-foreground: 240 5.9% 10%;
-            --background: 0 0% 100%;
-            --foreground: 240 10% 3.9%;
-            --card: 0 0% 100%;
-            --card-foreground: 240 10% 3.9%;
-            --border: 240 5.9% 90%;
-            --input: 240 5.9% 90%;
-            --ring: 263 70% 50%;
-            --muted: 240 4.8% 95.9%;
-            --muted-foreground: 240 3.8% 46.1%;
-        }
-
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
+        :root {
+            --bg: #0f0f1e;
+            --card: #1a1a2e;
+            --text: #ffffff;
+            --text-secondary: #a0a0b0;
+            --border: #2a2a3e;
+            --primary: #667eea;
+            --success: #11998e;
+            --danger: #eb3349;
+        }
+
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            background: hsl(var(--background));
-            color: hsl(var(--foreground));
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text);
             line-height: 1.6;
         }
 
-        .gradient-text {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        /* Mobile First Layout */
+        .container {
+            padding: 16px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px;
+            background: var(--card);
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+
+        .logo {
+            font-size: 20px;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), #764ba2);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            background-clip: text;
         }
 
-        .card {
-            background: hsl(var(--card));
-            border: 1px solid hsl(var(--border));
-            border-radius: 12px;
-            padding: 24px;
-            transition: all 0.3s ease;
-        }
-
-        .card:hover {
-            border-color: hsl(var(--primary));
-            box-shadow: 0 8px 30px rgba(102, 126, 234, 0.15);
-            transform: translateY(-2px);
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
 
         .btn {
-            padding: 10px 20px;
+            padding: 10px 16px;
             border-radius: 8px;
-            font-weight: 500;
-            transition: all 0.2s ease;
-            cursor: pointer;
             border: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, var(--primary), #764ba2);
             color: white;
         }
 
@@ -99,527 +84,541 @@
         }
 
         .btn-secondary {
-            background: hsl(var(--secondary));
-            color: hsl(var(--secondary-foreground));
+            background: var(--card);
+            color: var(--text);
+            border: 1px solid var(--border);
         }
 
-        .btn-secondary:hover {
-            background: hsl(var(--accent));
+        .btn-danger {
+            background: var(--danger);
+            color: white;
         }
 
-        .sidebar {
-            position: fixed;
-            left: 0;
-            top: 0;
-            height: 100vh;
-            width: 240px;
-            background: hsl(var(--card));
-            border-right: 1px solid hsl(var(--border));
-            padding: 24px 16px;
-            overflow-y: auto;
-            z-index: 40;
-        }
-
-        .sidebar-item {
-            display: flex;
-            align-items: center;
+        /* Stats Grid */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
             gap: 12px;
-            padding: 12px 16px;
-            border-radius: 8px;
-            color: hsl(var(--muted-foreground));
-            text-decoration: none;
-            transition: all 0.2s ease;
-            margin-bottom: 4px;
-        }
-
-        .sidebar-item:hover {
-            background: hsl(var(--accent));
-            color: hsl(var(--foreground));
-        }
-
-        .sidebar-item.active {
-            background: hsl(var(--primary));
-            color: hsl(var(--primary-foreground));
-        }
-
-        .main-content {
-            margin-left: 240px;
-            padding: 24px;
-            min-height: 100vh;
+            margin-bottom: 20px;
         }
 
         .stat-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+            background: var(--card);
+            padding: 16px;
             border-radius: 12px;
-            padding: 24px;
-            position: relative;
-            overflow: hidden;
+            border: 1px solid var(--border);
         }
 
-        .stat-card::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            right: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
-            animation: pulse 3s ease-in-out infinite;
+        .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 4px;
         }
 
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); opacity: 0.5; }
-            50% { transform: scale(1.1); opacity: 0.8; }
-        }
-
-        .model-badge {
-            display: inline-flex;
-            align-items: center;
-            padding: 4px 12px;
-            border-radius: 16px;
+        .stat-label {
             font-size: 12px;
-            font-weight: 500;
-            background: hsl(var(--accent));
-            color: hsl(var(--accent-foreground));
+            color: var(--text-secondary);
         }
 
-        .model-badge.featured {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+        /* Quick Actions */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 12px;
+            margin-bottom: 20px;
         }
 
-        .search-box {
-            position: relative;
-            width: 100%;
-        }
-
-        .search-box input {
-            width: 100%;
-            padding: 12px 16px 12px 44px;
-            border-radius: 8px;
-            border: 1px solid hsl(var(--border));
-            background: hsl(var(--background));
-            color: hsl(var(--foreground));
-            font-size: 14px;
-        }
-
-        .search-box input:focus {
-            outline: none;
-            border-color: hsl(var(--primary));
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-
-        .search-icon {
-            position: absolute;
-            left: 16px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: hsl(var(--muted-foreground));
-        }
-
-        .filter-chip {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 6px 14px;
-            border-radius: 20px;
-            border: 1px solid hsl(var(--border));
-            background: hsl(var(--background));
-            color: hsl(var(--foreground));
-            font-size: 13px;
+        .action-card {
+            background: var(--card);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            text-align: center;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.2s;
+            text-decoration: none;
+            color: var(--text);
         }
 
-        .filter-chip:hover {
-            border-color: hsl(var(--primary));
-            background: hsl(var(--accent));
+        .action-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
         }
 
-        .filter-chip.active {
-            background: hsl(var(--primary));
-            color: white;
-            border-color: hsl(var(--primary));
+        .action-icon {
+            font-size: 32px;
+            margin-bottom: 8px;
         }
 
-        @media (max-width: 768px) {
-            .sidebar {
-                transform: translateX(-100%);
-                transition: transform 0.3s ease;
-            }
-
-            .sidebar.open {
-                transform: translateX(0);
-            }
-
-            .main-content {
-                margin-left: 0;
-            }
+        .action-title {
+            font-weight: 600;
+            margin-bottom: 4px;
         }
 
-        .loading-skeleton {
-            background: linear-gradient(90deg, hsl(var(--muted)) 25%, hsl(var(--accent)) 50%, hsl(var(--muted)) 75%);
-            background-size: 200% 100%;
-            animation: loading 1.5s ease-in-out infinite;
+        .action-desc {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        /* Recent Activity */
+        .section {
+            background: var(--card);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+
+        .activity-item {
+            padding: 12px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+
+        .activity-info {
+            flex: 1;
+        }
+
+        .activity-title {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .activity-time {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-success {
+            background: rgba(17, 153, 142, 0.2);
+            color: var(--success);
+        }
+
+        .status-error {
+            background: rgba(235, 51, 73, 0.2);
+            color: var(--danger);
+        }
+
+        /* API Keys */
+        .key-item {
+            padding: 16px;
+            background: var(--bg);
             border-radius: 8px;
+            margin-bottom: 12px;
         }
 
-        @keyframes loading {
-            0% { background-position: 200% 0; }
-            100% { background-position: -200% 0; }
+        .key-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .key-name {
+            font-weight: 600;
+        }
+
+        .key-value {
+            font-family: monospace;
+            font-size: 12px;
+            color: var(--text-secondary);
+            word-break: break-all;
+        }
+
+        .key-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        /* Mobile Menu */
+        .mobile-menu {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--card);
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-around;
+            padding: 12px;
+            z-index: 100;
+        }
+
+        .menu-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 12px;
+        }
+
+        .menu-item.active {
+            color: var(--primary);
+        }
+
+        .menu-icon {
+            font-size: 24px;
+        }
+
+        /* Desktop */
+        @media (min-width: 768px) {
+            .container {
+                padding: 24px;
+            }
+
+            .stats {
+                grid-template-columns: repeat(4, 1fr);
+            }
+
+            .quick-actions {
+                grid-template-columns: repeat(4, 1fr);
+            }
+
+            .mobile-menu {
+                display: none;
+            }
+
+            .stat-value {
+                font-size: 36px;
+            }
+        }
+
+        /* Loading */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-secondary);
+        }
+
+        .spinner {
+            border: 3px solid var(--border);
+            border-top: 3px solid var(--primary);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 16px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-secondary);
+        }
+
+        .empty-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
         }
     </style>
 </head>
 <body>
-    <!-- Sidebar -->
-    <aside class="sidebar" id="sidebar">
-        <div class="mb-8">
-            <div class="flex items-center gap-3 px-4">
-                <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-500 to-purple-700 flex items-center justify-center text-white font-bold text-xl">
-                    L
-                </div>
-                <span class="text-xl font-bold gradient-text">LumeAI</span>
-            </div>
-        </div>
-
-        <nav>
-            <a href="/dashboard" class="sidebar-item active">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
-                </svg>
-                <span>Dashboard</span>
-            </a>
-
-            <a href="/models" class="sidebar-item">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
-                </svg>
-                <span>Модели</span>
-            </a>
-
-            <a href="/chat" class="sidebar-item">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
-                </svg>
-                <span>Чат</span>
-            </a>
-
-            <a href="/activity" class="sidebar-item">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
-                </svg>
-                <span>Активность</span>
-            </a>
-
-            <a href="/keys" class="sidebar-item">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
-                </svg>
-                <span>API Ключи</span>
-            </a>
-
-            <a href="/settings" class="sidebar-item">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                </svg>
-                <span>Настройки</span>
-            </a>
-        </nav>
-
-        <div class="mt-auto pt-8 border-t border-gray-700">
-            <a href="/docs" class="sidebar-item">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
-                </svg>
-                <span>Документация</span>
-            </a>
-
-            <button onclick="toggleTheme()" class="sidebar-item w-full text-left">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
-                </svg>
-                <span>Тема</span>
-            </button>
-        </div>
-    </aside>
-
-    <!-- Main Content -->
-    <main class="main-content">
+    <div class="container">
         <!-- Header -->
-        <header class="mb-8">
-            <div class="flex items-center justify-between mb-6">
-                <div>
-                    <h1 class="text-3xl font-bold mb-2">Добро пожаловать! 👋</h1>
-                    <p class="text-gray-400">Управляйте своими AI моделями и API ключами</p>
-                </div>
-                <button class="btn btn-primary">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-                    </svg>
-                    Создать ключ
-                </button>
+        <div class="header">
+            <div class="logo">💬 LumeAI</div>
+            <div class="user-menu">
+                <a href="/settings" class="btn btn-secondary">⚙️</a>
+                <button class="btn btn-danger" onclick="logout()">Выйти</button>
             </div>
-        </header>
+        </div>
 
-        <!-- Stats Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <!-- Stats -->
+        <div class="stats">
             <div class="stat-card">
-                <div class="relative z-10">
-                    <div class="text-sm opacity-90 mb-1">Всего запросов</div>
-                    <div class="text-3xl font-bold">12,458</div>
-                    <div class="text-sm opacity-75 mt-2">+23% за месяц</div>
+                <div class="stat-value" id="requestsCount">-</div>
+                <div class="stat-label">Запросов</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="tokensCount">-</div>
+                <div class="stat-label">Токенов</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="keysCount">-</div>
+                <div class="stat-label">API Ключей</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="costCount">$0</div>
+                <div class="stat-label">Потрачено</div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+            <a href="/chat" class="action-card">
+                <div class="action-icon">💬</div>
+                <div class="action-title">Чат</div>
+                <div class="action-desc">Начать диалог</div>
+            </a>
+            <a href="/models" class="action-card">
+                <div class="action-icon">🤖</div>
+                <div class="action-title">Модели</div>
+                <div class="action-desc">Выбрать AI</div>
+            </a>
+            <a href="/keys" class="action-card">
+                <div class="action-icon">🔑</div>
+                <div class="action-title">API Ключи</div>
+                <div class="action-desc">Управление</div>
+            </a>
+            <a href="/activity" class="action-card">
+                <div class="action-icon">📊</div>
+                <div class="action-title">Активность</div>
+                <div class="action-desc">Статистика</div>
+            </a>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="section">
+            <div class="section-title">Последняя активность</div>
+            <div id="activityList">
+                <div class="loading">
+                    <div class="spinner"></div>
+                    Загрузка...
                 </div>
             </div>
-
-            <div class="card">
-                <div class="text-sm text-gray-400 mb-1">Активных ключей</div>
-                <div class="text-3xl font-bold">5</div>
-                <div class="text-sm text-green-400 mt-2">↑ 2 новых</div>
-            </div>
-
-            <div class="card">
-                <div class="text-sm text-gray-400 mb-1">Использовано токенов</div>
-                <div class="text-3xl font-bold">2.4M</div>
-                <div class="text-sm text-gray-400 mt-2">из 10M</div>
-            </div>
-
-            <div class="card">
-                <div class="text-sm text-gray-400 mb-1">Средняя задержка</div>
-                <div class="text-3xl font-bold">245ms</div>
-                <div class="text-sm text-green-400 mt-2">↓ 15% быстрее</div>
-            </div>
         </div>
 
-        <!-- Search and Filters -->
-        <div class="mb-6">
-            <div class="search-box mb-4">
-                <svg class="search-icon w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                </svg>
-                <input type="text" placeholder="Поиск моделей..." id="searchInput" oninput="filterModels()">
+        <!-- API Keys -->
+        <div class="section">
+            <div class="section-title">
+                Мои API Ключи
+                <a href="/keys" class="btn btn-primary" style="float: right; font-size: 12px;">+ Создать</a>
             </div>
-
-            <div class="flex flex-wrap gap-2">
-                <button class="filter-chip active" onclick="filterByCategory('all')">
-                    Все модели
-                </button>
-                <button class="filter-chip" onclick="filterByCategory('featured')">
-                    ⭐ Популярные
-                </button>
-                <button class="filter-chip" onclick="filterByCategory('gpt')">
-                    GPT
-                </button>
-                <button class="filter-chip" onclick="filterByCategory('claude')">
-                    Claude
-                </button>
-                <button class="filter-chip" onclick="filterByCategory('gemini')">
-                    Gemini
-                </button>
-                <button class="filter-chip" onclick="filterByCategory('free')">
-                    🆓 Бесплатные
-                </button>
+            <div id="keysList">
+                <div class="loading">
+                    <div class="spinner"></div>
+                    Загрузка...
+                </div>
             </div>
         </div>
+    </div>
 
-        <!-- Models Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="modelsGrid">
-            <!-- Model cards will be inserted here by JavaScript -->
-        </div>
-    </main>
+    <!-- Mobile Menu -->
+    <div class="mobile-menu">
+        <a href="/dashboard" class="menu-item active">
+            <div class="menu-icon">🏠</div>
+            <div>Главная</div>
+        </a>
+        <a href="/chat" class="menu-item">
+            <div class="menu-icon">💬</div>
+            <div>Чат</div>
+        </a>
+        <a href="/models" class="menu-item">
+            <div class="menu-icon">🤖</div>
+            <div>Модели</div>
+        </a>
+        <a href="/settings" class="menu-item">
+            <div class="menu-icon">⚙️</div>
+            <div>Настройки</div>
+        </a>
+    </div>
 
     <script>
-        // Models data
-        const models = [
-            {
-                name: 'GPT-4',
-                provider: 'OpenAI',
-                description: 'Самая мощная модель от OpenAI с расширенными возможностями',
-                contextLength: '128K',
-                pricing: '$0.03 / 1K tokens',
-                featured: true,
-                category: 'gpt',
-                free: false
-            },
-            {
-                name: 'GPT-4o',
-                provider: 'OpenAI',
-                description: 'Оптимизированная версия GPT-4 с улучшенной скоростью',
-                contextLength: '128K',
-                pricing: '$0.015 / 1K tokens',
-                featured: true,
-                category: 'gpt',
-                free: false
-            },
-            {
-                name: 'Claude Sonnet 4.5',
-                provider: 'Anthropic',
-                description: 'Новейшая модель Claude с улучшенным пониманием контекста',
-                contextLength: '200K',
-                pricing: '$0.015 / 1K tokens',
-                featured: true,
-                category: 'claude',
-                free: false
-            },
-            {
-                name: 'Claude Haiku 4.5',
-                provider: 'Anthropic',
-                description: 'Быстрая и эффективная модель для простых задач',
-                contextLength: '200K',
-                pricing: '$0.0025 / 1K tokens',
-                featured: false,
-                category: 'claude',
-                free: false
-            },
-            {
-                name: 'Gemini 2.5 Flash',
-                provider: 'Google',
-                description: 'Сверхбыстрая модель с мультимодальными возможностями',
-                contextLength: '1M',
-                pricing: '$0.001 / 1K tokens',
-                featured: true,
-                category: 'gemini',
-                free: true
-            },
-            {
-                name: 'Gemini 2.5 Pro',
-                provider: 'Google',
-                description: 'Продвинутая модель для сложных задач',
-                contextLength: '2M',
-                pricing: '$0.005 / 1K tokens',
-                featured: false,
-                category: 'gemini',
-                free: false
-            },
-            {
-                name: 'DeepSeek V3',
-                provider: 'DeepSeek',
-                description: 'Мощная open-source модель',
-                contextLength: '64K',
-                pricing: 'Бесплатно',
-                featured: false,
-                category: 'free',
-                free: true
-            },
-            {
-                name: 'Llama 3.3 70B',
-                provider: 'Meta',
-                description: 'Открытая модель от Meta',
-                contextLength: '128K',
-                pricing: 'Бесплатно',
-                featured: false,
-                category: 'free',
-                free: true
-            },
-            {
-                name: 'Mistral Large',
-                provider: 'Mistral AI',
-                description: 'Европейская альтернатива GPT-4',
-                contextLength: '128K',
-                pricing: '$0.008 / 1K tokens',
-                featured: false,
-                category: 'other',
-                free: false
+        // Проверка авторизации
+        async function checkAuth() {
+            try {
+                const response = await fetch('/api/v1/users/me');
+                if (!response.ok) {
+                    window.location.href = '/login';
+                    return false;
+                }
+                return true;
+            } catch (error) {
+                console.error('Auth check failed:', error);
+                window.location.href = '/login';
+                return false;
             }
-        ];
+        }
 
-        let currentFilter = 'all';
+        // Загрузка статистики
+        async function loadStats() {
+            try {
+                const response = await fetch('/api/v1/stats/dashboard');
+                if (response.ok) {
+                    const data = await response.json();
+                    document.getElementById('requestsCount').textContent = data.requests || 0;
+                    document.getElementById('tokensCount').textContent = formatNumber(data.tokens || 0);
+                    document.getElementById('keysCount').textContent = data.keys || 0;
+                    document.getElementById('costCount').textContent = '$' + (data.cost || 0).toFixed(2);
+                } else {
+                    // Показываем моковые данные
+                    document.getElementById('requestsCount').textContent = '0';
+                    document.getElementById('tokensCount').textContent = '0';
+                    document.getElementById('keysCount').textContent = '0';
+                    document.getElementById('costCount').textContent = '$0.00';
+                }
+            } catch (error) {
+                console.error('Failed to load stats:', error);
+                // Показываем моковые данные
+                document.getElementById('requestsCount').textContent = '0';
+                document.getElementById('tokensCount').textContent = '0';
+                document.getElementById('keysCount').textContent = '0';
+                document.getElementById('costCount').textContent = '$0.00';
+            }
+        }
 
-        // Render models
-        function renderModels(modelsToRender) {
-            const grid = document.getElementById('modelsGrid');
-            grid.innerHTML = modelsToRender.map(model => `
-                <div class="card model-card" data-category="${model.category}" data-name="${model.name.toLowerCase()}">
-                    <div class="flex items-start justify-between mb-4">
-                        <div>
-                            <h3 class="text-xl font-bold mb-1">${model.name}</h3>
-                            <p class="text-sm text-gray-400">${model.provider}</p>
+        // Загрузка активности
+        async function loadActivity() {
+            try {
+                const response = await fetch('/api/v1/stats/activity?limit=5');
+                const container = document.getElementById('activityList');
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.length === 0) {
+                        container.innerHTML = `
+                            <div class="empty-state">
+                                <div class="empty-icon">📭</div>
+                                <div>Пока нет активности</div>
+                            </div>
+                        `;
+                    } else {
+                        container.innerHTML = data.map(item => `
+                            <div class="activity-item">
+                                <div class="activity-info">
+                                    <div class="activity-title">${item.action}</div>
+                                    <div class="activity-time">${item.time}</div>
+                                </div>
+                                <span class="status-badge status-${item.status}">${item.status === 'success' ? '✓' : '✗'}</span>
+                            </div>
+                        `).join('');
+                    }
+                } else {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-icon">📭</div>
+                            <div>Пока нет активности</div>
                         </div>
-                        ${model.featured ? '<span class="model-badge featured">⭐ Популярная</span>' : ''}
-                        ${model.free ? '<span class="model-badge">🆓 Бесплатно</span>' : ''}
+                    `;
+                }
+            } catch (error) {
+                console.error('Failed to load activity:', error);
+                document.getElementById('activityList').innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">📭</div>
+                        <div>Пока нет активности</div>
                     </div>
-                    
-                    <p class="text-sm text-gray-300 mb-4">${model.description}</p>
-                    
-                    <div class="flex items-center justify-between text-sm mb-4">
-                        <div>
-                            <div class="text-gray-400">Контекст</div>
-                            <div class="font-semibold">${model.contextLength}</div>
+                `;
+            }
+        }
+
+        // Загрузка ключей
+        async function loadKeys() {
+            try {
+                const response = await fetch('/api/v1/keys');
+                const container = document.getElementById('keysList');
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.length === 0) {
+                        container.innerHTML = `
+                            <div class="empty-state">
+                                <div class="empty-icon">🔑</div>
+                                <div>У вас пока нет API ключей</div>
+                                <a href="/keys" class="btn btn-primary" style="margin-top: 16px;">Создать первый ключ</a>
+                            </div>
+                        `;
+                    } else {
+                        container.innerHTML = data.slice(0, 3).map(key => `
+                            <div class="key-item">
+                                <div class="key-header">
+                                    <div class="key-name">${key.name || 'API Key'}</div>
+                                    <span class="status-badge status-${key.active ? 'success' : 'error'}">
+                                        ${key.active ? 'Активен' : 'Неактивен'}
+                                    </span>
+                                </div>
+                                <div class="key-value">${key.key}</div>
+                                <div class="key-actions">
+                                    <button class="btn btn-secondary" onclick="copyKey('${key.key}')">📋 Копировать</button>
+                                    <a href="/keys" class="btn btn-secondary">Управление</a>
+                                </div>
+                            </div>
+                        `).join('');
+                    }
+                } else {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-icon">🔑</div>
+                            <div>У вас пока нет API ключей</div>
+                            <a href="/keys" class="btn btn-primary" style="margin-top: 16px;">Создать первый ключ</a>
                         </div>
-                        <div class="text-right">
-                            <div class="text-gray-400">Цена</div>
-                            <div class="font-semibold">${model.pricing}</div>
-                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Failed to load keys:', error);
+                document.getElementById('keysList').innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">🔑</div>
+                        <div>У вас пока нет API ключей</div>
+                        <a href="/keys" class="btn btn-primary" style="margin-top: 16px;">Создать первый ключ</a>
                     </div>
-                    
-                    <button class="btn btn-primary w-full" onclick="selectModel('${model.name}')">
-                        Использовать модель
-                    </button>
-                </div>
-            `).join('');
+                `;
+            }
         }
 
-        // Filter models
-        function filterByCategory(category) {
-            currentFilter = category;
-            
-            // Update active chip
-            document.querySelectorAll('.filter-chip').forEach(chip => {
-                chip.classList.remove('active');
-            });
-            event.target.classList.add('active');
-            
-            // Filter and render
-            const filtered = category === 'all' 
-                ? models 
-                : models.filter(m => m.category === category || (category === 'featured' && m.featured));
-            
-            renderModels(filtered);
+        // Копирование ключа
+        function copyKey(key) {
+            navigator.clipboard.writeText(key);
+            alert('Ключ скопирован!');
         }
 
-        // Search models
-        function filterModels() {
-            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-            const filtered = models.filter(m => 
-                m.name.toLowerCase().includes(searchTerm) ||
-                m.provider.toLowerCase().includes(searchTerm) ||
-                m.description.toLowerCase().includes(searchTerm)
-            );
-            renderModels(filtered);
+        // Форматирование чисел
+        function formatNumber(num) {
+            if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
+            if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
+            return num.toString();
         }
 
-        // Select model
-        function selectModel(modelName) {
-            alert(`Модель ${modelName} выбрана! Перенаправление в чат...`);
-            // window.location.href = `/chat?model=${encodeURIComponent(modelName)}`;
+        // Выход
+        async function logout() {
+            try {
+                await fetch('/api/v1/auth/logout', { method: 'POST' });
+            } catch (error) {
+                console.error('Logout failed:', error);
+            }
+            window.location.href = '/login';
         }
 
-        // Toggle theme
-        function toggleTheme() {
-            const html = document.documentElement;
-            const currentTheme = html.getAttribute('data-theme');
-            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-            html.setAttribute('data-theme', newTheme);
-            localStorage.setItem('theme', newTheme);
+        // Инициализация
+        async function init() {
+            const isAuth = await checkAuth();
+            if (isAuth) {
+                loadStats();
+                loadActivity();
+                loadKeys();
+            }
         }
 
-        // Load theme
-        const savedTheme = localStorage.getItem('theme') || 'dark';
-        document.documentElement.setAttribute('data-theme', savedTheme);
-
-        // Initial render
-        renderModels(models);
-
-        // Mobile menu toggle
-        const menuBtn = document.getElementById('menuBtn');
-        const sidebar = document.getElementById('sidebar');
-        
-        if (menuBtn) {
-            menuBtn.addEventListener('click', () => {
-                sidebar.classList.toggle('open');
-            });
-        }
+        init();
     </script>
 </body>
 </html>
