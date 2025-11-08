@@ -1,6 +1,6 @@
 # Quick server update with auto password using plink
-$pass = "24162006gorA!"
-$server = "root@147.45.48.64"
+$pass = "2246"
+$server = "be1lnash3@192.168.31.26"
 
 Write-Host "Updating server..." -ForegroundColor Cyan
 
@@ -22,7 +22,7 @@ try {
     
     Write-Host ""
     Write-Host "[DONE] Server updated!" -ForegroundColor Green
-    Write-Host "Check: https://lumeai.ru" -ForegroundColor Cyan
+    Write-Host "Check: http://192.168.31.26" -ForegroundColor Cyan
 } catch {
     Write-Host "Error: $_" -ForegroundColor Red
     Write-Host ""

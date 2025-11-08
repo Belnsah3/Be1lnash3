@@ -56,5 +56,5 @@ Write-Host ""
 Write-Host "[SUCCESS] Deployment complete!" -ForegroundColor Green
 Write-Host ""
 Write-Host "To update server, run:" -ForegroundColor Yellow
-Write-Host "  ssh root@147.45.48.64 'cd ~/rest-api && git pull && pm2 restart lumeai'" -ForegroundColor Cyan
+Write-Host "  ssh be1lnash3@192.168.31.26 'cd ~/rest-api && git pull && pm2 restart lumeai'" -ForegroundColor Cyan
 Write-Host ""

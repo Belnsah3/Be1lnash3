@@ -23,12 +23,12 @@ $commands | Out-File -FilePath "temp_commands.sh" -Encoding ASCII
 
 # Используем plink (PuTTY) для автоматического ввода пароля
 Write-Host "Connecting to server..." -ForegroundColor Yellow
-echo y | plink -batch -pw $password root@147.45.48.64 "bash -s" < temp_commands.sh
+echo y | plink -batch -pw $password be1lnash3@192.168.31.26 "bash -s" < temp_commands.sh
 
 # Удаляем временный файл
 Remove-Item "temp_commands.sh" -ErrorAction SilentlyContinue
 
 Write-Host ""
 Write-Host "[DONE] Server update complete!" -ForegroundColor Green
-Write-Host "Check: https://lumeai.ru" -ForegroundColor Cyan
+Write-Host "Check: http://192.168.31.26" -ForegroundColor Cyan
 Write-Host ""

@@ -11,10 +11,14 @@ import logging
 import os
 
 import secrets
+import nest_asyncio
 
 from dotenv import load_dotenv
 
 load_dotenv()
+
+# Исправление event loop конфликта
+nest_asyncio.apply()
 
 # Настройка логирования
 logging.basicConfig(level=logging.INFO)
@@ -67,29 +71,93 @@ app.add_middleware(
 # Инициализация G4F клиента
 client = Client()
 
-# Модели и их провайдеры (те, что работают без API ключа)
+# Модели и их провайдеры (проверено - работают без API ключей)
 MODEL_PROVIDERS = {
-    # Claude модели - пробуем разные провайдеры
-    "claude-sonnet-4.5": ["You", "Puter", "Airforce", "PerplexityLabs", "auto"],
-    "claude-sonnet-4": ["You", "Puter", "Airforce", "PerplexityLabs", "auto"],
-    "claude-haiku-4.5": ["You", "Puter", "Airforce", "PerplexityLabs", "auto"],
-    "claude-3.5-sonnet": ["You", "Puter", "Airforce", "PerplexityLabs", "auto"],
-    "claude-3-sonnet": ["You", "Puter", "Airforce", "PerplexityLabs", "auto"],
-    "claude-3-haiku": ["You", "Puter", "Airforce", "PerplexityLabs", "auto"],
-
-    # GPT модели - работают без ключа
-    "gpt-4": ["auto", "Airforce"],
-    "gpt-4o": ["auto", "Airforce"],
-    "gpt-4o-mini": ["auto", "Airforce"],
-    "gpt-3.5-turbo": ["auto", "Airforce"],
-
-    # Gemini - работает без ключа
-    "gemini-2.5-flash": ["auto", "Airforce"],
-    "gemini-2.5-pro": ["auto", "Airforce"],
-
-    # DeepSeek - работает без ключа
-    "deepseek-v3": ["auto", "Airforce"],
-    "deepseek-r1": ["auto", "Airforce"],
+    # ==========================================
+    # GPT MODELS (OpenAI)
+    # ==========================================
+    "gpt-4": ["ApiAirforce"],
+    "gpt-4o": ["ApiAirforce"],
+    "gpt-4o-mini": ["ApiAirforce"],
+    "gpt-3.5-turbo": ["ApiAirforce"],
+    
+    # ==========================================
+    # CLAUDE MODELS (Anthropic)
+    # ==========================================
+    "claude-sonnet-4": ["ApiAirforce"],
+    "claude-sonnet-4.5": ["ApiAirforce"],
+    "claude-haiku-4.5": ["ApiAirforce"],
+    "claude-3.5-sonnet": ["ApiAirforce"],
+    "claude-3-sonnet": ["ApiAirforce"],
+    "claude-3-haiku": ["ApiAirforce"],
+    
+    # ==========================================
+    # GEMINI MODELS (Google)
+    # ==========================================
+    "gemini-2.5-pro": ["ApiAirforce"],
+    "gemini-2.5-flash": ["ApiAirforce"],
+    "gemini-2.5-flash-lite": ["ApiAirforce"],
+    
+    # ==========================================
+    # LLAMA MODELS (Meta)
+    # ==========================================
+    "llama-3.3": ["MetaAI", "DeepInfra", "HuggingFace"],
+    "llama-4-maverick": ["MetaAI", "DeepInfra"],
+    "llama-4-scout": ["MetaAI", "DeepInfra"],
+    
+    # ==========================================
+    # DEEPSEEK MODELS
+    # ==========================================
+    "deepseek-v3": ["DeepInfra"],
+    "deepseek-v3.1": ["DeepInfra"],
+    "deepseek-v3.2": ["DeepInfra"],
+    "deepseek-r1": ["DeepInfra"],
+    "deepseek-chat": ["DeepInfra"],
+    "deepseek-reasoner": ["DeepInfra"],
+    
+    # ==========================================
+    # MISTRAL MODELS
+    # ==========================================
+    "mistral-small-3.1-24b": ["DeepInfra", "HuggingFace"],
+    "mistral-medium-3": ["DeepInfra", "HuggingFace"],
+    
+    # ==========================================
+    # QWEN MODELS (Alibaba)
+    # ==========================================
+    "qwen2.5-coder-32b": ["Qwen", "DeepInfra", "HuggingFace"],
+    "qwen3-coder": ["Qwen", "DeepInfra"],
+    "qwen3-coder-big": ["Qwen"],
+    "qwen3-next": ["Qwen"],
+    "qwen3-omni": ["Qwen"],
+    
+    # ==========================================
+    # GLM MODELS (Zhipu AI)
+    # ==========================================
+    "glm-4.5": ["GLM"],
+    "glm-4.5-air": ["GLM"],
+    "glm-4.6": ["GLM"],
+    
+    # ==========================================
+    # HERMES MODELS
+    # ==========================================
+    "hermes-3-405b": ["DeepInfra", "HuggingFace"],
+    "hermes-4-405b": ["DeepInfra"],
+    
+    # ==========================================
+    # OTHER TEXT MODELS
+    # ==========================================
+    "goliath-120b": ["DeepInfra"],
+    "qwq-32b-fast": ["HuggingFace"],
+    
+    # ==========================================
+    # IMAGE GENERATION MODELS
+    # ==========================================
+    "dall-e-3": ["PollinationsAI", "PollinationsImage"],
+    "sdxl": ["PollinationsImage"],
+    "sd-3.5": ["PollinationsImage"],
+    "sd-3.5-large": ["StabilityAI_SD35Large", "PollinationsImage"],
+    "flux-schnell": ["BlackForestLabs_Flux1Dev", "PollinationsImage"],
+    "flux-dev": ["BlackForestLabs_Flux1Dev"],
 }
 
 # Модели данных

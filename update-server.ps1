@@ -2,7 +2,7 @@
 Write-Host "Updating server..." -ForegroundColor Cyan
 Write-Host ""
 
-ssh root@147.45.48.64 @"
+ssh be1lnash3@192.168.31.26 @"
 echo '[1/4] Navigating to project...'
 cd ~/rest-api || cd ~/rest-api/rest-api
 
@@ -17,10 +17,10 @@ pm2 restart lumeai 2>&1 | tail -5
 
 echo ''
 echo '[SUCCESS] Server updated!'
-echo 'Check: https://lumeai.ru'
+echo 'Check: http://192.168.31.26'
 "@
 
 Write-Host ""
 Write-Host "[DONE] Server update complete!" -ForegroundColor Green
-Write-Host "Check: https://lumeai.ru" -ForegroundColor Cyan
+Write-Host "Check: http://192.168.31.26" -ForegroundColor Cyan
 Write-Host ""
