@@ -3,6 +3,7 @@ node_modules/
 .env.local
 .env.*.local
 .server-password
+plink.exe
 *.log
 .DS_Store
 
