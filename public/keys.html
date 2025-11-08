@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Ключи - LumeAI</title>
+    <link rel="stylesheet" href="/css/main.css">
+    <style>
+        .key-item {
+            background: var(--card);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            margin-bottom: 16px;
+        }
+        .key-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        .key-name {
+            font-weight: 700;
+            font-size: 18px;
+        }
+        .key-value {
+            font-family: monospace;
+            background: var(--bg);
+            padding: 12px;
+            border-radius: 8px;
+            word-break: break-all;
+            margin: 12px 0;
+            font-size: 14px;
+        }
+        .key-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .status-success {
+            background: rgba(17, 153, 142, 0.2);
+            color: var(--success);
+        }
+        .status-error {
+            background: rgba(235, 51, 73, 0.2);
+            color: var(--danger);
+        }
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-secondary);
+        }
+        .empty-icon {
+            font-size: 64px;
+            margin-bottom: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="sidebar-logo">💬 LumeAI</div>
+        <a href="/dashboard" class="sidebar-item">
+            <span class="sidebar-icon">🏠</span>
+            Dashboard
+        </a>
+        <a href="/chat" class="sidebar-item">
+            <span class="sidebar-icon">💬</span>
+            Чат
+        </a>
+        <a href="/models" class="sidebar-item">
+            <span class="sidebar-icon">🤖</span>
+            Модели
+        </a>
+        <a href="/keys" class="sidebar-item active">
+            <span class="sidebar-icon">🔑</span>
+            API Ключи
+        </a>
+        <a href="/activity" class="sidebar-item">
+            <span class="sidebar-icon">📊</span>
+            Активность
+        </a>
+        <a href="/settings" class="sidebar-item">
+            <span class="sidebar-icon">⚙️</span>
+            Настройки
+        </a>
+        <div style="margin-top: auto; padding-top: 20px; border-top: 1px solid var(--border);">
+            <button class="btn btn-danger" onclick="logout()" style="width: 100%;">Выйти</button>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+            <h1>API Ключи</h1>
+            <button class="btn btn-primary" onclick="createKey()">+ Создать ключ</button>
+        </div>
+
+        <div id="keysList">
+            <div class="loading">
+                <div class="spinner"></div>
+                Загрузка...
+            </div>
+        </div>
+    </div>
+
+    <div class="mobile-menu">
+        <a href="/dashboard" class="menu-item">
+            <div class="menu-icon">🏠</div>
+            <div>Главная</div>
+        </a>
+        <a href="/chat" class="menu-item">
+            <div class="menu-icon">💬</div>
+            <div>Чат</div>
+        </a>
+        <a href="/keys" class="menu-item active">
+            <div class="menu-icon">🔑</div>
+            <div>Ключи</div>
+        </a>
+        <a href="/settings" class="menu-item">
+            <div class="menu-icon">⚙️</div>
+            <div>Настройки</div>
+        </a>
+    </div>
+
+    <script>
+        async function loadKeys() {
+            try {
+                const response = await fetch('/api/v1/keys');
+                const container = document.getElementById('keysList');
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.length === 0) {
+                        container.innerHTML = `
+                            <div class="empty-state">
+                                <div class="empty-icon">🔑</div>
+                                <h2>У вас пока нет API ключей</h2>
+                                <p style="margin: 16px 0;">Создайте первый ключ для начала работы с API</p>
+                                <button class="btn btn-primary" onclick="createKey()">Создать ключ</button>
+                            </div>
+                        `;
+                    } else {
+                        container.innerHTML = data.map(key => `
+                            <div class="key-item">
+                                <div class="key-header">
+                                    <div class="key-name">${key.name || 'API Key'}</div>
+                                    <span class="status-badge status-${key.active ? 'success' : 'error'}">
+                                        ${key.active ? '✓ Активен' : '✗ Неактивен'}
+                                    </span>
+                                </div>
+                                <div class="key-value">${key.key}</div>
+                                <div class="key-actions">
+                                    <button class="btn btn-secondary" onclick="copyKey('${key.key}')">
+                                        📋 Копировать
+                                    </button>
+                                    <button class="btn btn-secondary" onclick="toggleKey('${key.id}', ${key.active})">
+                                        ${key.active ? '⏸️ Деактивировать' : '▶️ Активировать'}
+                                    </button>
+                                    <button class="btn btn-danger" onclick="deleteKey('${key.id}', '${key.name}')">
+                                        🗑️ Удалить
+                                    </button>
+                                </div>
+                            </div>
+                        `).join('');
+                    }
+                } else {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-icon">🔑</div>
+                            <h2>У вас пока нет API ключей</h2>
+                            <button class="btn btn-primary" onclick="createKey()">Создать ключ</button>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Failed to load keys:', error);
+                document.getElementById('keysList').innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">❌</div>
+                        <h2>Ошибка загрузки</h2>
+                        <p>Не удалось загрузить список ключей</p>
+                        <button class="btn btn-primary" onclick="loadKeys()">Повторить</button>
+                    </div>
+                `;
+            }
+        }
+
+        function copyKey(key) {
+            navigator.clipboard.writeText(key).then(() => {
+                alert('✓ Ключ скопирован в буфер обмена!');
+            }).catch(() => {
+                alert('❌ Не удалось скопировать ключ');
+            });
+        }
+
+        async function createKey() {
+            const name = prompt('Введите название ключа:');
+            if (!name) return;
+
+            try {
+                const response = await fetch('/api/v1/keys', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name })
+                });
+
+                if (response.ok) {
+                    alert('✓ Ключ успешно создан!');
+                    loadKeys();
+                } else {
+                    const error = await response.json();
+                    alert('❌ Ошибка: ' + (error.error || 'Не удалось создать ключ'));
+                }
+            } catch (error) {
+                alert('❌ Ошибка: ' + error.message);
+            }
+        }
+
+        async function toggleKey(id, isActive) {
+            try {
+                const response = await fetch(`/api/v1/keys/${id}/toggle`, {
+                    method: 'POST'
+                });
+
+                if (response.ok) {
+                    alert(isActive ? '✓ Ключ деактивирован' : '✓ Ключ активирован');
+                    loadKeys();
+                } else {
+                    alert('❌ Ошибка изменения статуса');
+                }
+            } catch (error) {
+                alert('❌ Ошибка: ' + error.message);
+            }
+        }
+
+        async function deleteKey(id, name) {
+            if (!confirm(`Вы уверены что хотите удалить ключ "${name}"?\n\nЭто действие нельзя отменить!`)) return;
+
+            try {
+                const response = await fetch(`/api/v1/keys/${id}`, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    alert('✓ Ключ успешно удален');
+                    loadKeys();
+                } else {
+                    alert('❌ Ошибка удаления ключа');
+                }
+            } catch (error) {
+                alert('❌ Ошибка: ' + error.message);
+            }
+        }
+
+        function logout() {
+            fetch('/api/v1/auth/logout', { method: 'POST' }).then(() => {
+                window.location.href = '/login';
+            });
+        }
+
+        loadKeys();
+    </script>
+</body>
+</html>
