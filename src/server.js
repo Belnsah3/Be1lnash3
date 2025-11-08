@@ -321,6 +321,12 @@ app.use('/api/v1/admin', adminRoutes);
 app.use('/api/v1/models', modelsRoutes);
 app.use('/api/v1/settings', require('./routes/settings'));
 app.use('/api/v1/stats', require('./routes/stats'));
+
+// Алиасы без /v1/ для совместимости с фронтендом
+app.use('/api/auth', authRoutes);
+app.use('/api/keys', keysRoutes);
+app.use('/api/models', modelsRoutes);
+app.use('/api/ai', aiRoutes);
 app.use('/api/v1/files', require('./routes/files'));
 
 // Дополнительные роуты для совместимости с разными клиентами
