@@ -4,366 +4,111 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - LumeAI</title>
+    <link rel="stylesheet" href="/css/main.css">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        :root {
-            --bg: #0f0f1e;
-            --card: #1a1a2e;
-            --text: #ffffff;
-            --text-secondary: #a0a0b0;
-            --border: #2a2a3e;
-            --primary: #667eea;
-            --success: #11998e;
-            --danger: #eb3349;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            line-height: 1.6;
-        }
-
-        /* Mobile First Layout */
-        .container {
-            padding: 16px;
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-
-        /* Header */
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 16px;
-            background: var(--card);
-            border-radius: 12px;
-            margin-bottom: 20px;
-        }
-
-        .logo {
-            font-size: 20px;
-            font-weight: 700;
-            background: linear-gradient(135deg, var(--primary), #764ba2);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .user-menu {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .btn {
-            padding: 10px 16px;
-            border-radius: 8px;
-            border: none;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.2s;
-            text-decoration: none;
-            display: inline-block;
-            text-align: center;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, var(--primary), #764ba2);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
-        }
-
-        .btn-secondary {
-            background: var(--card);
-            color: var(--text);
-            border: 1px solid var(--border);
-        }
-
-        .btn-danger {
-            background: var(--danger);
-            color: white;
-        }
-
-        /* Stats Grid */
         .stats {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-            gap: 12px;
-            margin-bottom: 20px;
-        }
-
-        .stat-card {
-            background: var(--card);
-            padding: 16px;
-            border-radius: 12px;
-            border: 1px solid var(--border);
-        }
-
-        .stat-value {
-            font-size: 28px;
-            font-weight: 700;
-            color: var(--primary);
-            margin-bottom: 4px;
-        }
-
-        .stat-label {
-            font-size: 12px;
-            color: var(--text-secondary);
-        }
-
-        /* Quick Actions */
-        .quick-actions {
-            display: grid;
             grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 12px;
+            gap: 16px;
             margin-bottom: 20px;
         }
-
-        .action-card {
+        .stat-card {
             background: var(--card);
             padding: 20px;
             border-radius: 12px;
             border: 1px solid var(--border);
+        }
+        .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 8px;
+        }
+        .stat-label {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+        .action-card {
+            background: var(--card);
+            padding: 24px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
             text-align: center;
             cursor: pointer;
             transition: all 0.2s;
             text-decoration: none;
             color: var(--text);
         }
-
         .action-card:hover {
             border-color: var(--primary);
             transform: translateY(-2px);
         }
-
         .action-icon {
-            font-size: 32px;
-            margin-bottom: 8px;
+            font-size: 40px;
+            margin-bottom: 12px;
         }
-
         .action-title {
             font-weight: 600;
             margin-bottom: 4px;
         }
-
         .action-desc {
             font-size: 12px;
             color: var(--text-secondary);
         }
-
-        /* Recent Activity */
-        .section {
-            background: var(--card);
-            padding: 20px;
-            border-radius: 12px;
-            border: 1px solid var(--border);
-            margin-bottom: 20px;
-        }
-
-        .section-title {
-            font-size: 18px;
-            font-weight: 700;
-            margin-bottom: 16px;
-        }
-
-        .activity-item {
-            padding: 12px;
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .activity-item:last-child {
-            border-bottom: none;
-        }
-
-        .activity-info {
-            flex: 1;
-        }
-
-        .activity-title {
-            font-weight: 600;
-            margin-bottom: 4px;
-        }
-
-        .activity-time {
-            font-size: 12px;
-            color: var(--text-secondary);
-        }
-
-        .status-badge {
-            padding: 4px 12px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-
-        .status-success {
-            background: rgba(17, 153, 142, 0.2);
-            color: var(--success);
-        }
-
-        .status-error {
-            background: rgba(235, 51, 73, 0.2);
-            color: var(--danger);
-        }
-
-        /* API Keys */
-        .key-item {
-            padding: 16px;
-            background: var(--bg);
-            border-radius: 8px;
-            margin-bottom: 12px;
-        }
-
-        .key-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 8px;
-        }
-
-        .key-name {
-            font-weight: 600;
-        }
-
-        .key-value {
-            font-family: monospace;
-            font-size: 12px;
-            color: var(--text-secondary);
-            word-break: break-all;
-        }
-
-        .key-actions {
-            display: flex;
-            gap: 8px;
-            margin-top: 12px;
-        }
-
-        /* Mobile Menu */
-        .mobile-menu {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: var(--card);
-            border-top: 1px solid var(--border);
-            display: flex;
-            justify-content: space-around;
-            padding: 12px;
-            z-index: 100;
-        }
-
-        .menu-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 4px;
-            color: var(--text-secondary);
-            text-decoration: none;
-            font-size: 12px;
-        }
-
-        .menu-item.active {
-            color: var(--primary);
-        }
-
-        .menu-icon {
-            font-size: 24px;
-        }
-
-        /* Desktop */
-        @media (min-width: 768px) {
-            .container {
-                padding: 24px;
-            }
-
-            .stats {
-                grid-template-columns: repeat(4, 1fr);
-            }
-
-            .quick-actions {
-                grid-template-columns: repeat(4, 1fr);
-            }
-
-            .mobile-menu {
-                display: none;
-            }
-
-            .stat-value {
-                font-size: 36px;
-            }
-        }
-
-        /* Loading */
-        .loading {
-            text-align: center;
-            padding: 40px;
-            color: var(--text-secondary);
-        }
-
-        .spinner {
-            border: 3px solid var(--border);
-            border-top: 3px solid var(--primary);
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 16px;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        /* Empty State */
-        .empty-state {
-            text-align: center;
-            padding: 40px;
-            color: var(--text-secondary);
-        }
-
-        .empty-icon {
-            font-size: 48px;
-            margin-bottom: 16px;
-        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <!-- Header -->
-        <div class="header">
-            <div class="logo">💬 LumeAI</div>
-            <div class="user-menu">
-                <a href="/settings" class="btn btn-secondary">⚙️</a>
-                <button class="btn btn-danger" onclick="logout()">Выйти</button>
-            </div>
+    <div class="sidebar">
+        <div class="sidebar-logo">💬 LumeAI</div>
+        <a href="/dashboard" class="sidebar-item active">
+            <span class="sidebar-icon">🏠</span>
+            Dashboard
+        </a>
+        <a href="/chat" class="sidebar-item">
+            <span class="sidebar-icon">💬</span>
+            Чат
+        </a>
+        <a href="/models" class="sidebar-item">
+            <span class="sidebar-icon">🤖</span>
+            Модели
+        </a>
+        <a href="/keys" class="sidebar-item">
+            <span class="sidebar-icon">🔑</span>
+            API Ключи
+        </a>
+        <a href="/activity" class="sidebar-item">
+            <span class="sidebar-icon">📊</span>
+            Активность
+        </a>
+        <a href="/settings" class="sidebar-item">
+            <span class="sidebar-icon">⚙️</span>
+            Настройки
+        </a>
+        <div style="margin-top: auto; padding-top: 20px; border-top: 1px solid var(--border);">
+            <button class="btn btn-danger" onclick="logout()" style="width: 100%;">Выйти</button>
         </div>
+    </div>
 
-        <!-- Stats -->
+    <div class="main-content">
+        <h1 style="margin-bottom: 24px;">Dashboard</h1>
+
         <div class="stats">
             <div class="stat-card">
-                <div class="stat-value" id="requestsCount">-</div>
+                <div class="stat-value" id="requestsCount">0</div>
                 <div class="stat-label">Запросов</div>
             </div>
             <div class="stat-card">
-                <div class="stat-value" id="tokensCount">-</div>
+                <div class="stat-value" id="tokensCount">0</div>
                 <div class="stat-label">Токенов</div>
             </div>
             <div class="stat-card">
-                <div class="stat-value" id="keysCount">-</div>
+                <div class="stat-value" id="keysCount">0</div>
                 <div class="stat-label">API Ключей</div>
             </div>
             <div class="stat-card">
@@ -372,48 +117,32 @@
             </div>
         </div>
 
-        <!-- Quick Actions -->
         <div class="quick-actions">
             <a href="/chat" class="action-card">
                 <div class="action-icon">💬</div>
-                <div class="action-title">Чат</div>
-                <div class="action-desc">Начать диалог</div>
+                <div class="action-title">Начать чат</div>
+                <div class="action-desc">Общайтесь с AI моделями</div>
             </a>
             <a href="/models" class="action-card">
                 <div class="action-icon">🤖</div>
-                <div class="action-title">Модели</div>
-                <div class="action-desc">Выбрать AI</div>
+                <div class="action-title">Выбрать модель</div>
+                <div class="action-desc">Просмотр доступных AI</div>
             </a>
             <a href="/keys" class="action-card">
                 <div class="action-icon">🔑</div>
                 <div class="action-title">API Ключи</div>
-                <div class="action-desc">Управление</div>
+                <div class="action-desc">Управление доступом</div>
             </a>
             <a href="/activity" class="action-card">
                 <div class="action-icon">📊</div>
-                <div class="action-title">Активность</div>
-                <div class="action-desc">Статистика</div>
+                <div class="action-title">Статистика</div>
+                <div class="action-desc">Просмотр активности</div>
             </a>
         </div>
 
-        <!-- Recent Activity -->
-        <div class="section">
-            <div class="section-title">Последняя активность</div>
+        <div class="card">
+            <h2 class="section-title">Последняя активность</h2>
             <div id="activityList">
-                <div class="loading">
-                    <div class="spinner"></div>
-                    Загрузка...
-                </div>
-            </div>
-        </div>
-
-        <!-- API Keys -->
-        <div class="section">
-            <div class="section-title">
-                Мои API Ключи
-                <a href="/keys" class="btn btn-primary" style="float: right; font-size: 12px;">+ Создать</a>
-            </div>
-            <div id="keysList">
                 <div class="loading">
                     <div class="spinner"></div>
                     Загрузка...
@@ -422,7 +151,6 @@
         </div>
     </div>
 
-    <!-- Mobile Menu -->
     <div class="mobile-menu">
         <a href="/dashboard" class="menu-item active">
             <div class="menu-icon">🏠</div>
@@ -432,9 +160,9 @@
             <div class="menu-icon">💬</div>
             <div>Чат</div>
         </a>
-        <a href="/models" class="menu-item">
-            <div class="menu-icon">🤖</div>
-            <div>Модели</div>
+        <a href="/keys" class="menu-item">
+            <div class="menu-icon">🔑</div>
+            <div>Ключи</div>
         </a>
         <a href="/settings" class="menu-item">
             <div class="menu-icon">⚙️</div>
@@ -443,13 +171,6 @@
     </div>
 
     <script>
-        // Проверка авторизации
-        async function checkAuth() {
-            // Временно отключено - проверка через server.js
-            return true;
-        }
-
-        // Загрузка статистики
         async function loadStats() {
             try {
                 const response = await fetch('/api/v1/stats/dashboard');
@@ -459,24 +180,12 @@
                     document.getElementById('tokensCount').textContent = formatNumber(data.tokens || 0);
                     document.getElementById('keysCount').textContent = data.keys || 0;
                     document.getElementById('costCount').textContent = '$' + (data.cost || 0).toFixed(2);
-                } else {
-                    // Показываем моковые данные
-                    document.getElementById('requestsCount').textContent = '0';
-                    document.getElementById('tokensCount').textContent = '0';
-                    document.getElementById('keysCount').textContent = '0';
-                    document.getElementById('costCount').textContent = '$0.00';
                 }
             } catch (error) {
                 console.error('Failed to load stats:', error);
-                // Показываем моковые данные
-                document.getElementById('requestsCount').textContent = '0';
-                document.getElementById('tokensCount').textContent = '0';
-                document.getElementById('keysCount').textContent = '0';
-                document.getElementById('costCount').textContent = '$0.00';
             }
         }
 
-        // Загрузка активности
         async function loadActivity() {
             try {
                 const response = await fetch('/api/v1/stats/activity?limit=5');
@@ -485,130 +194,38 @@
                 if (response.ok) {
                     const data = await response.json();
                     if (data.length === 0) {
-                        container.innerHTML = `
-                            <div class="empty-state">
-                                <div class="empty-icon">📭</div>
-                                <div>Пока нет активности</div>
-                            </div>
-                        `;
+                        container.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-secondary)">Пока нет активности</div>';
                     } else {
                         container.innerHTML = data.map(item => `
-                            <div class="activity-item">
-                                <div class="activity-info">
-                                    <div class="activity-title">${item.action}</div>
-                                    <div class="activity-time">${item.time}</div>
-                                </div>
-                                <span class="status-badge status-${item.status}">${item.status === 'success' ? '✓' : '✗'}</span>
+                            <div style="padding:12px;border-bottom:1px solid var(--border)">
+                                <div style="font-weight:600">${item.action}</div>
+                                <div style="font-size:12px;color:var(--text-secondary)">${item.time}</div>
                             </div>
                         `).join('');
                     }
                 } else {
-                    container.innerHTML = `
-                        <div class="empty-state">
-                            <div class="empty-icon">📭</div>
-                            <div>Пока нет активности</div>
-                        </div>
-                    `;
+                    container.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-secondary)">Пока нет активности</div>';
                 }
             } catch (error) {
                 console.error('Failed to load activity:', error);
-                document.getElementById('activityList').innerHTML = `
-                    <div class="empty-state">
-                        <div class="empty-icon">📭</div>
-                        <div>Пока нет активности</div>
-                    </div>
-                `;
+                document.getElementById('activityList').innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-secondary)">Пока нет активности</div>';
             }
         }
 
-        // Загрузка ключей
-        async function loadKeys() {
-            try {
-                const response = await fetch('/api/v1/keys');
-                const container = document.getElementById('keysList');
-                
-                if (response.ok) {
-                    const data = await response.json();
-                    if (data.length === 0) {
-                        container.innerHTML = `
-                            <div class="empty-state">
-                                <div class="empty-icon">🔑</div>
-                                <div>У вас пока нет API ключей</div>
-                                <a href="/keys" class="btn btn-primary" style="margin-top: 16px;">Создать первый ключ</a>
-                            </div>
-                        `;
-                    } else {
-                        container.innerHTML = data.slice(0, 3).map(key => `
-                            <div class="key-item">
-                                <div class="key-header">
-                                    <div class="key-name">${key.name || 'API Key'}</div>
-                                    <span class="status-badge status-${key.active ? 'success' : 'error'}">
-                                        ${key.active ? 'Активен' : 'Неактивен'}
-                                    </span>
-                                </div>
-                                <div class="key-value">${key.key}</div>
-                                <div class="key-actions">
-                                    <button class="btn btn-secondary" onclick="copyKey('${key.key}')">📋 Копировать</button>
-                                    <a href="/keys" class="btn btn-secondary">Управление</a>
-                                </div>
-                            </div>
-                        `).join('');
-                    }
-                } else {
-                    container.innerHTML = `
-                        <div class="empty-state">
-                            <div class="empty-icon">🔑</div>
-                            <div>У вас пока нет API ключей</div>
-                            <a href="/keys" class="btn btn-primary" style="margin-top: 16px;">Создать первый ключ</a>
-                        </div>
-                    `;
-                }
-            } catch (error) {
-                console.error('Failed to load keys:', error);
-                document.getElementById('keysList').innerHTML = `
-                    <div class="empty-state">
-                        <div class="empty-icon">🔑</div>
-                        <div>У вас пока нет API ключей</div>
-                        <a href="/keys" class="btn btn-primary" style="margin-top: 16px;">Создать первый ключ</a>
-                    </div>
-                `;
-            }
-        }
-
-        // Копирование ключа
-        function copyKey(key) {
-            navigator.clipboard.writeText(key);
-            alert('Ключ скопирован!');
-        }
-
-        // Форматирование чисел
         function formatNumber(num) {
             if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
             if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
             return num.toString();
         }
 
-        // Выход
-        async function logout() {
-            try {
-                await fetch('/api/v1/auth/logout', { method: 'POST' });
-            } catch (error) {
-                console.error('Logout failed:', error);
-            }
-            window.location.href = '/login';
+        function logout() {
+            fetch('/api/v1/auth/logout', { method: 'POST' }).then(() => {
+                window.location.href = '/login';
+            });
         }
 
-        // Инициализация
-        async function init() {
-            const isAuth = await checkAuth();
-            if (isAuth) {
-                loadStats();
-                loadActivity();
-                loadKeys();
-            }
-        }
-
-        init();
+        loadStats();
+        loadActivity();
     </script>
 </body>
 </html>
