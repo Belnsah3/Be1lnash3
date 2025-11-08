@@ -88,15 +88,17 @@ router.post('/register', async (req, res) => {
  */
 router.post('/login', async (req, res) => {
     try {
-        const { login, password, twoFAToken } = req.body;
+        // Поддержка как login так и email поля для совместимости
+        const { login, email, password, twoFAToken, twoFactorCode } = req.body;
+        const loginValue = login || email;
 
-        console.log('Login attempt:', { login, has2FA: !!twoFAToken });
+        console.log('Login attempt:', { login: loginValue, has2FA: !!(twoFAToken || twoFactorCode) });
 
         // Валидация
-        if (!login || !password) {
+        if (!loginValue || !password) {
             return res.status(400).json({
                 success: false,
-                error: 'Login and password are required'
+                error: 'Email/login and password are required'
             });
         }
 
@@ -104,7 +106,7 @@ router.post('/login', async (req, res) => {
         const user = db.prepare(`
             SELECT * FROM users 
             WHERE LOWER(email) = LOWER(?) OR (username IS NOT NULL AND LOWER(username) = LOWER(?))
-        `).get(login, login);
+        `).get(loginValue, loginValue);
         
         console.log('User found:', user ? `${user.email} (${user.role})` : 'not found');
         
