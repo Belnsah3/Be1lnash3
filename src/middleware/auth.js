@@ -44,7 +44,7 @@ function getApiKeyInfo(apiKey) {
  */
 function getUserApiKeys(userId) {
     const stmt = db.prepare(`
-        SELECT id, key, name, limit_requests, used_requests, is_active, created_at
+        SELECT id, key, name, limit_requests, used_requests, is_active as active, created_at
         FROM api_keys
         WHERE user_id = ?
         ORDER BY created_at DESC
