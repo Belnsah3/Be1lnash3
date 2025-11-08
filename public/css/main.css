@@ -1,4 +1,4 @@
-/* LumeAI - Main Styles */
+/* LumeAI - Main Styles with Sidebar */
 * {
     margin: 0;
     padding: 0;
@@ -23,6 +23,63 @@ body {
     line-height: 1.6;
     margin: 0;
     padding: 0;
+}
+
+/* Sidebar */
+.sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    height: 100vh;
+    width: 240px;
+    background: var(--card);
+    border-right: 1px solid var(--border);
+    padding: 24px 16px;
+    overflow-y: auto;
+    z-index: 50;
+}
+
+.sidebar-logo {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 32px;
+    background: linear-gradient(135deg, var(--primary), #764ba2);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.sidebar-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    border-radius: 8px;
+    color: var(--text-secondary);
+    text-decoration: none;
+    transition: all 0.2s;
+    margin-bottom: 4px;
+}
+
+.sidebar-item:hover {
+    background: rgba(102, 126, 234, 0.1);
+    color: var(--text);
+}
+
+.sidebar-item.active {
+    background: linear-gradient(135deg, var(--primary), #764ba2);
+    color: white;
+}
+
+.sidebar-icon {
+    font-size: 20px;
+}
+
+/* Main Content (with sidebar) */
+.main-content {
+    margin-left: 240px;
+    padding: 24px;
+    min-height: 100vh;
 }
 
 /* Container */
@@ -158,6 +215,19 @@ body {
 @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+    .sidebar {
+        display: none;
+    }
+    
+    .main-content {
+        margin-left: 0;
+        padding: 16px;
+        padding-bottom: 80px;
+    }
 }
 
 /* Desktop */
