@@ -7,13 +7,13 @@ echo '[1/4] Navigating to project...'
 cd ~/rest-api || cd ~/rest-api/rest-api
 
 echo '[2/4] Pulling latest changes...'
-git pull
+git pull origin main || git pull origin master
 
 echo '[3/4] Installing dependencies...'
-npm install --production
+npm install --production 2>&1 | grep -v 'npm warn'
 
 echo '[4/4] Restarting application...'
-pm2 restart lumeai || pm2 restart all
+pm2 restart lumeai 2>&1 | tail -5
 
 echo ''
 echo '[SUCCESS] Server updated!'
