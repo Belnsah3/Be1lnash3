@@ -354,7 +354,7 @@ const modelsController = (req, res) => {
 };
 
 app.get('/v1/models', modelsController);
-app.get('/models', modelsController);
+// app.get('/models', modelsController); // ОТКЛЮЧЕНО - конфликтует с HTML страницей
 app.get('/v1/engines', modelsController);
 app.get('/engines', modelsController);
 
