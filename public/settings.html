@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Настройки - LumeAI</title>
+    <link rel="stylesheet" href="/css/main.css">
+    <style>
+        .form-group { margin-bottom: 20px; }
+        .form-label { display: block; margin-bottom: 8px; font-weight: 600; }
+        .form-input { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg); color: var(--text); font-family: inherit; }
+        .form-input:focus { outline: none; border-color: var(--primary); }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="sidebar-logo">💬 LumeAI</div>
+        <a href="/dashboard" class="sidebar-item"><span class="sidebar-icon">🏠</span> Dashboard</a>
+        <a href="/chat" class="sidebar-item"><span class="sidebar-icon">💬</span> Чат</a>
+        <a href="/models" class="sidebar-item"><span class="sidebar-icon">🤖</span> Модели</a>
+        <a href="/keys" class="sidebar-item"><span class="sidebar-icon">🔑</span> API Ключи</a>
+        <a href="/activity" class="sidebar-item"><span class="sidebar-icon">📊</span> Активность</a>
+        <a href="/settings" class="sidebar-item active"><span class="sidebar-icon">⚙️</span> Настройки</a>
+        <div style="margin-top: auto; padding-top: 20px; border-top: 1px solid var(--border);"><button class="btn btn-danger" onclick="logout()" style="width: 100%;">Выйти</button></div>
+    </div>
+
+    <div class="main-content">
+        <h1 style="margin-bottom: 24px;">Настройки</h1>
+
+        <div class="card">
+            <h2 class="section-title">Профиль</h2>
+            <div class="form-group">
+                <label class="form-label">Имя</label>
+                <input type="text" class="form-input" placeholder="Ваше имя">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Email</label>
+                <input type="email" class="form-input" placeholder="your@email.com">
+            </div>
+            <button class="btn btn-primary">Сохранить изменения</button>
+        </div>
+
+        <div class="card">
+            <h2 class="section-title">Безопасность</h2>
+            <div class="form-group">
+                <label class="form-label">Текущий пароль</label>
+                <input type="password" class="form-input" placeholder="••••••••">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Новый пароль</label>
+                <input type="password" class="form-input" placeholder="••••••••">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Подтвердите новый пароль</label>
+                <input type="password" class="form-input" placeholder="••••••••">
+            </div>
+            <button class="btn btn-primary">Изменить пароль</button>
+        </div>
+
+        <div class="card">
+            <h2 class="section-title">Опасная зона</h2>
+            <p style="color: var(--text-secondary); margin-bottom: 16px;">Удаление аккаунта приведет к безвозвратной потере всех данных</p>
+            <button class="btn btn-danger" onclick="if(confirm('Вы уверены? Это действие нельзя отменить!'))alert('Функция в разработке')">Удалить аккаунт</button>
+        </div>
+    </div>
+
+    <div class="mobile-menu">
+        <a href="/dashboard" class="menu-item"><div class="menu-icon">🏠</div><div>Главная</div></a>
+        <a href="/chat" class="menu-item"><div class="menu-icon">💬</div><div>Чат</div></a>
+        <a href="/keys" class="menu-item"><div class="menu-icon">🔑</div><div>Ключи</div></a>
+        <a href="/settings" class="menu-item active"><div class="menu-icon">⚙️</div><div>Настройки</div></a>
+    </div>
+
+    <script>
+        function logout() { fetch('/api/v1/auth/logout', { method: 'POST' }).then(() => { window.location.href = '/login'; }); }
+    </script>
+</body>
+</html>
