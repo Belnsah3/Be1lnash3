@@ -225,14 +225,17 @@
         async function toggleKey(id, isActive) {
             try {
                 const response = await fetch(`/api/v1/keys/${id}/toggle`, {
-                    method: 'POST'
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ active: !isActive })
                 });
 
                 if (response.ok) {
                     alert(isActive ? '✓ Ключ деактивирован' : '✓ Ключ активирован');
                     loadKeys();
                 } else {
-                    alert('❌ Ошибка изменения статуса');
+                    const error = await response.json();
+                    alert('❌ Ошибка: ' + (error.error || 'Не удалось изменить статус'));
                 }
             } catch (error) {
                 alert('❌ Ошибка: ' + error.message);
@@ -251,7 +254,8 @@
                     alert('✓ Ключ успешно удален');
                     loadKeys();
                 } else {
-                    alert('❌ Ошибка удаления ключа');
+                    const error = await response.json();
+                    alert('❌ Ошибка: ' + (error.error || 'Не удалось удалить ключ'));
                 }
             } catch (error) {
                 alert('❌ Ошибка: ' + error.message);
