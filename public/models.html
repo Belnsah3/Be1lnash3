@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Модели - LumeAI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --primary: 263 70% 50%;
+            --background: 240 10% 3.9%;
+            --foreground: 0 0% 98%;
+            --card: 240 10% 3.9%;
+            --border: 240 3.7% 15.9%;
+            --muted: 240 3.7% 15.9%;
+            --muted-foreground: 240 5% 64.9%;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: hsl(var(--background));
+            color: hsl(var(--foreground));
+        }
+
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            height: 100vh;
+            width: 240px;
+            background: hsl(var(--card));
+            border-right: 1px solid hsl(var(--border));
+            padding: 24px 16px;
+            overflow-y: auto;
+        }
+
+        .sidebar-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-radius: 8px;
+            color: hsl(var(--muted-foreground));
+            text-decoration: none;
+            transition: all 0.2s;
+            margin-bottom: 4px;
+        }
+
+        .sidebar-item:hover {
+            background: hsl(240 5% 26%);
+            color: hsl(var(--foreground));
+        }
+
+        .sidebar-item.active {
+            background: hsl(var(--primary));
+            color: white;
+        }
+
+        .main-content {
+            margin-left: 240px;
+            padding: 24px;
+        }
+
+        .model-card {
+            background: hsl(var(--card));
+            border: 1px solid hsl(var(--border));
+            border-radius: 12px;
+            padding: 24px;
+            transition: all 0.3s;
+        }
+
+        .model-card:hover {
+            border-color: hsl(var(--primary));
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px rgba(102, 126, 234, 0.2);
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 12px;
+            border-radius: 16px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .badge-featured {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .badge-free {
+            background: rgba(17, 153, 142, 0.1);
+            color: #11998e;
+        }
+
+        .badge-premium {
+            background: rgba(255, 193, 7, 0.1);
+            color: #ffc107;
+        }
+
+        .provider-logo {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 18px;
+        }
+
+        .openai { background: linear-gradient(135deg, #10a37f 0%, #0d8a6a 100%); color: white; }
+        .anthropic { background: linear-gradient(135deg, #d97757 0%, #c45a3a 100%); color: white; }
+        .google { background: linear-gradient(135deg, #4285f4 0%, #3367d6 100%); color: white; }
+        .meta { background: linear-gradient(135deg, #0668e1 0%, #0552b5 100%); color: white; }
+        .mistral { background: linear-gradient(135deg, #f2a900 0%, #d99000 100%); color: white; }
+
+        .filter-chip {
+            padding: 8px 16px;
+            border-radius: 20px;
+            border: 1px solid hsl(var(--border));
+            background: transparent;
+            color: hsl(var(--foreground));
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 14px;
+        }
+
+        .filter-chip:hover {
+            border-color: hsl(var(--primary));
+            background: hsl(240 5% 26%);
+        }
+
+        .filter-chip.active {
+            background: hsl(var(--primary));
+            color: white;
+            border-color: hsl(var(--primary));
+        }
+
+        .search-box {
+            position: relative;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px 16px 12px 44px;
+            border-radius: 8px;
+            border: 1px solid hsl(var(--border));
+            background: hsl(var(--card));
+            color: hsl(var(--foreground));
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: hsl(var(--primary));
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: hsl(var(--muted-foreground));
+        }
+
+        .btn-primary {
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="mb-8">
+            <div class="flex items-center gap-3 px-4">
+                <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-500 to-purple-700 flex items-center justify-center text-white font-bold text-xl">
+                    L
+                </div>
+                <span class="text-xl font-bold">LumeAI</span>
+            </div>
+        </div>
+
+        <nav>
+            <a href="/dashboard" class="sidebar-item">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                </svg>
+                <span>Dashboard</span>
+            </a>
+
+            <a href="/models" class="sidebar-item active">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+                </svg>
+                <span>Модели</span>
+            </a>
+
+            <a href="/chat" class="sidebar-item">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+                </svg>
+                <span>Чат</span>
+            </a>
+
+            <a href="/activity" class="sidebar-item">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                </svg>
+                <span>Активность</span>
+            </a>
+
+            <a href="/keys" class="sidebar-item">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
+                </svg>
+                <span>API Ключи</span>
+            </a>
+
+            <a href="/settings" class="sidebar-item">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                </svg>
+                <span>Настройки</span>
+            </a>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <header class="mb-8">
+            <h1 class="text-3xl font-bold mb-2">Доступные модели 🤖</h1>
+            <p class="text-gray-400">Выберите AI модель для своих задач</p>
+        </header>
+
+        <!-- Search and Filters -->
+        <div class="mb-8">
+            <div class="search-box mb-4">
+                <svg class="search-icon w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                </svg>
+                <input type="text" placeholder="Поиск моделей..." id="searchInput" oninput="filterModels()">
+            </div>
+
+            <div class="flex flex-wrap gap-2">
+                <button class="filter-chip active" onclick="filterByProvider('all')">Все</button>
+                <button class="filter-chip" onclick="filterByProvider('openai')">OpenAI</button>
+                <button class="filter-chip" onclick="filterByProvider('anthropic')">Anthropic</button>
+                <button class="filter-chip" onclick="filterByProvider('google')">Google</button>
+                <button class="filter-chip" onclick="filterByProvider('meta')">Meta</button>
+                <button class="filter-chip" onclick="filterByProvider('free')">🆓 Бесплатные</button>
+            </div>
+        </div>
+
+        <!-- Models Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="modelsGrid">
+            <!-- Models will be inserted here -->
+        </div>
+    </main>
+
+    <script>
+        const models = [
+            {
+                id: 'gpt-4',
+                name: 'GPT-4',
+                provider: 'OpenAI',
+                providerClass: 'openai',
+                description: 'Самая мощная модель от OpenAI с расширенными возможностями рассуждения и понимания контекста',
+                contextLength: '128K',
+                pricing: '$0.03 / 1K tokens',
+                featured: true,
+                free: false,
+                capabilities: ['Текст', 'Код', 'Анализ', 'Рассуждение']
+            },
+            {
+                id: 'gpt-4o',
+                name: 'GPT-4o',
+                provider: 'OpenAI',
+                providerClass: 'openai',
+                description: 'Оптимизированная версия GPT-4 с улучшенной скоростью и эффективностью',
+                contextLength: '128K',
+                pricing: '$0.015 / 1K tokens',
+                featured: true,
+                free: false,
+                capabilities: ['Текст', 'Код', 'Быстрый ответ']
+            },
+            {
+                id: 'gpt-3.5-turbo',
+                name: 'GPT-3.5 Turbo',
+                provider: 'OpenAI',
+                providerClass: 'openai',
+                description: 'Быстрая и экономичная модель для большинства задач',
+                contextLength: '16K',
+                pricing: '$0.002 / 1K tokens',
+                featured: false,
+                free: false,
+                capabilities: ['Текст', 'Код', 'Диалог']
+            },
+            {
+                id: 'claude-sonnet-4.5',
+                name: 'Claude Sonnet 4.5',
+                provider: 'Anthropic',
+                providerClass: 'anthropic',
+                description: 'Новейшая модель Claude с улучшенным пониманием контекста и безопасностью',
+                contextLength: '200K',
+                pricing: '$0.015 / 1K tokens',
+                featured: true,
+                free: false,
+                capabilities: ['Текст', 'Код', 'Анализ', 'Длинный контекст']
+            },
+            {
+                id: 'claude-haiku-4.5',
+                name: 'Claude Haiku 4.5',
+                provider: 'Anthropic',
+                providerClass: 'anthropic',
+                description: 'Быстрая и эффективная модель для простых задач',
+                contextLength: '200K',
+                pricing: '$0.0025 / 1K tokens',
+                featured: false,
+                free: false,
+                capabilities: ['Текст', 'Быстрый ответ']
+            },
+            {
+                id: 'gemini-2.5-flash',
+                name: 'Gemini 2.5 Flash',
+                provider: 'Google',
+                providerClass: 'google',
+                description: 'Сверхбыстрая модель с мультимодальными возможностями',
+                contextLength: '1M',
+                pricing: '$0.001 / 1K tokens',
+                featured: true,
+                free: true,
+                capabilities: ['Текст', 'Изображения', 'Видео', 'Аудио']
+            },
+            {
+                id: 'gemini-2.5-pro',
+                name: 'Gemini 2.5 Pro',
+                provider: 'Google',
+                providerClass: 'google',
+                description: 'Продвинутая модель для сложных задач с огромным контекстом',
+                contextLength: '2M',
+                pricing: '$0.005 / 1K tokens',
+                featured: false,
+                free: false,
+                capabilities: ['Текст', 'Изображения', 'Код', 'Анализ']
+            },
+            {
+                id: 'llama-3.3-70b',
+                name: 'Llama 3.3 70B',
+                provider: 'Meta',
+                providerClass: 'meta',
+                description: 'Открытая модель от Meta с отличным качеством',
+                contextLength: '128K',
+                pricing: 'Бесплатно',
+                featured: false,
+                free: true,
+                capabilities: ['Текст', 'Код', 'Open Source']
+            },
+            {
+                id: 'mistral-large',
+                name: 'Mistral Large',
+                provider: 'Mistral AI',
+                providerClass: 'mistral',
+                description: 'Европейская альтернатива GPT-4 с высокой производительностью',
+                contextLength: '128K',
+                pricing: '$0.008 / 1K tokens',
+                featured: false,
+                free: false,
+                capabilities: ['Текст', 'Код', 'Многоязычность']
+            }
+        ];
+
+        let currentFilter = 'all';
+
+        function renderModels(modelsToRender) {
+            const grid = document.getElementById('modelsGrid');
+            grid.innerHTML = modelsToRender.map(model => `
+                <div class="model-card" data-provider="${model.providerClass}">
+                    <div class="flex items-start justify-between mb-4">
+                        <div class="provider-logo ${model.providerClass}">
+                            ${model.provider[0]}
+                        </div>
+                        <div class="flex gap-2">
+                            ${model.featured ? '<span class="badge badge-featured">⭐ Популярная</span>' : ''}
+                            ${model.free ? '<span class="badge badge-free">🆓 Бесплатно</span>' : ''}
+                        </div>
+                    </div>
+
+                    <h3 class="text-xl font-bold mb-1">${model.name}</h3>
+                    <p class="text-sm text-gray-400 mb-3">${model.provider}</p>
+                    
+                    <p class="text-sm text-gray-300 mb-4 line-clamp-2">${model.description}</p>
+                    
+                    <div class="flex flex-wrap gap-1 mb-4">
+                        ${model.capabilities.map(cap => `
+                            <span class="text-xs px-2 py-1 rounded bg-gray-700 text-gray-300">${cap}</span>
+                        `).join('')}
+                    </div>
+                    
+                    <div class="flex items-center justify-between text-sm mb-4 pb-4 border-b border-gray-700">
+                        <div>
+                            <div class="text-gray-400">Контекст</div>
+                            <div class="font-semibold">${model.contextLength}</div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-gray-400">Цена</div>
+                            <div class="font-semibold">${model.pricing}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex gap-2">
+                        <button class="btn-primary flex-1" onclick="useModel('${model.id}')">
+                            Использовать
+                        </button>
+                        <button class="px-4 py-2 border border-gray-600 rounded-lg hover:bg-gray-700 transition" onclick="viewDetails('${model.id}')">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function filterByProvider(provider) {
+            currentFilter = provider;
+            
+            document.querySelectorAll('.filter-chip').forEach(chip => {
+                chip.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            let filtered = models;
+            if (provider !== 'all') {
+                if (provider === 'free') {
+                    filtered = models.filter(m => m.free);
+                } else {
+                    filtered = models.filter(m => m.providerClass === provider);
+                }
+            }
+            
+            renderModels(filtered);
+        }
+
+        function filterModels() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = models.filter(m => 
+                m.name.toLowerCase().includes(searchTerm) ||
+                m.provider.toLowerCase().includes(searchTerm) ||
+                m.description.toLowerCase().includes(searchTerm)
+            );
+            renderModels(filtered);
+        }
+
+        function useModel(modelId) {
+            window.location.href = `/chat?model=${modelId}`;
+        }
+
+        function viewDetails(modelId) {
+            const model = models.find(m => m.id === modelId);
+            alert(`Детали модели:\n\n${model.name}\n${model.provider}\n\n${model.description}\n\nКонтекст: ${model.contextLength}\nЦена: ${model.pricing}`);
+        }
+
+        // Initial render
+        renderModels(models);
+    </script>
+</body>
+</html>

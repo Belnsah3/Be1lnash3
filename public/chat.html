@@ -1,1047 +1,502 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" data-theme="dark">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Чат - LumeAI</title>
-    
-    <!-- Markdown и подсветка кода -->
-    <script src="https://cdn.jsdelivr.net/npm/marked@11.1.1/marked.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-    
-    <link rel="stylesheet" href="/css/new-theme.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <style>
+        :root {
+            --primary: 263 70% 50%;
+            --background: 240 10% 3.9%;
+            --foreground: 0 0% 98%;
+            --card: 240 10% 3.9%;
+            --border: 240 3.7% 15.9%;
+            --muted: 240 3.7% 15.9%;
+            --muted-foreground: 240 5% 64.9%;
+        }
+
         body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: hsl(var(--background));
+            color: hsl(var(--foreground));
             margin: 0;
-            padding: 0;
-            background: var(--bg-primary);
+            height: 100vh;
+            overflow: hidden;
         }
 
         .chat-container {
             display: flex;
             height: 100vh;
-            max-height: 100vh;
         }
 
-        /* Левая панель */
         .sidebar {
-            width: 300px;
-            background: var(--bg-secondary);
-            border-right: 1px solid var(--border-color);
+            width: 260px;
+            background: hsl(var(--card));
+            border-right: 1px solid hsl(var(--border));
             display: flex;
             flex-direction: column;
         }
 
-        .sidebar-header {
-            padding: 20px;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .sidebar-header h2 {
-            font-size: 20px;
-            margin-bottom: 15px;
-        }
-
-        .new-chat-btn {
-            width: 100%;
-            padding: 12px;
-            background: var(--gradient-primary);
-            border: none;
-            border-radius: 10px;
-            color: white;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .new-chat-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-glow);
-        }
-
-        .chats-list {
-            flex: 1;
-            overflow-y: auto;
-            padding: 10px;
-        }
-
-        .chat-item {
-            padding: 15px;
-            cursor: pointer;
-            border-radius: 10px;
-            transition: background 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .chat-item:hover {
-            background: var(--bg-tertiary);
-        }
-        
-        .chat-item:hover .chat-actions {
-            opacity: 1 !important;
-        }
-
-        .chat-item.active {
-            background: var(--bg-tertiary);
-        }
-
-        /* Центральная область */
         .chat-main {
             flex: 1;
             display: flex;
             flex-direction: column;
-            background: var(--bg-primary);
         }
 
         .chat-header {
-            padding: 20px;
-            border-bottom: 1px solid var(--border-color);
+            padding: 16px 24px;
+            border-bottom: 1px solid hsl(var(--border));
             display: flex;
-            justify-content: space-between;
             align-items: center;
+            justify-content: space-between;
         }
 
-        .model-selector {
-            padding: 8px 16px;
-            background: var(--bg-tertiary);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            color: var(--text-primary);
-            cursor: pointer;
-        }
-
-        .messages-container {
+        .chat-messages {
             flex: 1;
             overflow-y: auto;
-            padding: 20px;
+            padding: 24px;
         }
 
         .message {
-            margin-bottom: 20px;
+            margin-bottom: 24px;
             display: flex;
             gap: 12px;
         }
 
-        .message.user {
-            flex-direction: row-reverse;
-        }
-
         .message-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: var(--gradient-primary);
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
+            font-weight: 600;
             flex-shrink: 0;
         }
 
-        .message-content {
-            max-width: 70%;
-            padding: 12px 16px;
-            border-radius: 12px;
-            background: var(--bg-tertiary);
+        .message.user .message-avatar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
         }
 
-        .message.user .message-content {
-            background: var(--accent-blue);
+        .message.assistant .message-avatar {
+            background: hsl(var(--muted));
+            color: hsl(var(--foreground));
         }
-        
-        /* Markdown стили */
+
+        .message-content {
+            flex: 1;
+            line-height: 1.6;
+        }
+
         .message-content pre {
-            background: #1e1e1e;
-            padding: 12px;
+            background: hsl(var(--muted));
+            padding: 16px;
             border-radius: 8px;
             overflow-x: auto;
-            margin: 8px 0;
+            margin: 12px 0;
         }
-        
+
         .message-content code {
-            background: rgba(255, 255, 255, 0.1);
+            background: hsl(var(--muted));
             padding: 2px 6px;
             border-radius: 4px;
-            font-family: 'Courier New', monospace;
-            font-size: 0.9em;
+            font-size: 14px;
         }
-        
+
         .message-content pre code {
             background: none;
             padding: 0;
         }
-        
-        .message-content blockquote {
-            border-left: 3px solid var(--accent-blue);
-            padding-left: 12px;
-            margin: 8px 0;
-            color: var(--text-secondary);
+
+        .chat-input-container {
+            padding: 24px;
+            border-top: 1px solid hsl(var(--border));
         }
-        
-        .message-content a {
-            color: var(--accent-blue);
-            text-decoration: none;
-        }
-        
-        .message-content a:hover {
-            text-decoration: underline;
-        }
-        
-        .message-content img {
-            max-width: 100%;
-            border-radius: 8px;
-            margin: 8px 0;
-        }
-        
-        .message-content ul, .message-content ol {
-            padding-left: 20px;
-            margin: 8px 0;
-        }
-        
-        .message-content table {
-            border-collapse: collapse;
-            width: 100%;
-            margin: 8px 0;
-        }
-        
-        .message-content table th,
-        .message-content table td {
-            border: 1px solid var(--border-color);
-            padding: 8px;
-            text-align: left;
-        }
-        
-        .message-content table th {
-            background: var(--bg-tertiary);
-        }
-        
-        /* Кнопка копирования кода */
-        .code-block-wrapper {
+
+        .chat-input-wrapper {
             position: relative;
+            max-width: 900px;
+            margin: 0 auto;
         }
-        
-        .copy-code-btn {
+
+        .chat-input {
+            width: 100%;
+            padding: 16px 120px 16px 16px;
+            border: 2px solid hsl(var(--border));
+            border-radius: 12px;
+            background: hsl(var(--card));
+            color: hsl(var(--foreground));
+            font-size: 15px;
+            resize: none;
+            min-height: 56px;
+            max-height: 200px;
+        }
+
+        .chat-input:focus {
+            outline: none;
+            border-color: hsl(var(--primary));
+        }
+
+        .send-btn {
             position: absolute;
-            top: 8px;
             right: 8px;
-            background: rgba(255, 255, 255, 0.1);
+            bottom: 8px;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
             border: none;
-            color: var(--text-primary);
-            padding: 4px 8px;
-            border-radius: 4px;
+            border-radius: 8px;
             cursor: pointer;
-            font-size: 12px;
-            opacity: 0.7;
-            transition: opacity 0.2s;
+            font-weight: 600;
+            transition: all 0.2s;
         }
-        
-        .copy-code-btn:hover {
-            opacity: 1;
-            background: rgba(255, 255, 255, 0.2);
+
+        .send-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
         }
-        
-        /* Typing indicator */
+
+        .send-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .conversation-item {
+            padding: 12px 16px;
+            margin: 4px 8px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .conversation-item:hover {
+            background: hsl(var(--muted));
+        }
+
+        .conversation-item.active {
+            background: hsl(var(--primary));
+            color: white;
+        }
+
+        .model-selector {
+            padding: 12px 16px;
+            border: 1px solid hsl(var(--border));
+            border-radius: 8px;
+            background: hsl(var(--card));
+            color: hsl(var(--foreground));
+            cursor: pointer;
+            font-size: 14px;
+        }
+
         .typing-indicator {
-            display: inline-flex;
+            display: flex;
             gap: 4px;
-            padding: 4px;
+            padding: 8px 0;
         }
-        
-        .typing-dot {
+
+        .typing-indicator span {
             width: 8px;
             height: 8px;
+            background: hsl(var(--muted-foreground));
             border-radius: 50%;
-            background: var(--text-secondary);
             animation: typing 1.4s infinite;
         }
-        
-        .typing-dot:nth-child(2) {
+
+        .typing-indicator span:nth-child(2) {
             animation-delay: 0.2s;
         }
-        
-        .typing-dot:nth-child(3) {
+
+        .typing-indicator span:nth-child(3) {
             animation-delay: 0.4s;
         }
-        
+
         @keyframes typing {
             0%, 60%, 100% {
-                opacity: 0.3;
                 transform: translateY(0);
             }
             30% {
-                opacity: 1;
                 transform: translateY(-10px);
             }
         }
 
-        .input-container {
-            padding: 20px;
-            border-top: 1px solid var(--border-color);
-            background: var(--bg-secondary);
-        }
-
-        .input-wrapper {
+        .new-chat-btn {
+            margin: 16px;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
             display: flex;
-            gap: 10px;
-            align-items: flex-end;
-        }
-
-        .input-field {
-            flex: 1;
-            padding: 12px 16px;
-            background: var(--bg-tertiary);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            color: var(--text-primary);
-            resize: none;
-            min-height: 50px;
-            max-height: 150px;
-            font-family: inherit;
-        }
-
-        .input-actions {
-            display: flex;
+            align-items: center;
+            justify-content: center;
             gap: 8px;
         }
 
-        .action-btn {
-            width: 50px;
-            height: 50px;
-            border-radius: 12px;
-            border: none;
-            background: var(--bg-tertiary);
-            color: var(--text-primary);
-            cursor: pointer;
-            font-size: 20px;
-            transition: all 0.3s;
-        }
-
-        .action-btn:hover {
-            background: var(--accent-blue);
-        }
-
-        .send-btn {
-            background: var(--gradient-primary);
-            color: white;
-        }
-
-        /* Адаптивность */
-        @media (max-width: 768px) {
-            .chat-container {
-                width: 100vw;
-                height: 100vh;
-                overflow: hidden;
-            }
-            
-            .chat-main {
-                height: 100vh;
-                overflow: hidden;
-            }
-            
-            .messages-container {
-                flex: 1;
-                overflow-y: auto;
-                -webkit-overflow-scrolling: touch;
-            }
-            
-            .sidebar {
-                position: fixed;
-                left: -300px;
-                z-index: 100;
-                transition: left 0.3s;
-                height: 100vh;
-                box-shadow: 2px 0 10px rgba(0,0,0,0.5);
-            }
-
-            .sidebar.open {
-                left: 0;
-            }
-            
-            .mobile-menu-btn {
-                display: block !important;
-            }
-            
-            .chat-header {
-                padding: 15px;
-            }
-            
-            .chat-header h2 {
-                font-size: 18px;
-                margin: 0;
-            }
-            
-            .model-selector {
-                font-size: 12px;
-                padding: 6px 10px;
-                max-width: 150px;
-            }
-            
-            .action-btn {
-                width: 40px;
-                height: 40px;
-                font-size: 16px;
-                min-width: 40px;
-            }
-            
-            .messages-container {
-                padding: 10px;
-            }
-            
-            .message-content {
-                max-width: 80%;
-                font-size: 14px;
-            }
-            
-            .input-container {
-                padding: 10px;
-            }
-            
-            .input-wrapper {
-                gap: 8px;
-            }
-            
-            .input-field {
-                font-size: 16px; /* Предотвращает зум на iOS */
-                padding: 10px 12px;
-                min-height: 44px;
-            }
-            
-            .input-actions {
-                gap: 6px;
-                flex-shrink: 0;
-            }
-            
-            #file-preview {
-                padding: 8px;
-                margin-bottom: 8px;
-            }
-        }
-        
-        /* Оверлей для мобильного меню */
-        .sidebar-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            z-index: 99;
-        }
-        
-        .sidebar-overlay.active {
-            display: block;
+        .new-chat-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
         }
     </style>
 </head>
 <body>
-    <!-- Оверлей для мобильного меню -->
-    <div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleSidebar()"></div>
-    
     <div class="chat-container">
-        
-        <!-- Левая панель -->
-        <div class="sidebar" id="sidebar">
-            <div class="sidebar-header">
-                <h2>Чаты</h2>
-                <button class="new-chat-btn" onclick="createNewChat()">+ Новый чат</button>
-            </div>
-            
-            <!-- Поиск по чатам -->
-            <div style="padding: 10px;">
-                <input 
-                    type="text" 
-                    id="chat-search" 
-                    placeholder="🔍 Поиск по чатам..."
-                    style="width: 100%; padding: 10px; background: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); font-family: inherit;"
-                    oninput="filterChats(this.value)"
-                />
-            </div>
-            
-            <div class="chats-list" id="chats-list">
-                <div class="chat-item active">
-                    <div style="font-weight: 600; margin-bottom: 4px;">Новый чат</div>
-                    <div style="font-size: 12px; color: var(--text-tertiary);">Только что</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Центральная область -->
-        <div class="chat-main">
-            <div class="chat-header">
-                <button class="mobile-menu-btn" onclick="toggleSidebar()" style="display: none; background: none; border: none; font-size: 24px; cursor: pointer; color: var(--text-primary);">
-                    ☰
-                </button>
-                <h2>Чат с AI</h2>
-                <div style="display: flex; gap: 10px; align-items: center;">
-                    <select class="model-selector" id="model-selector">
-                    <!-- OpenAI -->
-                    <optgroup label="🤖 OpenAI">
-                        <option value="gpt-5-chat">GPT-5 Chat</option>
-                        <option value="gpt-5-nano">GPT-5 Nano</option>
-                        <option value="gpt-5-mini">GPT-5 Mini</option>
-                        <option value="gpt-4.1-mini">GPT-4.1 Mini</option>
-                        <option value="gpt-4.1-nano">GPT-4.1 Nano</option>
-                        <option value="gpt-4o-mini">GPT-4o Mini</option>
-                        <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
-                        <option value="o1-pro">O1 Pro</option>
-                        <option value="o4-mini">O4 Mini</option>
-                        <option value="o3-mini">O3 Mini</option>
-                        <option value="gpt-oss-120b">GPT OSS 120B</option>
-                        <option value="gpt-image-1">🎨 GPT Image-1</option>
-                        <option value="dall-e-3">🎨 DALL-E 3</option>
-                    </optgroup>
-                    
-                    <!-- Google -->
-                    <optgroup label="🔍 Google">
-                        <option value="gemini-2.5-pro">Gemini 2.5 Pro</option>
-                        <option value="gemini-2.5-flash">Gemini 2.5 Flash</option>
-                        <option value="gemini-2.5-flash-lite">Gemini 2.5 Flash Lite</option>
-                        <option value="gemma-3n-e4b">Gemma 3N E4B</option>
-                        <option value="nano-banana">🎨 Nano Banana</option>
-                    </optgroup>
-                    
-                    <!-- DeepSeek -->
-                    <optgroup label="🧠 DeepSeek">
-                        <option value="deepseek-v3.1">DeepSeek V3.1</option>
-                        <option value="deepseek-v3.2">DeepSeek V3.2</option>
-                        <option value="deepseek-v3">DeepSeek V3</option>
-                        <option value="deepseek-chat">DeepSeek Chat</option>
-                        <option value="deepseek-reasoner">DeepSeek Reasoner</option>
-                        <option value="deepseek-r1">DeepSeek R1</option>
-                        <option value="deepseek-r1-0528">DeepSeek R1-0528</option>
-                    </optgroup>
-                    
-                    <!-- Anthropic -->
-                    <optgroup label="🎭 Anthropic (Claude)">
-                        <option value="claude-sonnet-4.5">Claude Sonnet 4.5</option>
-                        <option value="claude-sonnet-4">Claude Sonnet 4</option>
-                        <option value="claude-3-7-sonnet">Claude 3.7 Sonnet</option>
-                        <option value="claude-haiku-4.5">Claude Haiku 4.5</option>
-                    </optgroup>
-                    
-                    <!-- Qwen / Alibaba -->
-                    <optgroup label="💻 Qwen (Alibaba)">
-                        <option value="qwen3-omni">Qwen3 Omni (Multi)</option>
-                        <option value="qwen3-coder">Qwen3 Coder</option>
-                        <option value="qwen3-coder-big">Qwen3 Coder Big</option>
-                        <option value="qwen2.5-coder-32b">Qwen2.5 Coder 32B</option>
-                        <option value="qwen3-next">Qwen3 Next</option>
-                        <option value="qwq-32b-fast">QwQ 32B Fast</option>
-                    </optgroup>
-                    
-                    <!-- Meta / Llama -->
-                    <optgroup label="🦙 Meta (Llama)">
-                        <option value="llama-4-maverick">Llama 4 Maverick</option>
-                        <option value="llama-4-scout">Llama 4 Scout</option>
-                        <option value="llama-3.3">Llama 3.3</option>
-                    </optgroup>
-                    
-                    <!-- xAI (Grok) -->
-                    <optgroup label="⚡ xAI (Grok)">
-                        <option value="grok-4">Grok 4</option>
-                        <option value="grok-4-think">Grok 4 Think</option>
-                        <option value="grok-code-1">Grok Code 1</option>
-                        <option value="grok-3-mini">Grok 3 Mini</option>
-                    </optgroup>
-                    
-                    <!-- Mistral AI -->
-                    <optgroup label="🌪️ Mistral AI">
-                        <option value="mistral-medium-3">Mistral Medium 3</option>
-                        <option value="mistral-small-3.1-24b">Mistral Small 3.1 24B</option>
-                    </optgroup>
-                    
-                    <!-- GLM (Zhipu AI) -->
-                    <optgroup label="🎯 GLM (Zhipu AI)">
-                        <option value="glm-4.6">GLM 4.6 (Multi)</option>
-                        <option value="glm-4.5">GLM 4.5</option>
-                        <option value="glm-4.5-air">GLM 4.5 Air</option>
-                    </optgroup>
-                    
-                    <!-- AWS -->
-                    <optgroup label="☁️ AWS">
-                        <option value="nova-pro">Nova Pro</option>
-                        <option value="nova-lite">Nova Lite</option>
-                        <option value="nova-micro">Nova Micro</option>
-                    </optgroup>
-                    
-                    <!-- Moonshot AI -->
-                    <optgroup label="🌙 Moonshot AI">
-                        <option value="kimi-k2">Kimi K2</option>
-                        <option value="kimi-k2-0905">Kimi K2 0905</option>
-                    </optgroup>
-                    
-                    <!-- Nous Research -->
-                    <optgroup label="🔬 Nous Research">
-                        <option value="hermes-4-405b">Hermes 4 405B</option>
-                        <option value="hermes-3-405b">Hermes 3 405B</option>
-                    </optgroup>
-                    
-                    <!-- Stability AI -->
-                    <optgroup label="🎨 Stability AI">
-                        <option value="sd-3.5-large">🎨 SD 3.5 Large</option>
-                        <option value="sd-3.5">🎨 SD 3.5</option>
-                        <option value="sdxl">🎨 SDXL</option>
-                        <option value="cogvideox-flash">📹 CogVideoX Flash</option>
-                    </optgroup>
-                    
-                    <!-- Flux -->
-                    <optgroup label="⚡ Flux">
-                        <option value="flux-schnell">🎨 Flux Schnell</option>
-                        <option value="seed-oss">Seed OSS</option>
-                    </optgroup>
-                    
-                    <!-- Другие -->
-                    <optgroup label="🌐 Другие">
-                        <option value="command-a">Command A (Cohere)</option>
-                        <option value="ernie-4.5">Ernie 4.5 (Baidu)</option>
-                        <option value="nemotron-ultra-235b">Nemotron Ultra 235B (NVIDIA)</option>
-                        <option value="sonar">Sonar (Perplexity)</option>
-                        <option value="cliptagger-12b">🖼️ ClipTagger 12B</option>
-                        <option value="goliath-120b">Goliath 120B</option>
-                        <option value="lucid-origin">Lucid Origin</option>
-                        <option value="ring-1t">Ring 1T</option>
-                        <option value="ling-1t">Ling 1T</option>
-                    </optgroup>
-                </select>
-                <button class="action-btn" onclick="exportChat()" title="Экспорт чата">
-                    💾
-                </button>
-                <button class="action-btn" onclick="openSettings()" title="Настройки">
-                    ⚙️
-                </button>
-                </div>
-            </div>
-
-            <div class="messages-container" id="messages">
-                <div class="message assistant">
-                    <div class="message-avatar">🤖</div>
-                    <div class="message-content">
-                        Привет! Я AI ассистент. Чем могу помочь?
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="p-4 border-b border-gray-700">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-500 to-purple-700 flex items-center justify-center text-white font-bold">
+                        L
                     </div>
+                    <span class="text-xl font-bold">LumeAI</span>
                 </div>
             </div>
 
-            <div class="input-container">
-                <!-- Превью прикрепленного файла -->
-                <div id="file-preview" style="display: none; padding: 10px; background: var(--bg-tertiary); border-radius: 10px; margin-bottom: 10px;">
-                    <div style="display: flex; align-items: center; gap: 10px;">
-                        <img id="file-preview-img" style="max-width: 100px; max-height: 100px; border-radius: 8px; display: none;">
-                        <div style="flex: 1;">
-                            <div id="file-preview-name" style="font-weight: 600; margin-bottom: 4px;"></div>
-                            <div id="file-preview-size" style="font-size: 12px; color: var(--text-tertiary);"></div>
+            <button class="new-chat-btn" onclick="newChat()">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                </svg>
+                Новый чат
+            </button>
+
+            <div class="flex-1 overflow-y-auto">
+                <div class="px-4 py-2 text-xs font-semibold text-gray-400 uppercase">История</div>
+                <div id="conversationsList">
+                    <div class="conversation-item active">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+                        </svg>
+                        <span class="text-sm">Новый чат</span>
+
+            .message-content pre code {
+                background: none;
+                padding: 0;
+            }
+
+            .chat-input-container {
+                padding: 24px;
+                border-top: 1px solid hsl(var(--border));
+            }
+
+            .chat-input-wrapper {
+                position: relative;
+                max-width: 900px;
+                margin: 0 auto;
+            }
+
+            .chat-input {
+                width: 100%;
+                padding: 16px 120px 16px 16px;
+                border: 2px solid hsl(var(--border));
+                border-radius: 12px;
+                background: hsl(var(--card));
+                color: hsl(var(--foreground));
+                font-size: 15px;
+                resize: none;
+                min-height: 56px;
+                max-height: 200px;
+            }
+
+            .chat-input:focus {
+                outline: none;
+                border-color: hsl(var(--primary));
+            }
+
+            .send-btn {
+                position: absolute;
+                right: 8px;
+                bottom: 8px;
+                padding: 12px 24px;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+                border: none;
+                border-radius: 8px;
+                cursor: pointer;
+                font-weight: 600;
+                transition: all 0.2s;
+            }
+
+            .send-btn:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+            }
+
+            .send-btn:disabled {
+                opacity: 0.5;
+                cursor: not-allowed;
+            }
+
+            .conversation-item {
+                padding: 12px 16px;
+                margin: 4px 8px;
+                border-radius: 8px;
+                cursor: pointer;
+                transition: all 0.2s;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+
+            .conversation-item:hover {
+                background: hsl(var(--muted));
+            }
+
+            .conversation-item.active {
+                background: hsl(var(--primary));
+                color: white;
+            }
+
+            .model-selector {
+                padding: 12px 16px;
+                border: 1px solid hsl(var(--border));
+                border-radius: 8px;
+                background: hsl(var(--card));
+                color: hsl(var(--foreground));
+                cursor: pointer;
+                font-size: 14px;
+            }
+
+            .typing-indicator {
+                display: flex;
+                gap: 4px;
+                padding: 8px 0;
+            }
+
+            .typing-indicator span {
+                width: 8px;
+                height: 8px;
+                background: hsl(var(--muted-foreground));
+                border-radius: 50%;
+                animation: typing 1.4s infinite;
+            }
+
+            .typing-indicator span:nth-child(2) {
+                animation-delay: 0.2s;
+            }
+
+            .typing-indicator span:nth-child(3) {
+                animation-delay: 0.4s;
+            }
+
+            @keyframes typing {
+                0%, 60%, 100% {
+                    transform: translateY(0);
+                }
+                30% {
+                    transform: translateY(-10px);
+                }
+            }
+
+            .new-chat-btn {
+                margin: 16px;
+                padding: 12px;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+                border: none;
+                border-radius: 8px;
+                cursor: pointer;
+                font-weight: 600;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 8px;
+            }
+
+            .new-chat-btn:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+            }
+        </style>
+    </head>
+    <body>
+        <div class="chat-container">
+            <!-- Sidebar -->
+            <aside class="sidebar">
+                <div class="p-4 border-b border-gray-700">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-500 to-purple-700 flex items-center justify-center text-white font-bold">
+                            L
                         </div>
-                        <button onclick="removeFile()" style="background: var(--accent-red); color: white; border: none; border-radius: 8px; padding: 8px 12px; cursor: pointer;">
-                            ✕
-                        </button>
+                        <span class="text-xl font-bold">LumeAI</span>
                     </div>
                 </div>
-                
-                <div class="input-wrapper">
+
+                <button class="new-chat-btn" onclick="newChat()">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                    </svg>
+                    Новый чат
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Chat Area -->
+        <main class="chat-main">
+            <!-- Header -->
+            <header class="chat-header">
+                <div class="flex items-center gap-4">
+                    <select class="model-selector" id="modelSelector">
+                        <option value="gpt-4">GPT-4</option>
+                        <option value="gpt-4o">GPT-4o</option>
+                        <option value="claude-sonnet">Claude Sonnet 4.5</option>
+                        <option value="claude-haiku">Claude Haiku 4.5</option>
+                        <option value="gemini-flash">Gemini 2.5 Flash</option>
+                        <option value="gemini-pro">Gemini 2.5 Pro</option>
+                    </select>
+                    <span class="text-sm text-gray-400">128K контекст</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button class="p-2 hover:bg-gray-700 rounded-lg transition" title="Настройки">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                        </svg>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Messages -->
+            <div class="chat-messages" id="chatMessages">
+                <div class="text-center text-gray-400 py-12">
+                    <div class="text-6xl mb-4">💬</div>
+                    <h2 class="text-2xl font-bold mb-2">Начните новый разговор</h2>
+                    <p>Выберите модель и задайте свой вопрос</p>
+                </div>
+            </div>
+
+            <!-- Input -->
+            <div class="chat-input-container">
+                <div class="chat-input-wrapper">
                     <textarea 
-                        class="input-field" 
-                        id="message-input" 
-                        placeholder="Введите сообщение..."
+                        id="chatInput" 
+                        class="chat-input" 
+                        placeholder="Напишите сообщение... (Shift+Enter для новой строки)"
+                        rows="1"
                         onkeydown="handleKeyPress(event)"
                     ></textarea>
-                    <div class="input-actions">
-                        <button class="action-btn" onclick="attachFile()" title="Прикрепить файл">
-                            📎
-                        </button>
-                        <button class="send-btn action-btn" onclick="sendMessage()" title="Отправить">
-                            ➤
-                        </button>
-                    </div>
+                    <button class="send-btn" onclick="sendMessage()" id="sendBtn">
+                        Отправить
+                    </button>
+                </div>
+                <div class="text-center text-xs text-gray-500 mt-2">
+                    LumeAI может допускать ошибки. Проверяйте важную информацию.
                 </div>
             </div>
-        </div>
-
+        </main>
     </div>
-
-    <!-- Модальное окно настроек -->
-    <div id="settings-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; align-items: center; justify-content: center; padding: 20px;">
-        <div style="background: var(--bg-secondary); border-radius: 20px; padding: 30px; max-width: 500px; width: 100%; max-height: 90vh; overflow-y: auto;">
-            <h2 style="margin-bottom: 20px;">⚙️ Настройки</h2>
-            
-            <div style="margin-bottom: 20px;">
-                <label style="display: block; margin-bottom: 8px; color: var(--text-secondary);">API Ключ</label>
-                <input 
-                    type="text" 
-                    id="api-key-input" 
-                    placeholder="Вставьте ваш API ключ из Dashboard"
-                    style="width: 100%; padding: 12px; background: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: 10px; color: var(--text-primary); font-family: monospace;"
-                >
-                <p style="font-size: 12px; color: var(--text-tertiary); margin-top: 8px;">
-                    Получите API ключ в Dashboard
-                </p>
-                <button onclick="window.location.href='/dashboard'" class="btn btn-secondary" style="width: 100%; margin-top: 10px;">
-                    🔑 Перейти в Dashboard
-                </button>
-            </div>
-            
-            <div style="display: flex; gap: 10px;">
-                <button onclick="saveSettings()" class="btn btn-primary" style="flex: 1;">
-                    Сохранить
-                </button>
-                <button onclick="closeSettings()" class="btn btn-secondary" style="flex: 1;">
-                    Отмена
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <input type="file" id="file-input" style="display: none;" onchange="handleFileSelect(event)">
 
     <script>
-        // История сообщений
-        let messageHistory = [];
-        
-        // Прикрепленный файл
-        let attachedFile = null;
-        
-        // API ключ
-        let apiKey = localStorage.getItem('lumeai_api_key') || '';
-        
-        // Текущий чат
-        let currentChatId = null;
-        let chats = [];
-        
-        // Модели генерации изображений
-        const imageGenerationModels = [
-            // OpenAI
-            'gpt-image-1',
-            'dall-e-3',
-            // Google
-            'nano-banana',
-            // Stability AI
-            'sdxl',
-            'sd-3.5',
-            'sd-3.5-large',
-            // Flux
-            'flux-schnell'
-        ];
-        
-        // Проверка API ключа и загрузка чатов при загрузке
-        window.addEventListener('DOMContentLoaded', async () => {
-            if (!apiKey) {
-                setTimeout(() => {
-                    openSettings();
-                    alert('Пожалуйста, введите ваш API ключ из Dashboard для использования чата');
-                }, 500);
-            }
-            
-            // Загрузить список чатов
-            await loadChats();
-        });
-        
-        // Открыть настройки
-        function openSettings() {
-            document.getElementById('settings-modal').style.display = 'flex';
-            document.getElementById('api-key-input').value = apiKey;
-        }
-        
-        // Закрыть настройки
-        function closeSettings() {
-            document.getElementById('settings-modal').style.display = 'none';
-        }
-        
-        // Сохранить настройки
-        function saveSettings() {
-            const newKey = document.getElementById('api-key-input').value.trim();
-            if (newKey) {
-                apiKey = newKey;
-                localStorage.setItem('lumeai_api_key', apiKey);
-                closeSettings();
-                addMessage('✅ API ключ сохранен!', 'assistant');
-            } else {
-                alert('Введите API ключ');
-            }
-        }
+        let messages = [];
+        let isTyping = false;
 
-        // Отправка сообщения
-        async function sendMessage() {
-            const input = document.getElementById('message-input');
-            let message = input.value.trim();
-            
-            // Проверка что есть сообщение или файл
-            if (!message && !attachedFile) return;
-            
-            // Если только файл без текста - создаем описание
-            if (!message && attachedFile) {
-                if (attachedFile.type.startsWith('image/')) {
-                    message = 'Что на этом изображении?';
-                } else {
-                    message = `Проанализируй этот файл: ${attachedFile.name}`;
-                }
-            }
-            
-            // Формируем сообщение с файлом если есть
-            let userMessage = message;
-            let fileData = null;
-            
-            if (attachedFile) {
-                userMessage = `📎 ${attachedFile.name}\n\n${message}`;
-                
-                // Читаем файл как base64 для изображений
-                if (attachedFile.type.startsWith('image/')) {
-                    fileData = await readFileAsBase64(attachedFile);
-                }
-            }
-            
-            // Добавить сообщение пользователя
-            addMessage(userMessage, 'user');
-            input.value = '';
-            
-            // Убрать превью файла
-            if (attachedFile) {
-                removeFile();
-            }
-            
-            // Добавить в историю
-            messageHistory.push({ role: 'user', content: message });
-            
-            // Подготовить информацию о файле для сохранения
-            let fileInfo = null;
-            if (attachedFile) {
-                fileInfo = {
-                    filename: attachedFile.name,
-                    type: attachedFile.type,
-                    size: attachedFile.size,
-                    data: fileData // base64 для изображений
-                };
-            }
-            
-            // Сохранить в БД
-            await saveMessage('user', message, fileInfo);
-            
-            // Показать анимированный индикатор печати
-            const typingId = addTypingIndicator();
-            
-            // Получить ответ от AI
-            try {
-                const model = document.getElementById('model-selector').value;
-                
-                // Проверка API ключа
-                if (!apiKey) {
-                    throw new Error('API ключ не установлен. Откройте настройки (⚙️)');
-                }
-                
-                // Формируем запрос с учетом изображений
-                let requestMessages = messageHistory;
-                
-                // Если есть изображение - добавляем его в последнее сообщение
-                if (fileData) {
-                    requestMessages = [...messageHistory];
-                    const lastMsg = requestMessages[requestMessages.length - 1];
-                    lastMsg.content = [
-                        {
-                            type: 'text',
-                            text: message
-                        },
-                        {
-                            type: 'image_url',
-                            image_url: {
-                                url: fileData
-                            }
-                        }
-                    ];
-                }
-                
-                // Отправка запроса с API ключом
-                const response = await fetch('/api/v1/ai/chat/completions', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${apiKey}`
-                    },
-                    body: JSON.stringify({
-                        model: model,
-                        messages: requestMessages,
-                        stream: false
-                    })
-                });
-                
-                // Удалить индикатор печати
-                document.getElementById(typingId).remove();
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                
-                const data = await response.json();
-                
-                // Проверяем тип ответа
-                let aiMessage = '';
-                
-                // Для моделей генерации изображений
-                if (imageGenerationModels.includes(model)) {
-                    // Проверяем разные форматы ответа
-                    if (data.data && data.data[0] && data.data[0].url) {
-                        // Формат DALL-E
-                        aiMessage = `Вот сгенерированное изображение:\n\n${data.data[0].url}`;
-                    } else if (data.images && data.images[0]) {
-                        // Формат Stable Diffusion
-                        aiMessage = `Вот сгенерированное изображение:\n\n${data.images[0]}`;
-                    } else if (data.choices && data.choices[0] && data.choices[0].message) {
-                        // Стандартный формат с URL в тексте
-                        aiMessage = data.choices[0].message.content;
-                    } else {
-                        throw new Error('Invalid image generation response');
-                    }
-                } else {
-                    // Для обычных моделей
-                    if (data.choices && data.choices[0] && data.choices[0].message) {
-                        aiMessage = data.choices[0].message.content;
-                    } else {
-                        throw new Error('Invalid response format');
-                    }
-                }
-                
-                messageHistory.push({ role: 'assistant', content: aiMessage });
-                addMessage(aiMessage, 'assistant');
-                
-                // Сохранить ответ в БД
-                await saveMessage('assistant', aiMessage);
-            } catch (error) {
-                console.error('Error:', error);
-                // Удалить индикатор печати если есть
-                const typing = document.querySelector('.message.assistant:last-child');
-                if (typing && typing.textContent.includes('Печатает')) {
-                    typing.remove();
-                }
-                addMessage('❌ Ошибка: ' + error.message, 'assistant');
-            }
-        }
-        
-        // Добавить анимированный typing indicator
-        function addTypingIndicator() {
-            const container = document.getElementById('messages');
-            const messageDiv = document.createElement('div');
-            const messageId = 'typing-' + Date.now();
-            messageDiv.id = messageId;
-            messageDiv.className = 'message assistant';
-            
-            const avatar = document.createElement('div');
-            avatar.className = 'message-avatar';
-            avatar.textContent = '🤖';
-            
-            const content = document.createElement('div');
-            content.className = 'message-content';
-            
-            const typingIndicator = document.createElement('div');
-            typingIndicator.className = 'typing-indicator';
-            
-            for (let i = 0; i < 3; i++) {
-                const dot = document.createElement('div');
-                dot.className = 'typing-dot';
-                typingIndicator.appendChild(dot);
-            }
-            
-            content.appendChild(typingIndicator);
-            messageDiv.appendChild(avatar);
-            messageDiv.appendChild(content);
-            container.appendChild(messageDiv);
-            
-            // Прокрутить вниз
-            container.scrollTop = container.scrollHeight;
-            
-            return messageId;
-        }
-
-        // Добавить сообщение
-        function addMessage(text, role) {
-            const container = document.getElementById('messages');
-            const messageDiv = document.createElement('div');
-            const messageId = 'msg-' + Date.now();
-            messageDiv.id = messageId;
-            messageDiv.className = `message ${role}`;
-            
-            const avatar = document.createElement('div');
-            avatar.className = 'message-avatar';
-            avatar.textContent = role === 'user' ? '👤' : '🤖';
-            
-            const content = document.createElement('div');
-            content.className = 'message-content';
-            
-            // Проверяем наличие изображений в тексте (base64 или URL)
-            const imageRegex = /(https?:\/\/[^\s]+\.(?:jpg|jpeg|png|gif|webp)|data:image\/[^;]+;base64,[^\s]+)/gi;
-            const images = text.match(imageRegex);
-            
-            if (images && images.length > 0) {
-                // Убираем URL изображений из текста
-                let cleanText = text;
-                images.forEach(img => {
-                    cleanText = cleanText.replace(img, '');
-                });
-                
-                // Добавляем текст с Markdown для AI
-                if (cleanText.trim()) {
-                    const textNode = document.createElement('div');
-                    if (role === 'assistant') {
-                        textNode.innerHTML = marked.parse(cleanText.trim());
-                    } else {
-                        textNode.textContent = cleanText.trim();
-                    }
-                    content.appendChild(textNode);
-                }
-                
-                // Добавляем изображения
-                images.forEach(imgUrl => {
-                    const img = document.createElement('img');
-                    img.src = imgUrl;
-                    img.style.maxWidth = '100%';
-                    img.style.borderRadius = '10px';
-                    img.style.marginTop = '10px';
-                    img.style.cursor = 'pointer';
-                    img.onclick = () => window.open(imgUrl, '_blank');
-                    content.appendChild(img);
-                });
-            } else {
-                // Рендерим Markdown для сообщений AI
-                if (role === 'assistant') {
-                    content.innerHTML = marked.parse(text);
-                } else {
-                    content.textContent = text;
-                }
-            }
-            
-            // Подсветка кода
-            if (role === 'assistant') {
-                content.querySelectorAll('pre code').forEach((block) => {
-                    hljs.highlightElement(block);
-                    
-                    // Добавляем кнопку копирования
-                    const pre = block.parentElement;
-                    const wrapper = document.createElement('div');
-                    wrapper.className = 'code-block-wrapper';
-                    pre.parentNode.insertBefore(wrapper, pre);
-                    wrapper.appendChild(pre);
-                    
-                    const copyBtn = document.createElement('button');
-                    copyBtn.className = 'copy-code-btn';
-                    copyBtn.textContent = 'Копировать';
-                    copyBtn.onclick = () => {
-                        navigator.clipboard.writeText(block.textContent);
-                        copyBtn.textContent = 'Скопировано!';
-                        setTimeout(() => copyBtn.textContent = 'Копировать', 2000);
-                    };
-                    wrapper.appendChild(copyBtn);
-                });
-            }
-            
-            messageDiv.appendChild(avatar);
-            messageDiv.appendChild(content);
-            container.appendChild(messageDiv);
-            
-            // Прокрутить вниз
-            container.scrollTop = container.scrollHeight;
-            
-            return messageId;
-        }
-
-        // Обработка Enter
+        // Handle Enter key
         function handleKeyPress(event) {
             if (event.key === 'Enter' && !event.shiftKey) {
                 event.preventDefault();
@@ -1049,358 +504,128 @@
             }
         }
 
-        // Прикрепить файл
-        function attachFile() {
-            document.getElementById('file-input').click();
+        // Auto-resize textarea
+        const textarea = document.getElementById('chatInput');
+        textarea.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = Math.min(this.scrollHeight, 200) + 'px';
+        });
+
+        // Send message
+        async function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            
+            if (!message || isTyping) return;
+            
+            // Add user message
+            addMessage('user', message);
+            input.value = '';
+            input.style.height = 'auto';
+            
+            // Show typing indicator
+            isTyping = true;
+            document.getElementById('sendBtn').disabled = true;
+            addTypingIndicator();
+            
+            // Simulate API call
+            setTimeout(() => {
+                removeTypingIndicator();
+                const response = generateResponse(message);
+                addMessage('assistant', response);
+                isTyping = false;
+                document.getElementById('sendBtn').disabled = false;
+            }, 1500);
         }
 
-        // Обработка выбора файла
-        function handleFileSelect(event) {
-            const file = event.target.files[0];
-            if (!file) return;
+        // Add message to chat
+        function addMessage(role, content) {
+            messages.push({ role, content });
             
-            attachedFile = file;
+            const messagesContainer = document.getElementById('chatMessages');
             
-            // Показать превью
-            const preview = document.getElementById('file-preview');
-            const previewName = document.getElementById('file-preview-name');
-            const previewSize = document.getElementById('file-preview-size');
-            const previewImg = document.getElementById('file-preview-img');
+            // Remove empty state
+            if (messages.length === 1) {
+                messagesContainer.innerHTML = '';
+            }
             
-            previewName.textContent = file.name;
-            previewSize.textContent = formatFileSize(file.size);
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${role}`;
             
-            // Если это изображение - показать превью
-            if (file.type.startsWith('image/')) {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    previewImg.src = e.target.result;
-                    previewImg.style.display = 'block';
-                };
-                reader.readAsDataURL(file);
+            const avatar = document.createElement('div');
+            avatar.className = 'message-avatar';
+            avatar.textContent = role === 'user' ? 'Вы' : 'AI';
+            
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'message-content';
+            
+            if (role === 'assistant') {
+                contentDiv.innerHTML = marked.parse(content);
             } else {
-                previewImg.style.display = 'none';
+                contentDiv.textContent = content;
             }
             
-            preview.style.display = 'block';
+            messageDiv.appendChild(avatar);
+            messageDiv.appendChild(contentDiv);
+            messagesContainer.appendChild(messageDiv);
             
-            // Очистить input
-            event.target.value = '';
-        }
-        
-        // Удалить файл
-        function removeFile() {
-            attachedFile = null;
-            document.getElementById('file-preview').style.display = 'none';
-            document.getElementById('file-preview-img').src = '';
-        }
-        
-        // Форматировать размер файла
-        function formatFileSize(bytes) {
-            if (bytes === 0) return '0 Bytes';
-            const k = 1024;
-            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-            const i = Math.floor(Math.log(bytes) / Math.log(k));
-            return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+            // Scroll to bottom
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
         }
 
-        // Загрузить список чатов
-        async function loadChats() {
-            try {
-                const response = await fetch('/api/v1/chats');
-                const data = await response.json();
-                
-                if (data.success) {
-                    chats = data.chats;
-                    renderChatsList();
-                    
-                    // Если есть чаты - загрузить первый
-                    if (chats.length > 0) {
-                        await loadChat(chats[0].id);
-                    }
-                }
-            } catch (error) {
-                console.error('Error loading chats:', error);
-            }
-        }
-        
-        // Отобразить список чатов
-        function renderChatsList() {
-            const chatsList = document.getElementById('chats-list');
+        // Add typing indicator
+        function addTypingIndicator() {
+            const messagesContainer = document.getElementById('chatMessages');
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'message assistant';
+            typingDiv.id = 'typingIndicator';
             
-            if (chats.length === 0) {
-                chatsList.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--text-tertiary);">Нет чатов</div>';
-                return;
-            }
-            
-            chatsList.innerHTML = chats.map(chat => `
-                <div class="chat-item ${chat.id === currentChatId ? 'active' : ''}" style="position: relative;">
-                    <div onclick="loadChat(${chat.id})" style="flex: 1; cursor: pointer;">
-                        <div style="font-weight: 600; margin-bottom: 4px;">${chat.title}</div>
-                        <div style="font-size: 12px; color: var(--text-tertiary);">${formatDate(chat.updated_at)}</div>
-                    </div>
-                    <div style="display: flex; gap: 5px; opacity: 0; transition: opacity 0.2s;" class="chat-actions">
-                        <button onclick="event.stopPropagation(); renameChat(${chat.id}, '${chat.title.replace(/'/g, "\\'")}')" 
-                                style="background: none; border: none; cursor: pointer; font-size: 16px; padding: 5px;" 
-                                title="Переименовать">✏️</button>
-                        <button onclick="event.stopPropagation(); deleteChat(${chat.id})" 
-                                style="background: none; border: none; cursor: pointer; font-size: 16px; padding: 5px; color: #ff4444;" 
-                                title="Удалить">🗑️</button>
+            typingDiv.innerHTML = `
+                <div class="message-avatar">AI</div>
+                <div class="message-content">
+                    <div class="typing-indicator">
+                        <span></span>
+                        <span></span>
+                        <span></span>
                     </div>
                 </div>
-            `).join('');
+            `;
+            
+            messagesContainer.appendChild(typingDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
         }
-        
-        // Загрузить чат
-        async function loadChat(chatId) {
-            try {
-                currentChatId = chatId;
-                
-                // Обновить UI
-                renderChatsList();
-                
-                // Загрузить сообщения
-                const response = await fetch(`/api/v1/chats/${chatId}/messages`);
-                const data = await response.json();
-                
-                if (data.success) {
-                    // Очистить контейнер
-                    document.getElementById('messages').innerHTML = '';
-                    
-                    // Загрузить историю
-                    messageHistory = data.messages.map(m => ({ role: m.role, content: m.content }));
-                    
-                    // Отобразить сообщения
-                    data.messages.forEach(msg => {
-                        addMessage(msg.content, msg.role);
-                    });
-                }
-            } catch (error) {
-                console.error('Error loading chat:', error);
+
+        // Remove typing indicator
+        function removeTypingIndicator() {
+            const indicator = document.getElementById('typingIndicator');
+            if (indicator) {
+                indicator.remove();
             }
         }
-        
-        // Создать новый чат
-        async function createNewChat() {
-            try {
-                const response = await fetch('/api/v1/chats', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ title: 'Новый чат' })
-                });
-                
-                const data = await response.json();
-                
-                if (data.success) {
-                    chats.unshift(data.chat);
-                    await loadChat(data.chat.id);
-                }
-            } catch (error) {
-                console.error('Error creating chat:', error);
-                // Fallback - очистить локально
-                currentChatId = null;
-                messageHistory = [];
-                document.getElementById('messages').innerHTML = `
-                    <div class="message assistant">
-                        <div class="message-avatar">🤖</div>
-                        <div class="message-content">
-                            Привет! Я AI ассистент. Чем могу помочь?
-                        </div>
-                    </div>
-                `;
-            }
-        }
-        
-        // Сохранить сообщение в БД
-        async function saveMessage(role, content, fileInfo = null) {
-            try {
-                // Создать новый чат если его нет
-                if (!currentChatId) {
-                    const response = await fetch('/api/v1/chats', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ title: 'Новый чат' })
-                    });
-                    
-                    const data = await response.json();
-                    if (data.success) {
-                        currentChatId = data.chat.id;
-                        chats.unshift(data.chat);
-                        renderChatsList();
-                    } else {
-                        console.error('Failed to create chat');
-                        return;
-                    }
-                }
-                
-                // Сохранить сообщение с файлом
-                const body = { role, content };
-                if (fileInfo) {
-                    body.file = fileInfo;
-                }
-                
-                await fetch(`/api/v1/chats/${currentChatId}/messages`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(body)
-                });
-                
-                // Обновить список чатов
-                await loadChats();
-            } catch (error) {
-                console.error('Error saving message:', error);
-            }
-        }
-        
-        // Форматировать дату
-        function formatDate(dateString) {
-            const date = new Date(dateString);
-            const now = new Date();
-            const diff = now - date;
+
+        // Generate mock response
+        function generateResponse(message) {
+            const responses = [
+                `Отличный вопрос! Вот что я могу вам рассказать:\n\n**Ключевые моменты:**\n\n1. Первый важный пункт\n2. Второй важный пункт\n3. Третий важный пункт\n\nЕсли нужны дополнительные детали, спрашивайте!`,
+                `Я понимаю ваш вопрос. Вот подробный ответ:\n\n\`\`\`javascript\nconst example = "Пример кода";\nconsole.log(example);\n\`\`\`\n\nЭтот код демонстрирует базовый пример.`,
+                `Интересный вопрос! Давайте разберем по шагам:\n\n- **Шаг 1**: Анализ проблемы\n- **Шаг 2**: Поиск решения\n- **Шаг 3**: Реализация\n\nЧто вы думаете об этом подходе?`
+            ];
             
-            if (diff < 60000) return 'Только что';
-            if (diff < 3600000) return Math.floor(diff / 60000) + ' мин назад';
-            if (diff < 86400000) return Math.floor(diff / 3600000) + ' ч назад';
-            return date.toLocaleDateString('ru-RU');
+            return responses[Math.floor(Math.random() * responses.length)];
         }
-        
-        // Поиск по чатам
-        function filterChats(searchQuery) {
-            const query = searchQuery.toLowerCase().trim();
-            const chatItems = document.querySelectorAll('.chat-item');
-            
-            chatItems.forEach(item => {
-                const titleElement = item.querySelector('div:first-child');
-                if (!titleElement) return;
-                
-                const title = titleElement.textContent.toLowerCase();
-                
-                if (title.includes(query)) {
-                    item.style.display = '';
-                } else {
-                    item.style.display = 'none';
-                }
-            });
+
+        // New chat
+        function newChat() {
+            messages = [];
+            const messagesContainer = document.getElementById('chatMessages');
+            messagesContainer.innerHTML = `
+                <div class="text-center text-gray-400 py-12">
+                    <div class="text-6xl mb-4">💬</div>
+                    <h2 class="text-2xl font-bold mb-2">Начните новый разговор</h2>
+                    <p>Выберите модель и задайте свой вопрос</p>
+                </div>
+            `;
         }
-        
-        // Переименовать чат
-        async function renameChat(chatId, currentTitle) {
-            const newTitle = prompt('Введите новое название чата:', currentTitle);
-            if (!newTitle || newTitle === currentTitle) return;
-            
-            try {
-                const response = await fetch(`/api/v1/chats/${chatId}`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ title: newTitle })
-                });
-                
-                const data = await response.json();
-                if (data.success) {
-                    await loadChats();
-                }
-            } catch (error) {
-                console.error('Error renaming chat:', error);
-                alert('Ошибка при переименовании чата');
-            }
-        }
-        
-        // Удалить чат
-        async function deleteChat(chatId) {
-            if (!confirm('Удалить этот чат?')) return;
-            
-            try {
-                const response = await fetch(`/api/v1/chats/${chatId}`, {
-                    method: 'DELETE'
-                });
-                
-                const data = await response.json();
-                if (data.success) {
-                    // Если удален текущий чат - очистить
-                    if (currentChatId === chatId) {
-                        currentChatId = null;
-                        messageHistory = [];
-                        document.getElementById('messages').innerHTML = `
-                            <div class="message assistant">
-                                <div class="message-avatar">🤖</div>
-                                <div class="message-content">
-                                    Привет! Я AI ассистент. Чем могу помочь?
-                                </div>
-                            </div>
-                        `;
-                    }
-                    
-                    await loadChats();
-                }
-            } catch (error) {
-                console.error('Error deleting chat:', error);
-                alert('Ошибка при удалении чата');
-            }
-        }
-        
-        // Экспортировать чат
-        function exportChat() {
-            if (messageHistory.length === 0) {
-                alert('Нет сообщений для экспорта');
-                return;
-            }
-            
-            // Формируем текст чата
-            let chatText = `LumeAI - Экспорт чата\n`;
-            chatText += `Дата: ${new Date().toLocaleString('ru-RU')}\n`;
-            chatText += `Модель: ${document.getElementById('model-selector').value}\n`;
-            chatText += `\n${'='.repeat(50)}\n\n`;
-            
-            messageHistory.forEach((msg, index) => {
-                const role = msg.role === 'user' ? 'Вы' : 'AI';
-                const content = typeof msg.content === 'string' 
-                    ? msg.content 
-                    : msg.content.map(c => c.text || '[Изображение]').join('\n');
-                
-                chatText += `[${role}]\n${content}\n\n${'-'.repeat(50)}\n\n`;
-            });
-            
-            // Создаем файл и скачиваем
-            const blob = new Blob([chatText], { type: 'text/plain;charset=utf-8' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `lumeai-chat-${new Date().getTime()}.txt`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-        }
-        
-        // Читать файл как base64
-        function readFileAsBase64(file) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onload = () => resolve(reader.result);
-                reader.onerror = reject;
-                reader.readAsDataURL(file);
-            });
-        }
-        
-        // Переключение мобильного меню
-        function toggleSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            const overlay = document.getElementById('sidebar-overlay');
-            
-            sidebar.classList.toggle('open');
-            overlay.classList.toggle('active');
-        }
-        
-        // Закрыть сайдбар при выборе чата на мобильном
-        const originalLoadChat = loadChat;
-        loadChat = async function(chatId) {
-            await originalLoadChat(chatId);
-            
-            // Закрыть меню на мобильном
-            if (window.innerWidth <= 768) {
-                toggleSidebar();
-            }
-        };
     </script>
 </body>
 </html>

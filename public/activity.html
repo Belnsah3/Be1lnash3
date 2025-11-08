@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Активность - LumeAI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary: 263 70% 50%;
+            --background: 240 10% 3.9%;
+            --foreground: 0 0% 98%;
+            --card: 240 10% 3.9%;
+            --border: 240 3.7% 15.9%;
+            --muted-foreground: 240 5% 64.9%;
+        }
+
+        [data-theme="light"] {
+            --background: 0 0% 100%;
+            --foreground: 240 10% 3.9%;
+            --card: 0 0% 100%;
+            --border: 240 5.9% 90%;
+            --muted-foreground: 240 3.8% 46.1%;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: hsl(var(--background));
+            color: hsl(var(--foreground));
+        }
+
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            height: 100vh;
+            width: 240px;
+            background: hsl(var(--card));
+            border-right: 1px solid hsl(var(--border));
+            padding: 24px 16px;
+            overflow-y: auto;
+        }
+
+        .sidebar-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-radius: 8px;
+            color: hsl(var(--muted-foreground));
+            text-decoration: none;
+            transition: all 0.2s;
+            margin-bottom: 4px;
+        }
+
+        .sidebar-item:hover {
+            background: hsl(240 5% 26%);
+            color: hsl(var(--foreground));
+        }
+
+        .sidebar-item.active {
+            background: hsl(var(--primary));
+            color: white;
+        }
+
+        .main-content {
+            margin-left: 240px;
+            padding: 24px;
+        }
+
+        .card {
+            background: hsl(var(--card));
+            border: 1px solid hsl(var(--border));
+            border-radius: 12px;
+            padding: 24px;
+        }
+
+        .stat-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 12px;
+            border-radius: 16px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .stat-badge.success {
+            background: rgba(17, 153, 142, 0.1);
+            color: #11998e;
+        }
+
+        .stat-badge.error {
+            background: rgba(235, 51, 73, 0.1);
+            color: #eb3349;
+        }
+
+        .stat-badge.warning {
+            background: rgba(255, 193, 7, 0.1);
+            color: #ffc107;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            text-align: left;
+            padding: 12px;
+            border-bottom: 2px solid hsl(var(--border));
+            font-weight: 600;
+            color: hsl(var(--muted-foreground));
+            font-size: 14px;
+        }
+
+        td {
+            padding: 16px 12px;
+            border-bottom: 1px solid hsl(var(--border));
+        }
+
+        tr:hover {
+            background: hsl(240 5% 26% / 0.3);
+        }
+
+        .filter-btn {
+            padding: 8px 16px;
+            border-radius: 8px;
+            border: 1px solid hsl(var(--border));
+            background: transparent;
+            color: hsl(var(--foreground));
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .filter-btn:hover {
+            border-color: hsl(var(--primary));
+            background: hsl(240 5% 26%);
+        }
+
+        .filter-btn.active {
+            background: hsl(var(--primary));
+            color: white;
+            border-color: hsl(var(--primary));
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="mb-8">
+            <div class="flex items-center gap-3 px-4">
+                <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-500 to-purple-700 flex items-center justify-center text-white font-bold text-xl">
+                    L
+                </div>
+                <span class="text-xl font-bold gradient-text">LumeAI</span>
+            </div>
+        </div>
+
+        <nav>
+            <a href="/dashboard" class="sidebar-item">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                </svg>
+                <span>Dashboard</span>
+            </a>
+
+            <a href="/models" class="sidebar-item">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+                </svg>
+                <span>Модели</span>
+            </a>
+
+            <a href="/chat" class="sidebar-item">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+                </svg>
+                <span>Чат</span>
+            </a>
+
+            <a href="/activity" class="sidebar-item active">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                </svg>
+                <span>Активность</span>
+            </a>
+
+            <a href="/keys" class="sidebar-item">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
+                </svg>
+                <span>API Ключи</span>
+            </a>
+
+            <a href="/settings" class="sidebar-item">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                </svg>
+                <span>Настройки</span>
+            </a>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <header class="mb-8">
+            <h1 class="text-3xl font-bold mb-2">Активность API 📊</h1>
+            <p class="text-gray-400">Мониторинг использования и статистика запросов</p>
+        </header>
+
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div class="card">
+                <div class="text-sm text-gray-400 mb-1">Запросов сегодня</div>
+                <div class="text-3xl font-bold">1,247</div>
+                <div class="text-sm text-green-400 mt-2">↑ 12% от вчера</div>
+            </div>
+
+            <div class="card">
+                <div class="text-sm text-gray-400 mb-1">Успешных</div>
+                <div class="text-3xl font-bold text-green-400">98.5%</div>
+                <div class="text-sm text-gray-400 mt-2">1,228 из 1,247</div>
+            </div>
+
+            <div class="card">
+                <div class="text-sm text-gray-400 mb-1">Средняя задержка</div>
+                <div class="text-3xl font-bold">245ms</div>
+                <div class="text-sm text-green-400 mt-2">↓ 15% быстрее</div>
+            </div>
+
+            <div class="card">
+                <div class="text-sm text-gray-400 mb-1">Токенов использовано</div>
+                <div class="text-3xl font-bold">124K</div>
+                <div class="text-sm text-gray-400 mt-2">из 10M лимита</div>
+            </div>
+        </div>
+
+        <!-- Chart -->
+        <div class="card mb-8">
+            <h2 class="text-xl font-bold mb-4">Запросы за последние 7 дней</h2>
+            <canvas id="activityChart" height="80"></canvas>
+        </div>
+
+        <!-- Filters -->
+        <div class="flex gap-3 mb-6">
+            <button class="filter-btn active" onclick="filterActivity('all')">Все</button>
+            <button class="filter-btn" onclick="filterActivity('success')">Успешные</button>
+            <button class="filter-btn" onclick="filterActivity('error')">Ошибки</button>
+            <button class="filter-btn" onclick="filterActivity('slow')">Медленные</button>
+        </div>
+
+        <!-- Activity Table -->
+        <div class="card">
+            <h2 class="text-xl font-bold mb-4">Последние запросы</h2>
+            <div class="overflow-x-auto">
+                <table id="activityTable">
+                    <thead>
+                        <tr>
+                            <th>Время</th>
+                            <th>Модель</th>
+                            <th>Endpoint</th>
+                            <th>Статус</th>
+                            <th>Задержка</th>
+                            <th>Токены</th>
+                            <th>Стоимость</th>
+                        </tr>
+                    </thead>
+                    <tbody id="activityBody">
+                        <!-- Rows will be inserted by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Sample activity data
+        const activities = [
+            { time: '2 мин назад', model: 'GPT-4', endpoint: '/v1/chat/completions', status: 'success', latency: 245, tokens: 1250, cost: '$0.038' },
+            { time: '5 мин назад', model: 'Claude Sonnet', endpoint: '/v1/chat/completions', status: 'success', latency: 189, tokens: 980, cost: '$0.015' },
+            { time: '8 мин назад', model: 'GPT-4o', endpoint: '/v1/chat/completions', status: 'success', latency: 156, tokens: 750, cost: '$0.011' },
+            { time: '12 мин назад', model: 'Gemini Flash', endpoint: '/v1/chat/completions', status: 'success', latency: 98, tokens: 450, cost: '$0.001' },
+            { time: '15 мин назад', model: 'GPT-4', endpoint: '/v1/chat/completions', status: 'error', latency: 5000, tokens: 0, cost: '$0.000' },
+            { time: '18 мин назад', model: 'Claude Haiku', endpoint: '/v1/chat/completions', status: 'success', latency: 134, tokens: 620, cost: '$0.002' },
+            { time: '22 мин назад', model: 'GPT-4o', endpoint: '/v1/completions', status: 'success', latency: 178, tokens: 890, cost: '$0.013' },
+            { time: '25 мин назад', model: 'Gemini Pro', endpoint: '/v1/chat/completions', status: 'success', latency: 234, tokens: 1100, cost: '$0.006' },
+            { time: '30 мин назад', model: 'GPT-4', endpoint: '/v1/chat/completions', status: 'success', latency: 267, tokens: 1450, cost: '$0.044' },
+            { time: '35 мин назад', model: 'Claude Sonnet', endpoint: '/v1/chat/completions', status: 'success', latency: 201, tokens: 1050, cost: '$0.016' }
+        ];
+
+        // Render activity table
+        function renderActivities(data) {
+            const tbody = document.getElementById('activityBody');
+            tbody.innerHTML = data.map(activity => `
+                <tr>
+                    <td class="text-sm text-gray-400">${activity.time}</td>
+                    <td class="font-semibold">${activity.model}</td>
+                    <td class="text-sm font-mono text-gray-400">${activity.endpoint}</td>
+                    <td>
+                        <span class="stat-badge ${activity.status}">
+                            ${activity.status === 'success' ? '✓ Успешно' : '✗ Ошибка'}
+                        </span>
+                    </td>
+                    <td class="text-sm ${activity.latency > 1000 ? 'text-red-400' : activity.latency > 500 ? 'text-yellow-400' : 'text-green-400'}">
+                        ${activity.latency}ms
+                    </td>
+                    <td class="text-sm">${activity.tokens.toLocaleString()}</td>
+                    <td class="font-semibold">${activity.cost}</td>
+                </tr>
+            `).join('');
+        }
+
+        // Filter activities
+        function filterActivity(type) {
+            // Update active button
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // Filter data
+            let filtered = activities;
+            if (type === 'success') {
+                filtered = activities.filter(a => a.status === 'success');
+            } else if (type === 'error') {
+                filtered = activities.filter(a => a.status === 'error');
+            } else if (type === 'slow') {
+                filtered = activities.filter(a => a.latency > 500);
+            }
+
+            renderActivities(filtered);
+        }
+
+        // Initialize chart
+        const ctx = document.getElementById('activityChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'],
+                datasets: [{
+                    label: 'Запросы',
+                    data: [850, 920, 1100, 980, 1150, 890, 1247],
+                    borderColor: 'rgb(102, 126, 234)',
+                    backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.05)'
+                        },
+                        ticks: {
+                            color: 'rgba(255, 255, 255, 0.5)'
+                        }
+                    },
+                    x: {
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.05)'
+                        },
+                        ticks: {
+                            color: 'rgba(255, 255, 255, 0.5)'
+                        }
+                    }
+                }
+            }
+        });
+
+        // Initial render
+        renderActivities(activities);
+    </script>
+</body>
+</html>
