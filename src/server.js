@@ -403,6 +403,29 @@ app.get('/chat', (req, res) => {
   }
 });
 
+// Keys page
+app.get('/keys', (req, res) => {
+  if (req.session && req.session.userId) {
+    res.sendFile(path.join(__dirname, '../public/keys.html'));
+  } else {
+    res.redirect('/login');
+  }
+});
+
+// Activity page
+app.get('/activity', (req, res) => {
+  if (req.session && req.session.userId) {
+    res.sendFile(path.join(__dirname, '../public/activity.html'));
+  } else {
+    res.redirect('/login');
+  }
+});
+
+// Models page
+app.get('/models', (req, res) => {
+  res.sendFile(path.join(__dirname, '../public/models.html'));
+});
+
 // Settings page
 app.get('/settings', (req, res) => {
   if (req.session && req.session.userId) {
