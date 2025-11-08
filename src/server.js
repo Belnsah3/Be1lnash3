@@ -331,7 +331,7 @@ app.use('/api/v1/files', require('./routes/files'));
 
 // Дополнительные роуты для совместимости с разными клиентами
 app.use('/v1', aiRoutes);  // Для клиентов которые добавляют /v1
-app.use('/api', aiRoutes);  // Для клиентов которые добавляют /api
+// app.use('/api', aiRoutes);  // ОТКЛЮЧЕНО - конфликтует с /api/auth
 
 // Корневые роуты - используем те же aiRoutes
 app.use('/', aiRoutes);  // Для корневых путей типа /chat/completions
