@@ -159,10 +159,10 @@
                                     <button class="btn btn-secondary" onclick="copyKey('${key.key}')">
                                         📋 Копировать
                                     </button>
-                                    <button class="btn btn-secondary" onclick="toggleKey('${key.id}', ${key.active})">
+                                    <button class="btn btn-secondary" onclick="toggleKey('${key.key}', ${key.active})">
                                         ${key.active ? '⏸️ Деактивировать' : '▶️ Активировать'}
                                     </button>
-                                    <button class="btn btn-danger" onclick="deleteKey('${key.id}', '${key.name}')">
+                                    <button class="btn btn-danger" onclick="deleteKey('${key.key}', '${key.name}')">
                                         🗑️ Удалить
                                     </button>
                                 </div>
