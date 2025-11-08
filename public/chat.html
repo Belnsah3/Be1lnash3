@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Чат - LumeAI</title>
+    <link rel="stylesheet" href="/css/main.css">
+    <style>
+        body { margin: 0; height: 100vh; overflow: hidden; }
+        .chat-container { display: flex; flex-direction: column; height: 100vh; }
+        .chat-header { padding: 16px; background: var(--card); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+        .chat-messages { flex: 1; overflow-y: auto; padding: 20px; }
+        .message { margin-bottom: 20px; display: flex; gap: 12px; }
+        .message-avatar { width: 36px; height: 36px; border-radius: 8px; background: var(--primary); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .message-content { flex: 1; }
+        .chat-input-container { padding: 20px; border-top: 1px solid var(--border); background: var(--card); }
+        .chat-input { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg); color: var(--text); resize: none; }
+        .empty-chat { text-align: center; padding: 60px 20px; color: var(--text-secondary); }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">
+            <div class="logo">💬 Чат</div>
+            <div style="display: flex; gap: 12px;">
+                <select class="btn btn-secondary" style="padding: 8px 12px;">
+                    <option>GPT-4</option>
+                    <option>Claude</option>
+                    <option>Gemini</option>
+                </select>
+                <a href="/dashboard" class="btn btn-secondary">← Назад</a>
+            </div>
+        </div>
+
+        <div class="chat-messages" id="messages">
+            <div class="empty-chat">
+                <div style="font-size: 64px; margin-bottom: 16px;">💬</div>
+                <h2>Начните новый разговор</h2>
+                <p>Напишите сообщение ниже</p>
+            </div>
+        </div>
+
+        <div class="chat-input-container">
+            <textarea class="chat-input" placeholder="Напишите сообщение..." rows="3" id="input"></textarea>
+            <button class="btn btn-primary" style="margin-top: 12px; width: 100%;" onclick="send()">Отправить</button>
+        </div>
+    </div>
+
+    <script>
+        function send() {
+            const input = document.getElementById('input');
+            const text = input.value.trim();
+            if (!text) return;
+            
+            const messages = document.getElementById('messages');
+            messages.innerHTML += `
+                <div class="message">
+                    <div class="message-avatar">👤</div>
+                    <div class="message-content">${text}</div>
+                </div>
+            `;
+            input.value = '';
+            messages.scrollTop = messages.scrollHeight;
+        }
+    </script>
+</body>
+</html>

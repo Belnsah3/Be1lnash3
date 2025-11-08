@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Настройки - LumeAI</title>
+    <link rel="stylesheet" href="/css/main.css">
+    <style>
+        .form-group { margin-bottom: 20px; }
+        .form-label { display: block; margin-bottom: 8px; font-weight: 600; }
+        .form-input { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg); color: var(--text); }
+        .form-input:focus { outline: none; border-color: var(--primary); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">⚙️ Настройки</div>
+            <a href="/dashboard" class="btn btn-secondary">← Назад</a>
+        </div>
+
+        <div class="card">
+            <h2 class="section-title">Профиль</h2>
+            <div class="form-group">
+                <label class="form-label">Имя</label>
+                <input type="text" class="form-input" placeholder="Ваше имя">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Email</label>
+                <input type="email" class="form-input" placeholder="your@email.com">
+            </div>
+            <button class="btn btn-primary">Сохранить</button>
+        </div>
+
+        <div class="card">
+            <h2 class="section-title">Безопасность</h2>
+            <div class="form-group">
+                <label class="form-label">Текущий пароль</label>
+                <input type="password" class="form-input">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Новый пароль</label>
+                <input type="password" class="form-input">
+            </div>
+            <button class="btn btn-primary">Изменить пароль</button>
+        </div>
+
+        <div class="card">
+            <h2 class="section-title">Опасная зона</h2>
+            <button class="btn btn-danger">Удалить аккаунт</button>
+        </div>
+    </div>
+
+    <div class="mobile-menu">
+        <a href="/dashboard" class="menu-item"><div class="menu-icon">🏠</div><div>Главная</div></a>
+        <a href="/chat" class="menu-item"><div class="menu-icon">💬</div><div>Чат</div></a>
+        <a href="/keys" class="menu-item"><div class="menu-icon">🔑</div><div>Ключи</div></a>
+        <a href="/settings" class="menu-item active"><div class="menu-icon">⚙️</div><div>Настройки</div></a>
+    </div>
+</body>
+</html>
