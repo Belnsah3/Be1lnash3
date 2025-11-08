@@ -134,7 +134,8 @@
                 const container = document.getElementById('keysList');
                 
                 if (response.ok) {
-                    const data = await response.json();
+                    const result = await response.json();
+                    const data = result.keys || result || [];
                     if (data.length === 0) {
                         container.innerHTML = `
                             <div class="empty-state">
