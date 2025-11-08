@@ -309,6 +309,7 @@ const authRoutes = require('./routes/auth');
 const twoFARoutes = require('./routes/twofa');
 const adminRoutes = require('./routes/admin');
 const modelsRoutes = require('./routes/models');
+const functionsRoutes = require('./routes/functions');
 
 app.use('/api/v1/users', usersRoutes);
 app.use('/api/v1/products', productsRoutes);
@@ -319,6 +320,7 @@ app.use('/api/v1/2fa', twoFARoutes);
 app.use('/api/v1/chats', require('./routes/chats'));
 app.use('/api/v1/admin', adminRoutes);
 app.use('/api/v1/models', modelsRoutes);
+app.use('/api/v1/functions', functionsRoutes);
 app.use('/api/v1/settings', require('./routes/settings'));
 app.use('/api/v1/stats', require('./routes/stats'));
 
